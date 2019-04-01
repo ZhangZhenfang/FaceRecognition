@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+
+    <contextName>logbackdemo</contextName>
+
+    <appender name="consoleLog1" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>
+                <pattern>%yellow(%date{HH:mm:SSS}) %green(%-5level) [%10thread{10}] %green(%-31logger{30}) : %black(%msg%n)</pattern>
+            </pattern>
+        </layout>
+    </appender>
+
+    <logger name="peer.afang.facerecognition" level="DEBUG" additivity="false">
+        <appender-ref ref="consoleLog1"/>
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="consoleLog1"/>
+    </root>
+</configuration>
