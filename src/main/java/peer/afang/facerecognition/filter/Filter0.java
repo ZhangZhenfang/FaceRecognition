@@ -4,9 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
-import peer.afang.facerecognition.Enums.OriginControlTypeEnum;
-import peer.afang.facerecognition.properties.OriginControl;
-import peer.afang.facerecognition.properties.Path;
+import peer.afang.facerecognition.enums.OriginControlTypeEnum;
+import peer.afang.facerecognition.property.OriginControl;
+import peer.afang.facerecognition.property.Path;
 
 import javax.annotation.Resource;
 import javax.servlet.*;

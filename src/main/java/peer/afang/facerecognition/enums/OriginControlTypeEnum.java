@@ -1,4 +1,4 @@
-package peer.afang.facerecognition.Enums;
+package peer.afang.facerecognition.enums;
 
 /**
  * @author ZhangZhenfang
