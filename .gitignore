@@ -1,7 +1,7 @@
 HELP.md
-/target/
+/FaceRecognitionApi/target/
 !.mvn/wrapper/maven-wrapper.jar
-/src/main/resources/imgs/*
+/FaceRecognitionApi/src/main/resources/imgs/*
 ### STS ###
 .apt_generated
 .classpath
@@ -12,10 +12,10 @@ HELP.md
 .sts4-cache
 
 ### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
+/FaceRecognitionApi/.idea
+/FaceRecognitionApi/*.iws
+/FaceRecognitionApi/*.iml
+/FaceRecognitionApi/*.ipr
 
 ### NetBeans ###
 /nbproject/private/
@@ -26,4 +26,4 @@ HELP.md
 /build/
 
 ### VS Code ###
-.vscode/
+/FaceRecognitionWebApp/.vscode/

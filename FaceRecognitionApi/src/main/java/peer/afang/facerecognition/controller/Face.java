@@ -75,5 +75,6 @@ public class Face {
     @ResponseBody
     @RequestMapping(value = "/addSample", method = RequestMethod.POST)
     public void addSample(MultipartFile data, String name) {
+        
     }
 }
