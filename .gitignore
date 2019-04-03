@@ -17,6 +17,9 @@ HELP.md
 /FaceRecognitionApi/*.iml
 /FaceRecognitionApi/*.ipr
 
+
+/FaceRecognitionCore/.idea
+/FaceRecognitionCore/__pycache__
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
