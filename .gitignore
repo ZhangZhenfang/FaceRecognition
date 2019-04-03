@@ -20,6 +20,8 @@ HELP.md
 
 /FaceRecognitionCore/.idea
 /FaceRecognitionCore/__pycache__
+/FaceRecognitionCore/mnist_model
+/FaceRecognitionCore/MNIST_data
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
