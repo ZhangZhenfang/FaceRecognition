@@ -17,6 +17,14 @@ import Properties
 # print(array2)
 # print(array3)
 
-parse = Properties.parse("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms.properties")
-print(parse.get("train_path"))
-print(parse.get("test_path"))
+# parse = Properties.parse("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms.properties")
+# print(parse.get("train_path"))
+# print(parse.get("test_path"))
+
+path = "E:/faces/other"
+for f in os.listdir(path) :
+    image_open = Image.open(path + "/" + f)
+    resize = image_open.resize((92, 112))
+    resize.save(path + "/_" + f)
+    # convert = image_open.convert("L")
+    # convert.save(path + "/" + f)
