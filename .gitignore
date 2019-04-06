@@ -18,6 +18,8 @@ HELP.md
 /FaceRecognitionApi/*.ipr
 
 
+/FaceRecognitionCore/m1/
+/FaceRecognitionCore/m1.zip
 /FaceRecognitionCore/.idea
 /FaceRecognitionCore/__pycache__
 /FaceRecognitionCore/mnist_model

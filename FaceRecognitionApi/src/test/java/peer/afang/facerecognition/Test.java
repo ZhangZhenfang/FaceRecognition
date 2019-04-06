@@ -21,6 +21,12 @@ public class Test {
     public static String modelPath = "D:/openCV/opencv/sources/data/haarcascades/haarcascade_frontalface_alt.xml";
 
     public static void main(String[] args) {
+        Mat imread = Imgcodecs.imread("E:\\faces\\other\\s41_2.bmp", CvType.CV_32FC3);
+        Mat dst = new Mat();
+        System.out.println(imread.dump());
+        Imgproc.resize(imread, dst, new Size((int)imread.width() * (int)imread.height() * (int)imread.channels(), 1));
+        System.out.println(dst.dump());
+
 //        Mat imread = Imgcodecs.imread("E:\\faces\\color\\source0-99\\003\\003_4.bmp");
 //        System.out.println(imread);
 //        List<Mat> detect = detect(imread);
@@ -29,7 +35,7 @@ public class Test {
 //        for (Mat m : detect) {
 //            Imgcodecs.imwrite("E:\\faces\\color\\source0-99\\003\\" + i++ + ".bmp", m);
 //        }
-        resize64();
+//        resize64();
 //        dataSet();
 //        Mat imread = Imgcodecs.imread(path + "/000_0.bmp");
 //        System.out.println(imread);

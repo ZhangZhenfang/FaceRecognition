@@ -3,6 +3,7 @@ import tensorflow as tf
 import numpy as np
 import Properties
 import math
+import saver_loader_util as slutil
 
 super_parms = Properties.parse("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms.properties")
 input_channel = int(super_parms.get("input_channel"))
@@ -13,19 +14,19 @@ conv1_filter_size = int(super_parms.get("conv1_filter_size"))
 conv2_filter_size = int(super_parms.get("conv2_filter_size"))
 conv3_filter_size = int(super_parms.get("conv3_filter_size"))
 learn_rate = float(super_parms.get("learn_rate"))
-label_length = 100
+label_length = 42
 
 width, height, channel, train, labels = data_set.read_train(super_parms.get("train_path"), label_length)
 print(width, height)
 _, _, _, test, test_labels = data_set.read_train(super_parms.get("test_path"), label_length)
 
 # 定义输入数据
-x = tf.placeholder(tf.float32, shape=[None, height, width, input_channel])
+x = tf.placeholder(tf.float32, shape=[None, height, width, input_channel], name="x")
 # 定义输出数据
-y_ = tf.placeholder(tf.float32, shape=[None, label_length])
+y_ = tf.placeholder(tf.float32, shape=[None, label_length], name="y_")
 
 # x_image = tf.reshape(x, [-1, height, width, 3])
-keep_prob = tf.placeholder(tf.float32)
+keep_prob = tf.placeholder(tf.float32, name="keep_prob")
 # 卷积层1卷积核
 W_conv1 = tf.Variable(tf.truncated_normal([conv1_filter_size, conv1_filter_size, input_channel, conv1_filters],
                                           stddev=0.1))
@@ -85,20 +86,33 @@ cross_entry = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_, 
 train_step = tf.train.AdamOptimizer(learn_rate).minimize(cross_entry)
 
 # 计算正确的个数，向量对应的位置的数进行比较，相等则对应位置为True
-y_max = tf.argmax(y_, 1)
-y_conv_max = tf.argmax(y_conv, 1)
+y_max = tf.argmax(y_, 1, name="y_max")
+y_conv_max = tf.argmax(y_conv, 1, name="y_conv_max")
 # 预测值
 prediction = tf.argmax(y_conv, 1)
 correct_prediction = tf.equal(y_max, y_conv_max)
 # 计算训练准确率，将True转为1，然后计算平均值
 train_accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
+inputs = {
+            'input_x': tf.saved_model.utils.build_tensor_info(x),
+            'input_y': tf.saved_model.utils.build_tensor_info(y_),
+            'keep_prob': tf.saved_model.utils.build_tensor_info(keep_prob)
+        }
+
+# y 为最终需要的输出结果tensor
+outputs = {
+            'y_max' : tf.saved_model.utils.build_tensor_info(y_max),
+
+            'y_conv_max' : tf.saved_model.utils.build_tensor_info(y_conv_max)
+        }
+
 saver = tf.train.Saver()
-trained = False
+trained = True
 with tf.Session() as sess :
     if trained :
         sess.run(tf.global_variables_initializer())
-        for i in range(200) :
+        for i in range(100) :
             if i % 4 == 0 :
                 l = list(zip(train, labels))
                 np.random.shuffle(l)
@@ -109,16 +123,18 @@ with tf.Session() as sess :
             input_y = labels[start:end]
             _, accuracy = sess.run([train_step, train_accuracy],
                 feed_dict={x: input_x, y_: input_y, keep_prob: 0.5})
-            saver.save(sess, './mnist_model/model.ckpt')
+            # saver.save(sess, './mnist_model/model.ckpt')
+
             l = list(zip(test, test_labels))
             np.random.shuffle(l)
             test, test_labels = zip(*l)
             b_fc2_, y_max_, y_conv_max_, train_accuracy_ = sess.run([b_fc2, y_max, y_conv_max, train_accuracy, ],
                                                                     feed_dict={x: test, y_: test_labels, keep_prob: 1.0})
             print("%g" %i, accuracy, train_accuracy_)
+        slutil.saver2(tf, sess, ["serve"], "./m1", inputs, outputs)
     else :
-        saver.restore(sess, "./mnist_model/model.ckpt")
-        _, _, _, other, other_labels = data_set.read_train("E:/faces/other", 100)
+        slutil.loader1(tf, "./m1/saved_model.pb", sess, ["serve"])
+        _, _, _, other, other_labels = data_set.read_train("E:/faces/other", 42)
 
         b_fc2_, y_max_, y_conv_max_, train_accuracy_ = sess.run([b_fc2, y_max, y_conv_max, train_accuracy, ],
                                                                     feed_dict={x: other, y_: other_labels, keep_prob: 1.0})
