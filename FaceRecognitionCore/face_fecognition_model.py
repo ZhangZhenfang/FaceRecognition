@@ -122,7 +122,7 @@ class FaceRecognitionModel:
                                                    self.input_channel,
                                                    self.label_length)
         epoch = train.shape[0]
-        batch_size = 50
+        batch_size = 100
         times = epoch / batch_size
         threshold = 0.98
         print(epoch)
@@ -131,7 +131,7 @@ class FaceRecognitionModel:
             sess.run(tf.global_variables_initializer())
             index = 0
             epoch_index = 1
-            for i in range(1000):
+            for i in range(2000):
                 if index + batch_size >= epoch:
                     input_x = train[index: epoch]
                     input_y = train_labels[index: epoch]

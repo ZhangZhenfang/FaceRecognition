@@ -15,6 +15,16 @@ public class Path {
     private String tmpPath;
     private String opencvPath;
     private String opencvCasPath;
+    private String userFacePath;
+
+    public String getUserFacePath() {
+        return userFacePath;
+    }
+
+    public void setUserFacePath(String userFacePath) {
+        this.userFacePath = userFacePath;
+    }
+
     public String getTmpPath() {
         return tmpPath;
     }

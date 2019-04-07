@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="peer.afang.facerecognition.mapper.FaceMapper">
+  <resultMap id="BaseResultMap" type="peer.afang.facerecognition.pojo.Face">
+    <id column="faceid" jdbcType="INTEGER" property="faceid" />
+    <result column="userid" jdbcType="INTEGER" property="userid" />
+    <result column="imagename" jdbcType="VARCHAR" property="imagename" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    faceid, userid, imagename
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from face
+    where faceid = #{faceid,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from face
+    where faceid = #{faceid,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="peer.afang.facerecognition.pojo.Face">
+    insert into face (faceid, userid, imagename
+      )
+    values (#{faceid,jdbcType=INTEGER}, #{userid,jdbcType=INTEGER}, #{imagename,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="peer.afang.facerecognition.pojo.Face" useGeneratedKeys="true" keyColumn="faceid" keyProperty="faceid">
+    insert into face
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="faceid != null">
+        faceid,
+      </if>
+      <if test="userid != null">
+        userid,
+      </if>
+      <if test="imagename != null">
+        imagename,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="faceid != null">
+        #{faceid,jdbcType=INTEGER},
+      </if>
+      <if test="userid != null">
+        #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="imagename != null">
+        #{imagename,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="peer.afang.facerecognition.pojo.Face">
+    update face
+    <set>
+      <if test="userid != null">
+        userid = #{userid,jdbcType=INTEGER},
+      </if>
+      <if test="imagename != null">
+        imagename = #{imagename,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where faceid = #{faceid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="peer.afang.facerecognition.pojo.Face">
+    update face
+    set userid = #{userid,jdbcType=INTEGER},
+      imagename = #{imagename,jdbcType=VARCHAR}
+    where faceid = #{faceid,jdbcType=INTEGER}
+  </update>
+</mapper>

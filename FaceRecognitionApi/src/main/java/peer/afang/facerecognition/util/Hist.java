@@ -1,5 +1,6 @@
 package peer.afang.facerecognition.util;
 
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
@@ -11,25 +12,25 @@ import java.io.File;
  * @date 2019/4/7 17:16
  */
 public class Hist {
-
+    static {
+        System.load("D:/openCV/opencv/build/java/x64/opencv_java341.dll");
+    }
     public static void main(String[] args) {
-        String dir = "E:\\faces\\color\\64";
-        String dstDir = "E:\\faces\\color\\64hist";
+        String dirtest = "E:\\faces\\color\\64\\colortest";
+        String dirtrain = "E:\\faces\\color\\64\\colortrain";
+        String dstTest = "E:\\faces\\color\\64hist\\colortest";
+        String dstDir = "E:\\faces\\color\\64hist\\colortrain";
 
-        File d = new File(dir);
-//        for ()
-
-
+        hist(dirtrain, dstDir);
     }
-
-    public static Mat hist(String path) {
-        Mat imread = Imgcodecs.imread(path);
-        return hist(imread);
-    }
-
-    public static Mat hist(Mat mat) {
-        Mat res = new Mat();
-        Imgproc.equalizeHist(mat, res);
-        return res;
+    public static void hist(String src, String dst) {
+        File srcDir = new File(src);
+        String[] list = srcDir.list();
+        for (String s : list) {
+            Mat imread = Imgcodecs.imread(src + "/" + s, Imgcodecs.CV_LOAD_IMAGE_GRAYSCALE);
+//            imread.convertTo(imread, CvType.CV_32FC1);
+            Imgproc.equalizeHist(imread, imread);
+            Imgcodecs.imwrite(dst + "/" + s, imread);
+        }
     }
 }
