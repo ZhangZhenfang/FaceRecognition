@@ -1,12 +1,13 @@
 import data_set
 import tensorflow as tf
 import numpy as np
-import Properties
+import properties
 import math
 import saver_loader_util as slutil
 
-class Face_Recognition_Model:
-    super_parms = Properties.parse("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms.properties")
+
+class FaceRecognitionModel:
+    super_parms = properties.parse("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms.properties")
     input_height = int(super_parms.get("input_height"))
     input_width = int(super_parms.get("input_width"))
     input_channel = int(super_parms.get("input_channel"))
@@ -111,10 +112,10 @@ class Face_Recognition_Model:
 
     def train(self):
         train, train_labels = data_set.read_data_set(self.super_parms.get("train_path"),
-                                            self.input_height,
-                                            self.input_width,
-                                            self.input_channel,
-                                            self.label_length)
+                                                     self.input_height,
+                                                     self.input_width,
+                                                     self.input_channel,
+                                                     self.label_length)
         test, test_labels = data_set.read_data_set(self.super_parms.get("test_path"),
                                                    self.input_height,
                                                    self.input_width,
@@ -130,7 +131,7 @@ class Face_Recognition_Model:
             sess.run(tf.global_variables_initializer())
             index = 0
             epoch_index = 1
-            for i in range(100):
+            for i in range(150):
                 if index + batch_size >= epoch:
                     input_x = train[index: epoch]
                     input_y = train_labels[index: epoch]
@@ -193,6 +194,6 @@ class Face_Recognition_Model:
         return
 
 
-model = Face_Recognition_Model("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms.properties")
+model = FaceRecognitionModel("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms.properties")
 model.train()
 # model.predit()

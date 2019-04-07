@@ -4,7 +4,7 @@ import saver_loader_util as slutil
 import tensorflow as tf
 import data_set
 import numpy as np
-import Properties
+import properties
 # path = "E:/faces/s1"
 # color = "E:/faces/color/source0-99/000"
 #
