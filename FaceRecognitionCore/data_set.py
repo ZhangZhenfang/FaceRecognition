@@ -15,7 +15,7 @@ def read_data_set(path, height, width, channel, result_length) :
         train[i] = array
         zeros = np.zeros(result_length)
         end = f.index("_")
-        zeros[int(f[1:end]) - 1] = 1
+        zeros[int(f[0:end])] = 1
         labels[i] = zeros
         i += 1
     return (train, labels)
@@ -26,6 +26,8 @@ def read_data(paths, height, width, channel, result_length):
     i = 0
     for f in paths:
         image_open = Image.open(f)
+        if image_open.mode == "RGB" :
+            image_open = image_open.convert("L")
         if image_open.mode == "L" :
             image_open = image_open.convert("RGB")
         array = np.array(image_open) / 256

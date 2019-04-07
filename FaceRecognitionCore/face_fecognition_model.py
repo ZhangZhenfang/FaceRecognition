@@ -7,7 +7,7 @@ import saver_loader_util as slutil
 
 
 class FaceRecognitionModel:
-    super_parms = properties.parse("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms.properties")
+    super_parms = properties.parse("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms2.properties")
     input_height = int(super_parms.get("input_height"))
     input_width = int(super_parms.get("input_width"))
     input_channel = int(super_parms.get("input_channel"))
@@ -52,16 +52,16 @@ class FaceRecognitionModel:
 
     W_conv3 = tf.Variable(tf.truncated_normal([conv3_filter_size, conv3_filter_size, conv2_filters, conv3_filters],
                                               stddev=0.1))
-    b_conv3 = tf.constant(0.1, shape=[64])
+    b_conv3 = tf.constant(0.1, shape=[conv3_filters])
 
     h_conv3 = tf.nn.relu(tf.nn.conv2d(h_pool2, W_conv3, strides=[1, 1, 1, 1], padding='SAME') + b_conv3)
     h_pool3 = tf.nn.max_pool(h_conv3, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
     h_pool3 = tf.nn.dropout(h_pool3, keep_prob)
     # 全连接层1权重定义
     W_fc1 = tf.Variable(tf.truncated_normal([math.ceil(input_height / 8) * math.ceil(input_width / 8) * conv3_filters,
-                                             512], stddev=0.1))
+                                             1024], stddev=0.1))
     # 全连接层1偏置定义
-    b_fc1 = tf.constant(0.1, shape=[512])
+    b_fc1 = tf.constant(0.1, shape=[1024])
 
     # 对卷积层2的输出展开
     h_pool3 = tf.reshape(h_pool3, [-1, math.ceil(input_height / 8) * math.ceil(input_width / 8) * conv3_filters])
@@ -73,7 +73,7 @@ class FaceRecognitionModel:
     h_fc1 = tf.nn.dropout(h_fc1, keep_prob)
 
     # 全连接层2权重
-    W_fc2 = tf.Variable(tf.truncated_normal([512, label_length], stddev=0.1))
+    W_fc2 = tf.Variable(tf.truncated_normal([1024, label_length], stddev=0.1))
     # 全连接层2偏置
     b_fc2 = tf.constant(0.1, shape=[label_length])
 
@@ -122,7 +122,7 @@ class FaceRecognitionModel:
                                                    self.input_channel,
                                                    self.label_length)
         epoch = train.shape[0]
-        batch_size = 81
+        batch_size = 50
         times = epoch / batch_size
         threshold = 0.98
         print(epoch)
@@ -131,7 +131,7 @@ class FaceRecognitionModel:
             sess.run(tf.global_variables_initializer())
             index = 0
             epoch_index = 1
-            for i in range(150):
+            for i in range(1000):
                 if index + batch_size >= epoch:
                     input_x = train[index: epoch]
                     input_y = train_labels[index: epoch]
@@ -162,7 +162,7 @@ class FaceRecognitionModel:
                                                                                             accuracy,
                                                                                             train_accuracy_))
 
-            slutil.saver2(tf, sess, ["serve"], "./m1", self.inputs, self.outputs)
+            slutil.saver2(tf, sess, ["serve"], "./m2", self.inputs, self.outputs)
 
 
     def predit(self):

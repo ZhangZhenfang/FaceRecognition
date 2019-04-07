@@ -15,7 +15,8 @@
 </head>
 <body>
     <video id="video"></video>
-    <button id="btn">拍照</button>
+    <button id="btn" onclick="start()">start</button>
+    <button id="stopbtn" onclick="stop()">stop</button>
     <canvas id="canvas"></canvas>
     <img id="img" width="320" height="240"/>
 </body>
@@ -28,12 +29,19 @@
     let width = 320
     let height = 0
     let streaming = false
+    var interveal
     // let img = new Image()
     navigator.mediaDevices.getUserMedia({video: true, audio: false}).then(stream => {
         video.srcObject = stream
         video.play()
-        setInterval(snapAndUpload, 300)
+        interveal = setInterval(snapAndUpload, 500)
     })
+    function start() {
+        interveal = setInterval(snapAndUpload, 500)
+    }
+    function stop() {
+        clearInterval(interveal)
+    }
     function snapAndUpload() {
         var file = takecapture()
         var formData = new FormData()
@@ -68,7 +76,7 @@
         }
         return new Blob([ab], {type : 'image/' + type})
     }
-    btn.addEventListener('click', snapAndUpload, false) // 按钮点击事件
+    // btn.addEventListener('click', snapAndUpload, false) // 按钮点击事件
 
     // 监听视频流就位事件,即视频可以播放了
     video.addEventListener('canplay', function (ev) {
