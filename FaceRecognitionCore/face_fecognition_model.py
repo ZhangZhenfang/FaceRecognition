@@ -7,7 +7,8 @@ import saver_loader_util as slutil
 
 
 class FaceRecognitionModel:
-    super_parms = properties.parse("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms2.properties")
+
+    super_parms = properties.parse("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms.properties")
     input_height = int(super_parms.get("input_height"))
     input_width = int(super_parms.get("input_width"))
     input_channel = int(super_parms.get("input_channel"))
@@ -21,15 +22,16 @@ class FaceRecognitionModel:
     learn_rate = float(super_parms.get("learn_rate"))
 
     # 定义输入数据
-    x = tf.placeholder(tf.float32, shape=[None, input_height, input_width, input_channel], name="x")
+    x = tf.placeholder(tf.float32, shape=[None, input_height, input_width,
+                                               input_channel], name="x")
     # 定义输出数据
     y = tf.placeholder(tf.float32, shape=[None, label_length], name="y")
 
     # x_image = tf.reshape(x, [-1, height, width, 3])
     keep_prob = tf.placeholder(tf.float32, name="keep_prob")
     # 卷积层1卷积核
-    W_conv1 = tf.Variable(tf.truncated_normal([conv1_filter_size, conv1_filter_size, input_channel, conv1_filters],
-                                              stddev=0.1))
+    W_conv1 = tf.Variable(tf.truncated_normal([conv1_filter_size, conv1_filter_size, input_channel,
+                                               conv1_filters], stddev=0.1))
     # 卷积层1偏置
     b_conv1 = tf.constant(0.1, shape=[conv1_filters])
 
@@ -58,13 +60,15 @@ class FaceRecognitionModel:
     h_pool3 = tf.nn.max_pool(h_conv3, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
     h_pool3 = tf.nn.dropout(h_pool3, keep_prob)
     # 全连接层1权重定义
-    W_fc1 = tf.Variable(tf.truncated_normal([math.ceil(input_height / 8) * math.ceil(input_width / 8) * conv3_filters,
-                                             1024], stddev=0.1))
+    W_fc1 = tf.Variable(tf.truncated_normal([math.ceil(input_height / 8) * math.ceil(input_width / 8)
+                                             * conv3_filters, 1024], stddev=0.1))
     # 全连接层1偏置定义
     b_fc1 = tf.constant(0.1, shape=[1024])
 
     # 对卷积层2的输出展开
-    h_pool3 = tf.reshape(h_pool3, [-1, math.ceil(input_height / 8) * math.ceil(input_width / 8) * conv3_filters])
+    h_pool3 = tf.reshape(h_pool3, [-1, math.ceil(input_height / 8)
+                                   * math.ceil(input_width / 8)
+                                   * conv3_filters])
     # 全连接层1，上一层的输出矩阵乘权重后加偏置后经过激活函数
     h_fc1 = tf.nn.relu(tf.matmul(h_pool3, W_fc1) + b_fc1)
 
@@ -83,7 +87,7 @@ class FaceRecognitionModel:
     # 交叉熵
     cross_entry = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y, logits=y_conv))
     # 选择优化器对交叉熵进行最小化优化
-    train_step = tf.train.AdamOptimizer(learn_rate).minimize(cross_entry)
+    train_step = tf.train.AdamOptimizer(learn_rate).minimize(cross_entry, name="train_step")
 
     # 计算正确的个数，向量对应的位置的数进行比较，相等则对应位置为True
     y_max = tf.argmax(y, 1, name="y_max")
@@ -92,7 +96,7 @@ class FaceRecognitionModel:
     prediction = tf.argmax(y_conv, 1)
     correct_prediction = tf.equal(y_max, y_conv_max)
     # 计算训练准确率，将True转为1，然后计算平均值
-    train_accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+    train_accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32), name="train_accuracy")
 
     inputs = {
                 'input_x': tf.saved_model.utils.build_tensor_info(x),
@@ -102,27 +106,29 @@ class FaceRecognitionModel:
 
     # y 为最终需要的输出结果tensor
     outputs = {
-                'y_max' : tf.saved_model.utils.build_tensor_info(y_max),
-                'y_conv' : tf.saved_model.utils.build_tensor_info(y_conv),
-                'y_conv_max' : tf.saved_model.utils.build_tensor_info(y_conv_max)
-            }
+                'y_max': tf.saved_model.utils.build_tensor_info(y_max),
+                'y_conv': tf.saved_model.utils.build_tensor_info(y_conv),
+                'y_conv_max': tf.saved_model.utils.build_tensor_info(y_conv_max),
+                # 'train_step': tf.saved_model.utils.build_tensor_info(self.train_step.),
+                'train_accuracy': tf.saved_model.utils.build_tensor_info(train_accuracy),
+    }
 
     def __init__(self, propertityPath):
         return
 
     def train(self):
-        train, train_labels = data_set.read_data_set(self.super_parms.get("train_path"),
+        train, train_labels = data_set.read_data_set2(self.super_parms.get("train_path"),
                                                      self.input_height,
                                                      self.input_width,
                                                      self.input_channel,
                                                      self.label_length)
-        test, test_labels = data_set.read_data_set(self.super_parms.get("test_path"),
+        test, test_labels = data_set.read_data_set2(self.super_parms.get("test_path"),
                                                    self.input_height,
                                                    self.input_width,
                                                    self.input_channel,
                                                    self.label_length)
         epoch = train.shape[0]
-        batch_size = 1
+        batch_size = 20
         times = epoch / batch_size
         threshold = 0.98
         print(epoch)
@@ -131,7 +137,7 @@ class FaceRecognitionModel:
             sess.run(tf.global_variables_initializer())
             index = 0
             epoch_index = 1
-            for i in range(200):
+            for i in range(100):
                 if index + batch_size >= epoch:
                     input_x = train[index: epoch]
                     input_y = train_labels[index: epoch]
@@ -162,7 +168,7 @@ class FaceRecognitionModel:
                                                                                             accuracy,
                                                                                             train_accuracy_))
 
-            slutil.saver2(tf, sess, ["serve"], "./m3", self.inputs, self.outputs)
+            slutil.saver2(tf, sess, ["serve"], "./m4", self.inputs, self.outputs)
 
 
     def predit(self):
