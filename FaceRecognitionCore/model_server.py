@@ -4,7 +4,7 @@ from flask import Flask, request
 from gevent import pywsgi
 import tensorflow as tf
 import data_set
-
+import properties
 
 monkey.patch_all()
 os.environ["CUDA_VISIBLE_DEVICES"] = "" #不使用GPU
@@ -12,7 +12,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "" #不使用GPU
 sess = tf.Session()
 meta_graph_def = tf.saved_model.loader.load(sess,
                                             ["serve"],
-                                            "E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/m1")
+                                            "E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/m3")
 sig = meta_graph_def.signature_def
 x = sig["test_signature"].inputs["input_x"].name
 y = sig["test_signature"].inputs["input_y"].name
@@ -29,7 +29,6 @@ def index():
 
 @app.route('/hello')
 def response_request():
-    num = request.args.get('num')
     x_, y_ = data_set.read_data_set("E:/faces/other", 112, 92, 3, 42)
     y_conv_, y_max_, y_conv_max_ = sess.run([y_conv, y_max, y_conv_max], feed_dict={x:x_, y:y_, keep_prob:1.0})
     print(y_max_)
@@ -37,8 +36,13 @@ def response_request():
     return str(y_conv_max_)
 @app.route('/upload', methods=['POST'])
 def upload():
+    super_parms = properties.parse("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms2.properties")
     imgs = request.files.getlist('data')
-    input, label = data_set.read_data(imgs, 112, 92, 3, 42)
+    input_height = int(super_parms.get("input_height"))
+    input_width = int(super_parms.get("input_width"))
+    input_channel = int(super_parms.get("input_channel"))
+    label_length = int(super_parms.get("label_length"))
+    input, label = data_set.read_data(imgs, input_height, input_width, input_channel, label_length)
     y_conv_, y_conv_max_ = sess.run([y_conv, y_conv_max], feed_dict={x: input, y: label, keep_prob: 1.0})
     # print(y_conv_)
     # print(y_conv_max_)

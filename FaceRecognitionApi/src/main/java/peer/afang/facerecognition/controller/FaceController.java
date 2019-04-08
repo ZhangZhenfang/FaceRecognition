@@ -21,6 +21,7 @@ import peer.afang.facerecognition.service.FaceService;
 import peer.afang.facerecognition.service.UserService;
 import peer.afang.facerecognition.util.DirUtils;
 import peer.afang.facerecognition.util.FaceDetectUtil;
+import peer.afang.facerecognition.util.FileUtil;
 import peer.afang.facerecognition.util.HttpClientUtil;
 
 import javax.annotation.Resource;
@@ -164,6 +165,54 @@ public class FaceController {
         userService.addUser(user);
         result.put("status", 1);
         result.put("message", "添加成功");
+        return result;
+    }
+
+    /**
+     * 识别人脸
+     * @param data
+     * @param type
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/recognize", method = RequestMethod.POST)
+    public JSONObject recognize(MultipartFile data, String type) {
+        JSONObject result = new JSONObject();
+        if (type == null) {
+            result.put("status", 2);
+            result.put("message", "type不能为空");
+            return result;
+        }
+        String tmpPath = path.getTmpPath() + Thread.currentThread().getId();
+        String outPath = tmpPath + "/" + data.getOriginalFilename();
+        try {
+            FileUtil.saveStream(data.getInputStream(), outPath);
+        } catch (IOException e) {
+            LOGGER.error("IO异常", e);
+        }
+        List<String> strings;
+        if ("face".equals(type)) {
+            strings = new ArrayList<>();
+            strings.add(outPath);
+            String s = HttpClientUtil.PostFiles("http://localhost:12580/upload", strings, new HashMap<>());
+            result.put("status", 1);
+            result.put("message", "识别成功");
+        } else if ("image".equals(type)) {
+            strings = FaceDetectUtil.detectFaceAndSub(outPath);
+
+            if (CollectionUtils.isEmpty(strings)) {
+                result.put("status", 3);
+                result.put("message", "图片中未检测到人脸");
+            } else {
+                String s = HttpClientUtil.PostFiles("http://localhost:12580/upload", strings, new HashMap<>());
+                result.put("status", 1);
+                result.put("message", "识别成功");
+                result.put("data", s);
+            }
+        } else {
+            result.put("status", 4);
+            result.put("message", "类型错误");
+        }
         return result;
     }
 

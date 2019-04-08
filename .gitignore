@@ -16,11 +16,12 @@ HELP.md
 /FaceRecognitionApi/*.iws
 /FaceRecognitionApi/*.iml
 /FaceRecognitionApi/*.ipr
-
+/FaceRecognitionApi/src/main/resources/static/userface/
 
 /FaceRecognitionCore/m1/
 /FaceRecognitionCore/m2/
 /FaceRecognitionCore/m3/
+/FaceRecognitionCore/m4/
 /FaceRecognitionCore/m1.zip
 /FaceRecognitionCore/.idea
 /FaceRecognitionCore/__pycache__
