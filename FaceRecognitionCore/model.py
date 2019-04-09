@@ -3,36 +3,34 @@ import tensorflow as tf
 import numpy as np
 import properties
 import math
-import saver_loader_util as slutil
 
 
 class FaceRecognitionModel:
 
-
     def __init__(self, propertityPath):
-        super_parms = properties.parse("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms.properties")
-        input_height = int(super_parms.get("input_height"))
-        input_width = int(super_parms.get("input_width"))
-        input_channel = int(super_parms.get("input_channel"))
-        label_length = int(super_parms.get("label_length"))
-        conv1_filters = int(super_parms.get("conv1_filters"))
-        conv2_filters = int(super_parms.get("conv2_filters"))
-        conv3_filters = int(super_parms.get("conv3_filters"))
-        conv1_filter_size = int(super_parms.get("conv1_filter_size"))
-        conv2_filter_size = int(super_parms.get("conv2_filter_size"))
-        conv3_filter_size = int(super_parms.get("conv3_filter_size"))
-        learn_rate = float(super_parms.get("learn_rate"))
+        self.super_parms = properties.parse(propertityPath)
+        self.input_height = int(self.super_parms.get("input_height"))
+        self.input_width = int(self.super_parms.get("input_width"))
+        self.input_channel = int(self.super_parms.get("input_channel"))
+        self.label_length = int(self.super_parms.get("label_length"))
+        conv1_filters = int(self.super_parms.get("conv1_filters"))
+        conv2_filters = int(self.super_parms.get("conv2_filters"))
+        conv3_filters = int(self.super_parms.get("conv3_filters"))
+        conv1_filter_size = int(self.super_parms.get("conv1_filter_size"))
+        conv2_filter_size = int(self.super_parms.get("conv2_filter_size"))
+        conv3_filter_size = int(self.super_parms.get("conv3_filter_size"))
+        learn_rate = float(self.super_parms.get("learn_rate"))
 
         # 定义输入数据
-        self.x = tf.placeholder(tf.float32, shape=[None, input_height, input_width,
-                                                   input_channel], name="x")
+        self.x = tf.placeholder(tf.float32, shape=[None, self.input_height, self.input_width,
+                                                   self.input_channel], name="x")
         # 定义输出数据
-        self.y = tf.placeholder(tf.float32, shape=[None, label_length], name="y")
+        self.y = tf.placeholder(tf.float32, shape=[None, self.label_length], name="y")
 
         # x_image = tf.reshape(x, [-1, height, width, 3])
         self.keep_prob = tf.placeholder(tf.float32, name="keep_prob")
         # 卷积层1卷积核
-        W_conv1 = tf.Variable(tf.truncated_normal([conv1_filter_size, conv1_filter_size, input_channel,
+        W_conv1 = tf.Variable(tf.truncated_normal([conv1_filter_size, conv1_filter_size, self.input_channel,
                                                    conv1_filters], stddev=0.1))
         # 卷积层1偏置
         b_conv1 = tf.constant(0.1, shape=[conv1_filters])
@@ -62,14 +60,14 @@ class FaceRecognitionModel:
         h_pool3 = tf.nn.max_pool(h_conv3, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
         h_pool3 = tf.nn.dropout(h_pool3, self.keep_prob)
         # 全连接层1权重定义
-        W_fc1 = tf.Variable(tf.truncated_normal([math.ceil(input_height / 8) * math.ceil(input_width / 8)
+        W_fc1 = tf.Variable(tf.truncated_normal([math.ceil(self.input_height / 8) * math.ceil(self.input_width / 8)
                                                  * conv3_filters, 1024], stddev=0.1))
         # 全连接层1偏置定义
         b_fc1 = tf.constant(0.1, shape=[1024])
 
         # 对卷积层2的输出展开
-        h_pool3 = tf.reshape(h_pool3, [-1, math.ceil(input_height / 8)
-                                       * math.ceil(input_width / 8)
+        h_pool3 = tf.reshape(h_pool3, [-1, math.ceil(self.input_height / 8)
+                                       * math.ceil(self.input_width / 8)
                                        * conv3_filters])
         # 全连接层1，上一层的输出矩阵乘权重后加偏置后经过激活函数
         h_fc1 = tf.nn.relu(tf.matmul(h_pool3, W_fc1) + b_fc1)
@@ -79,9 +77,9 @@ class FaceRecognitionModel:
         h_fc1 = tf.nn.dropout(h_fc1, self.keep_prob)
 
         # 全连接层2权重
-        W_fc2 = tf.Variable(tf.truncated_normal([1024, label_length], stddev=0.1))
+        W_fc2 = tf.Variable(tf.truncated_normal([1024, self.label_length], stddev=0.1))
         # 全连接层2偏置
-        b_fc2 = tf.constant(0.1, shape=[label_length])
+        b_fc2 = tf.constant(0.1, shape=[self.label_length])
 
         # 输出
         self.y_conv = tf.matmul(h_fc1, W_fc2) + b_fc2
@@ -169,15 +167,12 @@ class FaceRecognitionModel:
                                                                                             i,
                                                                                             accuracy,
                                                                                             train_accuracy_))
-
-            # slutil.saver2(tf, sess, ["serve"], "./m4", self.inputs, self.outputs)
             self.saver.save(sess, './mnist_model/model.ckpt')
 
     def predit(self, input, label):
-        # with tf.Session() as sess:
-            # if self.loaded == False:
-            #     self.loaded = True
-        self.saver.restore(self.sess, "./mnist_model/model.ckpt")
+        if self.loaded == False:
+            self.loaded = True
+            self.saver.restore(self.sess, "./mnist_model/model.ckpt")
         y_conv_, y_conv_max_ = self.sess.run([self.y_conv, self.y_conv_max], feed_dict={self.x: input,
                                                                                        self.y: label,
                                                                                        self.keep_prob: 1.0})
@@ -203,42 +198,41 @@ class FaceRecognitionModel:
         l = list(zip(train, train_labels))
         np.random.shuffle(l)
         train, train_labels = zip(*l)
-        with tf.Session() as sess:
-            if self.loaded == False:
-                self.loaded = True
-                self.saver.restore(sess, "./mnist_model/model.ckpt")
-
-            # sess.run(tf.global_variables_initializer())
-            index = 0
-            epoch_index = 1
-            for i in range(100):
-                if index + batch_size >= epoch:
-                    input_x = train[index: epoch]
-                    input_y = train_labels[index: epoch]
-                    index = 0
-                    epoch_index += 1
-                    l = list(zip(train, train_labels))
-                    np.random.shuffle(l)
-                    train, train_labels = zip(*l)
-                else:
-                    input_x = train[index:index + batch_size]
-                    input_y = train_labels[index:index + batch_size]
-                    index += batch_size
-                _, accuracy = sess.run([self.train_step, self.train_accuracy],
-                feed_dict={self.x: input_x, self.y: input_y, self.keep_prob: 0.5})
-                # saver.save(sess, './mnist_model/model.ckpt')
-
-                l = list(zip(test, test_labels))
+        if self.loaded == False:
+            self.loaded = True
+            self.saver.restore(self.sess, "./mnist_model/model.ckpt")
+        index = 0
+        epoch_index = 1
+        for i in range(100):
+            if index + batch_size >= epoch:
+                input_x = train[index: epoch]
+                input_y = train_labels[index: epoch]
+                index = 0
+                epoch_index += 1
+                l = list(zip(train, train_labels))
                 np.random.shuffle(l)
-                test, test_labels = zip(*l)
-                y_max_, y_conv_max_, train_accuracy_ = sess.run([self.y_max,
-                                                                 self.y_conv_max,
-                                                                 self.train_accuracy],
-                                                                feed_dict={self.x: test,
-                                                                           self.y: test_labels,
-                                                                           self.keep_prob: 1.0})
-                print("epoch:{} batch:{} train_accuracy:{:.3f} test_accuracy:{:.3f}".format(epoch_index,
-                                                                                            i,
-                                                                                            accuracy,
-                                                                                            train_accuracy_))
+                train, train_labels = zip(*l)
+            else:
+                input_x = train[index:index + batch_size]
+                input_y = train_labels[index:index + batch_size]
+                index += batch_size
+            _, accuracy = self.sess.run([self.train_step, self.train_accuracy],
+            feed_dict={self.x: input_x, self.y: input_y, self.keep_prob: 0.5})
+
+            l = list(zip(test, test_labels))
+            np.random.shuffle(l)
+            test, test_labels = zip(*l)
+            y_max_, y_conv_max_, train_accuracy_ = self.sess.run([self.y_max,
+                                                             self.y_conv_max,
+                                                             self.train_accuracy],
+                                                            feed_dict={self.x: test,
+                                                                       self.y: test_labels,
+                                                                       self.keep_prob: 1.0})
+            print("epoch:{} batch:{} train_accuracy:{:.3f} test_accuracy:{:.3f}".format(epoch_index,
+                                                                                        i,
+                                                                                        accuracy,
+                                                                                        train_accuracy_))
+            if train_accuracy_ >= threshold:
+                self.saver.save(self.sess, './mnist_model/model.ckpt')
+                break
         return
