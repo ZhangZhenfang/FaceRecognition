@@ -1,11 +1,15 @@
 package peer.afang.facerecognition.service.impl;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import peer.afang.facerecognition.mapper.FaceMapper;
 import peer.afang.facerecognition.mapper.UserMapper;
 import peer.afang.facerecognition.pojo.User;
 import peer.afang.facerecognition.service.UserService;
+import peer.afang.facerecognition.vo.UserInfoVO;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,6 +21,8 @@ public class UserServiceImpl implements UserService {
 
     @Resource
     UserMapper userMapper;
+    @Resource
+    FaceMapper faceMapper;
 
     @Override
     public User getById(Integer userid) {
@@ -46,7 +52,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> listPage(Integer startid, Integer pageSize) {
-        return userMapper.listPage(startid, pageSize);
+    public List<UserInfoVO> listPage(Integer startid, Integer pageSize) {
+        List<User> users = userMapper.listPage(startid, pageSize);
+        List<UserInfoVO> result = new ArrayList<>();
+        for (User user : users) {
+            UserInfoVO userInfoVO = new UserInfoVO();
+            Integer faces = faceMapper.countByUserid(user.getUserid());
+            BeanUtils.copyProperties(user, userInfoVO);
+            userInfoVO.setFaces(faces);
+            result.add(userInfoVO);
+        }
+        return result;
     }
 }

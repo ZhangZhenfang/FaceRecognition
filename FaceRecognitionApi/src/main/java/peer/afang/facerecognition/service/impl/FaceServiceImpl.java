@@ -79,7 +79,7 @@ public class FaceServiceImpl implements FaceService {
     }
 
     @Override
-    public Long countByUserid(Integer userid) {
+    public Integer countByUserid(Integer userid) {
         return faceMapper.countByUserid(userid);
     }
 

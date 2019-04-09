@@ -76,7 +76,7 @@
     where userid = #{userid,jdbcType=INTEGER}
   </select>
 
-  <select id="countByUserid" parameterType="java.lang.Integer" resultType="java.lang.Long">
+  <select id="countByUserid" parameterType="java.lang.Integer" resultType="java.lang.Integer">
     select count(faceid) from face
     where userid = #{userid,jdbcType=INTEGER}
   </select>

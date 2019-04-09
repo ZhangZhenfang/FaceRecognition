@@ -38,5 +38,5 @@ public interface FaceService {
      * @param userid
      * @return
      */
-    Long countByUserid(Integer userid);
+    Integer countByUserid(Integer userid);
 }

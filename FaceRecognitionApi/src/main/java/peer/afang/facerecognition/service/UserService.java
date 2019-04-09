@@ -1,6 +1,7 @@
 package peer.afang.facerecognition.service;
 
 import peer.afang.facerecognition.pojo.User;
+import peer.afang.facerecognition.vo.UserInfoVO;
 
 import java.util.List;
 
@@ -49,5 +50,5 @@ public interface UserService {
      * @param pageSize
      * @return
      */
-    List<User> listPage(Integer startid, Integer pageSize);
+    List<UserInfoVO> listPage(Integer startid, Integer pageSize);
 }

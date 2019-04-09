@@ -63,5 +63,5 @@ public interface FaceMapper {
      * @param userid
      * @return
      */
-    Long countByUserid(Integer userid);
+    Integer countByUserid(Integer userid);
 }

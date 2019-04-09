@@ -110,7 +110,7 @@ public class FaceController {
     @ResponseBody
     @RequestMapping(value = "/countByUserid", method = RequestMethod.GET)
     public JSONObject countFacesByUserid(Integer userid) {
-        Long faces = faceService.countByUserid(userid);
+        Integer faces = faceService.countByUserid(userid);
         return ResponseUtil.wrapResponse(1, "success", faces);
     }
 

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import peer.afang.facerecognition.pojo.User;
 import peer.afang.facerecognition.service.UserService;
 import peer.afang.facerecognition.util.ResponseUtil;
+import peer.afang.facerecognition.vo.UserInfoVO;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -58,7 +59,7 @@ public class UserController {
     public JSONObject listAllUser(Integer startid, Integer pageSize) {
         LOGGER.info("{}, {}", startid, pageSize);
         JSONObject result = new JSONObject();
-        List<User> users = userService.listPage(startid, pageSize);
+        List<UserInfoVO> users = userService.listPage(startid, pageSize);
         result.put("status", 1);
         result.put("message", "success");
         result.put("data", users);
