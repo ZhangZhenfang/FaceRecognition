@@ -6,6 +6,7 @@ import peer.afang.facerecognition.pojo.User;
 import peer.afang.facerecognition.service.UserService;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author ZhangZhenfang
@@ -32,5 +33,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getByName(String userName) {
         return userMapper.getByUserName(userName);
+    }
+
+    @Override
+    public List<User> listAll() {
+        return userMapper.listAll();
     }
 }

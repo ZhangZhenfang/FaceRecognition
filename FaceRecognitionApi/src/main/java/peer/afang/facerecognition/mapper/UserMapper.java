@@ -2,6 +2,8 @@ package peer.afang.facerecognition.mapper;
 
 import peer.afang.facerecognition.pojo.User;
 
+import java.util.List;
+
 /**
  * @author ZhangZhenfang
  * @date 2019/4/1 00:00
@@ -55,4 +57,10 @@ public interface UserMapper {
      * @return
      */
     User getByUserName(String userName);
+
+    /**
+     * 获取所有的用户
+     * @return
+     */
+    List<User> listAll();
 }

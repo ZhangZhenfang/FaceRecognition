@@ -25,4 +25,11 @@ public interface FaceService {
      * @return
      */
     Integer addFace(Face face, String srcPath, List<String> facePaths);
+
+    /**
+     * 获取用户userid的所有face
+     * @param userid
+     * @return
+     */
+    List<Face> listByUserid(Integer userid);
 }

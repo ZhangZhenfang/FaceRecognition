@@ -63,4 +63,10 @@
     from user
     where username = #{userName,jdbcType=VARCHAR}
   </select>
+
+  <select id="listAll" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from user
+  </select>
 </mapper>

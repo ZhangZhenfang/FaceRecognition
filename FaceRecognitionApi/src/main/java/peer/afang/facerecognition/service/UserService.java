@@ -2,7 +2,7 @@ package peer.afang.facerecognition.service;
 
 import peer.afang.facerecognition.pojo.User;
 
-import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author ZhangZhenfang
@@ -30,4 +30,10 @@ public interface UserService {
      * @return
      */
     User getByName(String userName);
+
+    /**
+     * 获取所有的用户
+     * @return
+     */
+    List<User> listAll();
 }
