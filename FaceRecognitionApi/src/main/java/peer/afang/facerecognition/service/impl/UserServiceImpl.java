@@ -39,4 +39,14 @@ public class UserServiceImpl implements UserService {
     public List<User> listAll() {
         return userMapper.listAll();
     }
+
+    @Override
+    public Long countAll() {
+        return userMapper.countAll();
+    }
+
+    @Override
+    public List<User> listPage(Integer startid, Integer pageSize) {
+        return userMapper.listPage(startid, pageSize);
+    }
 }

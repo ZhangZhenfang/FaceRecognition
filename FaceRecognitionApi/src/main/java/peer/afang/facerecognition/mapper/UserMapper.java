@@ -1,5 +1,6 @@
 package peer.afang.facerecognition.mapper;
 
+import org.apache.ibatis.annotations.Param;
 import peer.afang.facerecognition.pojo.User;
 
 import java.util.List;
@@ -63,4 +64,18 @@ public interface UserMapper {
      * @return
      */
     List<User> listAll();
+
+    /**
+     * 统计所用用户数量
+     * @return
+     */
+    Long countAll();
+
+    /**
+     * 分页查询user
+     * @param startid
+     * @param pageSize
+     * @return
+     */
+    List<User> listPage(@Param(value = "startid") Integer startid, @Param(value = "pageSize") Integer pageSize);
 }

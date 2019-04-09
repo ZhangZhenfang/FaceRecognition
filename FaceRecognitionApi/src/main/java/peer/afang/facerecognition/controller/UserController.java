@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import peer.afang.facerecognition.pojo.User;
 import peer.afang.facerecognition.service.UserService;
+import peer.afang.facerecognition.util.ResponseUtil;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -53,14 +54,25 @@ public class UserController {
      * @return
      */
     @ResponseBody
-    @RequestMapping(value = "listAllUser", method = RequestMethod.GET)
-    private JSONObject listAllUser() {
+    @RequestMapping(value = "listAllUser", method = RequestMethod.POST)
+    public JSONObject listAllUser(Integer startid, Integer pageSize) {
+        LOGGER.info("{}, {}", startid, pageSize);
         JSONObject result = new JSONObject();
-        List<User> users = userService.listAll();
+        List<User> users = userService.listPage(startid, pageSize);
         result.put("status", 1);
         result.put("message", "success");
         result.put("data", users);
         return result;
     }
 
+    /**
+     * 统计所有用户数量
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/countAllUser", method = RequestMethod.GET)
+    public JSONObject countAllUser() {
+        Long countAllUser = userService.countAll();
+        return ResponseUtil.wrapResponse(1, "success", countAllUser);
+    }
 }

@@ -57,4 +57,11 @@ public interface FaceMapper {
      * @return
      */
     List<Face> listByUserid(Integer userid);
+
+    /**
+     * 根据userid统计face数量
+     * @param userid
+     * @return
+     */
+    Long countByUserid(Integer userid);
 }

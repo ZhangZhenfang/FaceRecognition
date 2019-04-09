@@ -2,11 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="peer.afang.facerecognition.mapper.UserMapper">
   <resultMap id="BaseResultMap" type="peer.afang.facerecognition.pojo.User">
-    <id column="userid" jdbcType="INTEGER" property="userid" />
-    <result column="username" jdbcType="VARCHAR" property="username" />
+      <id column="userid" jdbcType="INTEGER" property="userid" />
+      <result column="username" jdbcType="VARCHAR" property="username" />
+      <result column="time" jdbcType="TIMESTAMP" property="time" />
   </resultMap>
   <sql id="Base_Column_List">
-    userid, username
+    userid, username, time
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -68,5 +69,14 @@
     select
     <include refid="Base_Column_List" />
     from user
+  </select>
+  <select id="countAll" resultType="java.lang.Long">
+    select count(userid) from user
+  </select>
+  <select id="listPage" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from user
+    where userid > #{startid, jdbcType=INTEGER} order by userid asc limit #{pageSize, jdbcType=INTEGER}
   </select>
 </mapper>

@@ -78,6 +78,11 @@ public class FaceServiceImpl implements FaceService {
         return faceMapper.listByUserid(userid);
     }
 
+    @Override
+    public Long countByUserid(Integer userid) {
+        return faceMapper.countByUserid(userid);
+    }
+
     private void checkDir(String path) {
         File d = new File(path);
         if (!d.exists()) {

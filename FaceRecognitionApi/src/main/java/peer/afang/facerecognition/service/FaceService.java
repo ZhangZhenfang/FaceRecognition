@@ -32,4 +32,11 @@ public interface FaceService {
      * @return
      */
     List<Face> listByUserid(Integer userid);
+
+    /**
+     * 根据用户id统计照片数量
+     * @param userid
+     * @return
+     */
+    Long countByUserid(Integer userid);
 }

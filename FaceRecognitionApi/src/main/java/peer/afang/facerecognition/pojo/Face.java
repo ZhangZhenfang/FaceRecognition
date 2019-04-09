@@ -1,11 +1,15 @@
 package peer.afang.facerecognition.pojo;
 
+import java.util.Date;
+
 public class Face {
     private Integer faceid;
 
     private Integer userid;
 
     private String imagename;
+
+    private Date time;
 
     public Integer getFaceid() {
         return faceid;
@@ -31,12 +35,21 @@ public class Face {
         this.imagename = imagename == null ? null : imagename.trim();
     }
 
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
     @Override
     public String toString() {
         return "Face{" +
                 "faceid=" + faceid +
                 ", userid=" + userid +
                 ", imagename='" + imagename + '\'' +
+                ", time=" + time +
                 '}';
     }
 }

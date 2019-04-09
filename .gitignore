@@ -36,6 +36,7 @@ HELP.md
 /build/
 
 ### VS Code ###
+.vscode
 /FaceRecognitionWebApp/.DS_Store
 /FaceRecognitionWebApp/node_modules/
 /FaceRecognitionWebApp//dist/

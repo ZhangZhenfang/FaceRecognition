@@ -36,4 +36,18 @@ public interface UserService {
      * @return
      */
     List<User> listAll();
+
+    /**
+     * 统计所有用户个数
+     * @return
+     */
+    Long countAll();
+
+    /**
+     * 分页查询user
+     * @param startid
+     * @param pageSize
+     * @return
+     */
+    List<User> listPage(Integer startid, Integer pageSize);
 }

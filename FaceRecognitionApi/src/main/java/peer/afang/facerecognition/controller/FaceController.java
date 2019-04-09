@@ -102,6 +102,19 @@ public class FaceController {
         return ResponseUtil.wrapResponse(1, "success", faces);
     }
 
+    /**
+     * 查询用户的照片数量
+     * @param userid
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/countByUserid", method = RequestMethod.GET)
+    public JSONObject countFacesByUserid(Integer userid) {
+        Long faces = faceService.countByUserid(userid);
+        return ResponseUtil.wrapResponse(1, "success", faces);
+    }
+
+
 
     /**
      * 删除dir目录下的所有文件
