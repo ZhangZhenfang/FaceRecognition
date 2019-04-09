@@ -10,7 +10,19 @@ import java.util.List;
  */
 public interface FaceService {
 
-    Face getBuFaceId(Integer faceid);
+    /**
+     * 通过faceid查询face
+     * @param faceid
+     * @return
+     */
+    Face getByFaceId(Integer faceid);
 
+    /**
+     * 添加face
+     * @param face
+     * @param srcPath
+     * @param facePaths
+     * @return
+     */
     Integer addFace(Face face, String srcPath, List<String> facePaths);
 }

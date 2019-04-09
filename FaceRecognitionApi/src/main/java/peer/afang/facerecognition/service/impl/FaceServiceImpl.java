@@ -14,7 +14,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author ZhangZhenfang
@@ -32,7 +31,7 @@ public class FaceServiceImpl implements FaceService {
     FaceMapper faceMapper;
 
     @Override
-    public Face getBuFaceId(Integer faceid) {
+    public Face getByFaceId(Integer faceid) {
         return faceMapper.selectByPrimaryKey(faceid);
     }
 
@@ -43,9 +42,8 @@ public class FaceServiceImpl implements FaceService {
         String tmpFaceDir = userFacePath + face.getUserid() + "/face/";
         checkDir(tmpFaceDir);
         checkDir(tmpSrcDir);
-//        UUID uuid = UUID.randomUUID();
-        FileInputStream is =null;
-        FileOutputStream os = null;
+        FileInputStream is;
+        FileOutputStream os;
         try {
             face.setImagename("tmpname");
             faceMapper.insertSelective(face);

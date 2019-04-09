@@ -1,7 +1,5 @@
 package peer.afang.facerecognition;
 
-//import com.the15373.supercommissary.dao.pojo.Excel;
-
 import org.mybatis.generator.api.MyBatisGenerator;
 import org.mybatis.generator.config.Configuration;
 import org.mybatis.generator.config.xml.ConfigurationParser;
@@ -14,6 +12,7 @@ import java.util.List;
 
 
 /**
+ * 根据配置文件生成mapper以及实体类
  * @author ZhangZhenfang
  * @date 2019/3/22 18:15
  */

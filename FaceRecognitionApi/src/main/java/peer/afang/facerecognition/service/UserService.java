@@ -1,7 +1,5 @@
 package peer.afang.facerecognition.service;
 
-import org.springframework.stereotype.Service;
-import peer.afang.facerecognition.mapper.UserMapper;
 import peer.afang.facerecognition.pojo.User;
 
 import javax.annotation.Resource;
@@ -12,9 +10,24 @@ import javax.annotation.Resource;
  */
 public interface UserService {
 
+    /**
+     * 通过userid获取user
+     * @param userid
+     * @return
+     */
     User getById(Integer userid);
 
+    /**
+     * 添加user
+     * @param user
+     * @return
+     */
     Integer addUser(User user);
 
+    /**
+     * 通过userName获取user
+     * @param userName
+     * @return
+     */
     User getByName(String userName);
 }

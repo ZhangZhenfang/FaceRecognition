@@ -27,7 +27,6 @@ import peer.afang.facerecognition.util.HttpClientUtil;
 import javax.annotation.Resource;
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author ZhangZhenfang
@@ -75,7 +74,6 @@ public class FaceController {
         cascadeClassifier.detectMultiScale(m, matOfRect);
         List<Rect> rects = matOfRect.toList();
         int i = 0;
-        Map
         List<String> paths = new ArrayList<>();
         for (Rect rect : rects) {
             int extendHeight = (rect.width * 112 / 92 - rect.height) / 2;
