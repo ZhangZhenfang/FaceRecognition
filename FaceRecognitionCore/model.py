@@ -7,7 +7,8 @@ import math
 
 class FaceRecognitionModel:
 
-    def __init__(self, propertityPath):
+    def __init__(self, propertityPath, save_path):
+        self.save_path = save_path
         self.super_parms = properties.parse(propertityPath)
         self.input_height = int(self.super_parms.get("input_height"))
         self.input_width = int(self.super_parms.get("input_width"))
@@ -167,12 +168,12 @@ class FaceRecognitionModel:
                                                                                             i,
                                                                                             accuracy,
                                                                                             train_accuracy_))
-            self.saver.save(sess, './mnist_model/model.ckpt')
+            self.saver.save(sess, self.save_path + '/model.ckpt')
 
     def predit(self, input, label):
         if self.loaded == False:
             self.loaded = True
-            self.saver.restore(self.sess, "./mnist_model/model.ckpt")
+            self.saver.restore(self.sess, self.save_path + "/model.ckpt")
         y_conv_, y_conv_max_ = self.sess.run([self.y_conv, self.y_conv_max], feed_dict={self.x: input,
                                                                                        self.y: label,
                                                                                        self.keep_prob: 1.0})
@@ -200,7 +201,7 @@ class FaceRecognitionModel:
         train, train_labels = zip(*l)
         if self.loaded == False:
             self.loaded = True
-            self.saver.restore(self.sess, "./mnist_model/model.ckpt")
+            self.saver.restore(self.sess, self.save_path + "/model.ckpt")
         index = 0
         epoch_index = 1
         for i in range(100):
@@ -233,6 +234,6 @@ class FaceRecognitionModel:
                                                                                         accuracy,
                                                                                         train_accuracy_))
             if train_accuracy_ >= threshold:
-                self.saver.save(self.sess, './mnist_model/model.ckpt')
+                self.saver.save(self.sess, self.save_path + '/model.ckpt')
                 break
         return

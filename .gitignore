@@ -36,4 +36,20 @@ HELP.md
 /build/
 
 ### VS Code ###
-/FaceRecognitionWebApp/.vscode/
+/FaceRecognitionWebApp/.DS_Store
+/FaceRecognitionWebApp/node_modules/
+/FaceRecognitionWebApp//dist/
+/FaceRecognitionWebApp/npm-debug.log*
+/FaceRecognitionWebApp/yarn-debug.log*
+/FaceRecognitionWebApp/yarn-error.log*
+/FaceRecognitionWebApp//test/unit/coverage/
+/FaceRecognitionWebApp//test/e2e/reports/
+/FaceRecognitionWebApp/selenium-debug.log
+
+# Editor directories and files
+/FaceRecognitionWebApp/.idea
+/FaceRecognitionWebApp/.vscode
+/FaceRecognitionWebApp/*.suo
+/FaceRecognitionWebApp/*.ntvs*
+/FaceRecognitionWebApp/*.njsproj
+/FaceRecognitionWebApp/*.sln

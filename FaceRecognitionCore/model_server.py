@@ -9,7 +9,7 @@ import numpy as np
 monkey.patch_all()
 os.environ["CUDA_VISIBLE_DEVICES"] = "" #不使用GPU
 
-model = model.FaceRecognitionModel("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms.properties")
+model = model.FaceRecognitionModel("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms2.properties")
 app = Flask(__name__)
 
 

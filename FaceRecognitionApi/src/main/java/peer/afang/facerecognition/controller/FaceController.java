@@ -96,7 +96,7 @@ public class FaceController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/listByUserid", method = RequestMethod.POST)
+    @RequestMapping(value = "/listByUserid", method = RequestMethod.GET)
     public JSONObject listFacesByUserid(Integer userid) {
         List<Face> faces = faceService.listByUserid(userid);
         return ResponseUtil.wrapResponse(1, "success", faces);
