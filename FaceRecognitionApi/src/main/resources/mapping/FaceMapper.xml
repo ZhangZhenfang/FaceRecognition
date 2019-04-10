@@ -5,9 +5,10 @@
     <id column="faceid" jdbcType="INTEGER" property="faceid" />
     <result column="userid" jdbcType="INTEGER" property="userid" />
     <result column="imagename" jdbcType="VARCHAR" property="imagename" />
+    <result column="time" jdbcType="TIMESTAMP" property="time" />
   </resultMap>
   <sql id="Base_Column_List">
-    faceid, userid, imagename
+    faceid, userid, imagename, time
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -37,6 +38,9 @@
       <if test="imagename != null">
         imagename,
       </if>
+      <if test="time != null">
+        time,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="faceid != null">
@@ -47,6 +51,9 @@
       </if>
       <if test="imagename != null">
         #{imagename,jdbcType=VARCHAR},
+      </if>
+      <if test="time != null">
+        #{time,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>

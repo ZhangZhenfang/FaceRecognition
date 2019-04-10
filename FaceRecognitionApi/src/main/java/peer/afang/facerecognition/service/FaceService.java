@@ -1,6 +1,7 @@
 package peer.afang.facerecognition.service;
 
 import peer.afang.facerecognition.pojo.Face;
+import peer.afang.facerecognition.vo.FaceVO;
 
 import java.util.List;
 
@@ -24,14 +25,14 @@ public interface FaceService {
      * @param facePaths
      * @return
      */
-    Integer addFace(Face face, String srcPath, List<String> facePaths);
+    FaceVO addFace(Face face, String srcPath, List<String> facePaths);
 
     /**
      * 获取用户userid的所有face
      * @param userid
      * @return
      */
-    List<Face> listByUserid(Integer userid);
+    List<FaceVO> listByUserid(Integer userid);
 
     /**
      * 根据用户id统计照片数量

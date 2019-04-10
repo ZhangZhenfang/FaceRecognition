@@ -11,7 +11,8 @@
     </el-table-column>
     <el-table-column prop="faces" label="">
       <template slot-scope="scope">
-        <el-button @click="handleClick(scope.row)" type="text" size="small">详细信息</el-button>
+        <router-link :to="{ name: 'Userinfo', query: { userid: scope.row.userid, username: scope.row.username }}">详细信息</router-link>
+        <!-- <el-button @click="handleClick(scope.row)" type="text" size="small">详细信息</el-button> -->
       </template>
     </el-table-column>
   </el-table>
@@ -79,6 +80,7 @@ export default {
     }
   },
   mounted () {
+    this.$emit('changeBread', 'userboard')
     this.countAllUser()
     this.listNextPage(0, 10)
   }

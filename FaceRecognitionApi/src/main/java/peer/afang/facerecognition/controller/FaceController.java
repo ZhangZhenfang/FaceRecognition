@@ -17,6 +17,7 @@ import peer.afang.facerecognition.service.UserService;
 import peer.afang.facerecognition.util.DirUtils;
 import peer.afang.facerecognition.util.FaceDetectUtil;
 import peer.afang.facerecognition.util.ResponseUtil;
+import peer.afang.facerecognition.vo.FaceVO;
 
 import javax.annotation.Resource;
 import java.io.*;
@@ -85,11 +86,12 @@ public class FaceController {
             result.put("status", 4);
             result.put("message", "检测到多个人脸");
         } else {
-            result.put("status", 1);
-            result.put("message", "上传成功");
             Face face = new Face();
             face.setUserid(byName.getUserid());
-            faceService.addFace(face, tmpPath, strings);
+            FaceVO faceVO = faceService.addFace(face, tmpPath, strings);
+            result.put("status", 1);
+            result.put("message", "上传成功");
+            result.put("data", faceVO);
         }
         deleteFiles(tmpDir);
         return result;
@@ -98,7 +100,7 @@ public class FaceController {
     @ResponseBody
     @RequestMapping(value = "/listByUserid", method = RequestMethod.GET)
     public JSONObject listFacesByUserid(Integer userid) {
-        List<Face> faces = faceService.listByUserid(userid);
+        List<FaceVO> faces = faceService.listByUserid(userid);
         return ResponseUtil.wrapResponse(1, "success", faces);
     }
 

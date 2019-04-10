@@ -2,17 +2,21 @@ package peer.afang.facerecognition.service.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import peer.afang.facerecognition.mapper.FaceMapper;
 import peer.afang.facerecognition.pojo.Face;
 import peer.afang.facerecognition.property.Path;
 import peer.afang.facerecognition.service.FaceService;
+import peer.afang.facerecognition.vo.FaceVO;
 
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -36,7 +40,7 @@ public class FaceServiceImpl implements FaceService {
     }
 
     @Override
-    public Integer addFace(Face face, String srcPath, List<String> facePaths) {
+    public FaceVO addFace(Face face, String srcPath, List<String> facePaths) {
         String userFacePath = path.getUserFacePath();
         String tmpSrcDir = userFacePath + face.getUserid() + "/src/";
         String tmpFaceDir = userFacePath + face.getUserid() + "/face/";
@@ -46,6 +50,7 @@ public class FaceServiceImpl implements FaceService {
         FileOutputStream os;
         try {
             face.setImagename("tmpname");
+            face.setTime(new Date());
             faceMapper.insertSelective(face);
             LOGGER.info(face.toString());
             face.setImagename(face.getUserid() + "_" + face.getFaceid() + ".bmp");
@@ -70,12 +75,23 @@ public class FaceServiceImpl implements FaceService {
             LOGGER.error("IO异常", e);
         }
         faceMapper.updateByPrimaryKey(face);
-        return face.getFaceid();
+        FaceVO faceVO = new FaceVO();
+        BeanUtils.copyProperties(face, faceVO);
+        faceVO.setUrl("userface/" + face.getUserid() + "/src/" + face.getImagename());
+        return faceVO;
     }
 
     @Override
-    public List<Face> listByUserid(Integer userid) {
-        return faceMapper.listByUserid(userid);
+    public List<FaceVO> listByUserid(Integer userid) {
+        List<Face> faces = faceMapper.listByUserid(userid);
+        List<FaceVO> result = new ArrayList<>();
+        for (Face f : faces) {
+            FaceVO faceVO = new FaceVO();
+            BeanUtils.copyProperties(f, faceVO);
+            faceVO.setUrl("userface/" + f.getUserid() + "/src/" + f.getImagename());
+            result.add(faceVO);
+        }
+        return result;
     }
 
     @Override

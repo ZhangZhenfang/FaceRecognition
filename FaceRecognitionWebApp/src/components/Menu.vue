@@ -3,7 +3,7 @@
     <el-menu default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose">
       <el-menu-item index="2">
         <i class="el-icon-menu"></i>
-        <span slot="title">导航二</span>
+        <span slot="title">人脸库管理</span>
       </el-menu-item>
       <el-menu-item index="3">
         <i class="el-icon-setting"></i>
