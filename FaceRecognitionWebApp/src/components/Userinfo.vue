@@ -28,7 +28,7 @@
         </div>
         <div style="padding: 14px;">
           <div class="bottom clearfix">
-            <time class="time">{{ face.time }}</time>
+            <time class="time">上传时间：{{ face.time }}</time>
             <el-button type="text" class="button" @click="deleteFace(face.faceid)">删除</el-button>
           </div>
         </div>
@@ -93,12 +93,10 @@ export default {
       this.axios.post('http://localhost:8080/face/addFace', filedata, config).then((response) => {
         console.log(response.data.status)
         if (response.data.status === 1) {
-          console.log(response.data.data)
           this.faces.push(response.data.data)
           file.onSuccess(response)
         } else if (response.data.status === 3) {
           this.message(file.file.name + '未检测到人脸')
-          alert("111")
           file.onError(response)
         } else if (response.data.status === 4) {
           this.message(file.file.name + '检测到多张人脸')

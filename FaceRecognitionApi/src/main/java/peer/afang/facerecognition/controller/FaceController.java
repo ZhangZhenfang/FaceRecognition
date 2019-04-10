@@ -95,6 +95,11 @@ public class FaceController {
         return result;
     }
 
+    /**
+     * 通过userid获取人脸图片
+     * @param userid
+     * @return
+     */
     @ResponseBody
     @RequestMapping(value = "/listByUserid", method = RequestMethod.GET)
     public JSONObject listFacesByUserid(Integer userid) {
@@ -102,6 +107,11 @@ public class FaceController {
         return ResponseUtil.wrapResponse(1, "success", faces);
     }
 
+    /**
+     * 根据faceid删除人脸图片
+     * @param faceid
+     * @return
+     */
     @ResponseBody
     @RequestMapping(value = "/face/{faceid}", method = RequestMethod.DELETE)
     public JSONObject deleteFace(@PathVariable(value = "faceid") Integer faceid) {
@@ -121,8 +131,6 @@ public class FaceController {
         Integer faces = faceService.countByUserid(userid);
         return ResponseUtil.wrapResponse(1, "success", faces);
     }
-
-
 
     /**
      * 删除dir目录下的所有文件

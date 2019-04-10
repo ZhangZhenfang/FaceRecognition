@@ -5,7 +5,7 @@
     </el-table-column>
     <el-table-column prop="username" label="姓名" width="180">
     </el-table-column>
-    <el-table-column prop="time" label="时间">
+    <el-table-column prop="time" label="创建时间">
     </el-table-column>
     <el-table-column prop="faces" label="照片数量">
     </el-table-column>
