@@ -5,9 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import peer.afang.facerecognition.pojo.Face;
 import peer.afang.facerecognition.pojo.User;
@@ -102,6 +100,14 @@ public class FaceController {
     public JSONObject listFacesByUserid(Integer userid) {
         List<FaceVO> faces = faceService.listByUserid(userid);
         return ResponseUtil.wrapResponse(1, "success", faces);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/face/{faceid}", method = RequestMethod.DELETE)
+    public JSONObject deleteFace(@PathVariable(value = "faceid") Integer faceid) {
+        LOGGER.info("delete {}", faceid);
+        Integer integer = faceService.deleteFace(faceid);
+        return ResponseUtil.wrapResponse(1, "删除成功", integer);
     }
 
     /**

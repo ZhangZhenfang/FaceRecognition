@@ -29,7 +29,7 @@
         <div style="padding: 14px;">
           <div class="bottom clearfix">
             <time class="time">{{ face.time }}</time>
-            <el-button type="text" class="button">删除</el-button>
+            <el-button type="text" class="button" @click="deleteFace(face.faceid)">删除</el-button>
           </div>
         </div>
       </el-card>
@@ -51,6 +51,23 @@ export default {
     }
   },
   methods: {
+    deleteFace (faceid) {
+      console.log(faceid)
+      this.axios.delete('http://localhost:8080/face/face/' + faceid).then((response) => {
+        if (response.status === 200) {
+          if (response.data.status === 1) {
+            for (var i = 0; i < this.faces.length; i++) {
+              if (this.faces[i].faceid === faceid) {
+                this.faces.splice(i, 1)
+              }
+            }
+            this.$message('删除成功')
+          } else {
+            this.$message('删除人脸失败')
+          }
+        }
+      })
+    },
     getFacesByUserid (userid) {
       console.log(userid)
       this.axios.get('http://localhost:8080/face/listByUserid?userid=' + userid).then((response) => {

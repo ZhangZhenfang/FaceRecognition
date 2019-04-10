@@ -99,6 +99,11 @@ public class FaceServiceImpl implements FaceService {
         return faceMapper.countByUserid(userid);
     }
 
+    @Override
+    public Integer deleteFace(Integer faceid) {
+        return faceMapper.deleteByPrimaryKey(faceid);
+    }
+
     private void checkDir(String path) {
         File d = new File(path);
         if (!d.exists()) {

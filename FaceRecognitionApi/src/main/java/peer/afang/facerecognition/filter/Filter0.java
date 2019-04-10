@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMethod;
 import peer.afang.facerecognition.enums.OriginControlTypeEnum;
 import peer.afang.facerecognition.property.OriginControl;
 import peer.afang.facerecognition.property.Path;
@@ -45,6 +46,7 @@ public class Filter0 implements Filter {
 
         if (originControlType == OriginControlTypeEnum.ALLOW_ALL.getType()) {
             response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+            response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, RequestMethod.DELETE.name());
             filterChain.doFilter(servletRequest, servletResponse);
         } else if (originControlType == OriginControlTypeEnum.BLACK.getType()) {
             if (!originControl.getOrigins().contains(origin)) {

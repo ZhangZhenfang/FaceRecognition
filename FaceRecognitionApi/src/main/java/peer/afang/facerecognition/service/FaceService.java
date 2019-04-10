@@ -40,4 +40,11 @@ public interface FaceService {
      * @return
      */
     Integer countByUserid(Integer userid);
+
+    /**
+     * 删除人脸图片
+     * @param faceid
+     * @return
+     */
+    Integer deleteFace(Integer faceid);
 }
