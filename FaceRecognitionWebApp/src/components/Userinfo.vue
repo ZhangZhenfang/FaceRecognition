@@ -1,11 +1,11 @@
 <template>
   <div>
     <div id="addface-div">
-      <div>
+      <div id="currentuser-div">
         当前用户：{{ username }}, 共{{ faces.length }}张
       </div>
-      <div>
-        <el-button @click="outdialogVisible = true">添加人脸</el-button>
+      <div id="newface-div">
+        <el-button type="primary" size="small" icon="el-icon-plus" @click="outdialogVisible = true">添加人脸</el-button>
         <el-dialog title="提示" :visible.sync="outdialogVisible" width="30%" :before-close="handleClose">
           <el-upload action="https://jsonplaceholder.typicode.com/posts/" list-type="picture-card" multiple
             :on-preview="handlePictureCardPreview" :on-remove="handleRemove" :auto-upload="false" ref="upload" :http-request="uploadfile">
@@ -137,6 +137,12 @@ export default {
   padding-bottom: 10px;
   padding-left: 0px;
   text-align: left;
+}
+#currentuser-div {
+  margin-top: 5px;
+}
+#newface-div {
+  margin-top: 5px;
 }
 #userface-div {
   width: 290px;

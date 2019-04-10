@@ -20,7 +20,7 @@
     delete from face
     where faceid = #{faceid,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="peer.afang.facerecognition.pojo.Face">
+  <insert id="insert" parameterType="peer.afang.facerecognition.pojo.Face" useGeneratedKeys="true" keyColumn="faceid" keyProperty="faceid">
     insert into face (faceid, userid, imagename
       )
     values (#{faceid,jdbcType=INTEGER}, #{userid,jdbcType=INTEGER}, #{imagename,jdbcType=VARCHAR}

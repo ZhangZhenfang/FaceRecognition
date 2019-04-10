@@ -51,4 +51,11 @@ public interface UserService {
      * @return
      */
     List<UserInfoVO> listPage(Integer startid, Integer pageSize);
+
+    /**
+     * 更新用户信息
+     * @param user
+     */
+    Integer updateUser(User user);
+
 }

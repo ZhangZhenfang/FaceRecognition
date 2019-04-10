@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import peer.afang.facerecognition.pojo.User;
 import peer.afang.facerecognition.service.UserService;
@@ -13,6 +14,7 @@ import peer.afang.facerecognition.util.ResponseUtil;
 import peer.afang.facerecognition.vo.UserInfoVO;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -44,10 +46,30 @@ public class UserController {
         }
         User user = new User();
         user.setUsername(userName);
+        user.setTime(new Date());
         userService.addUser(user);
         result.put("status", 1);
         result.put("message", "添加成功");
+        result.put("data", user);
         return result;
+    }
+
+    /**
+     * 更新用户
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "updateUser", method = RequestMethod.POST)
+    public JSONObject updateUser(@RequestParam(value = "userid") Integer userid,
+                                 @RequestParam(value = "username") String userName) {
+        User byName = userService.getByName(userName);
+        if (byName != null) {
+            return ResponseUtil.wrapResponse(2, "用户名已经存在", "");
+        }
+        User user = userService.getById(userid);
+        user.setUsername(userName);
+        userService.updateUser(user);
+        return ResponseUtil.wrapResponse(1, "更新成功", user);
     }
 
     /**

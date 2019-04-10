@@ -19,11 +19,11 @@
     delete from user
     where userid = #{userid,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="peer.afang.facerecognition.pojo.User">
-    insert into user (userid, username)
-    values (#{userid,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR})
+  <insert id="insert" parameterType="peer.afang.facerecognition.pojo.User" useGeneratedKeys="true" keyColumn="userid" keyProperty="userid">
+    insert into user (userid, username, time)
+    values (#{userid,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{time,jdbcType=TIMESTAMP})
   </insert>
-  <insert id="insertSelective" parameterType="peer.afang.facerecognition.pojo.User">
+  <insert id="insertSelective" parameterType="peer.afang.facerecognition.pojo.User"  useGeneratedKeys="true" keyColumn="userid" keyProperty="userid">
     insert into user
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="userid != null">

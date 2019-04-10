@@ -79,10 +79,9 @@ export default {
   color: #333;
   text-align: center;
   height: 20px;
-  /* line-height: 60px; */
 }
 .el-aside {
-  background-color: #D3DCE6;
+  background-color: #545c64;
   color: #333;
   text-align: center;
   max-height: 60%;
@@ -91,7 +90,10 @@ export default {
   background-color: #E9EEF3;
   color: #333;
   text-align: center;
-  max-height: 60%;
+  min-height: 900px;
+}
+.el-breadcrumb {
+  font-size: 17px;
 }
 body > .el-container {
   margin-bottom: 40px;
