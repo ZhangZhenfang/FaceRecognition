@@ -78,10 +78,11 @@ public class UserController {
      */
     @ResponseBody
     @RequestMapping(value = "listAllUser", method = RequestMethod.POST)
-    public JSONObject listAllUser(Integer startid, Integer pageSize) {
-        LOGGER.info("{}, {}", startid, pageSize);
+    public JSONObject listAllUser(@RequestParam(value = "pageNumber") Integer pageNumber,
+                                  @RequestParam(value = "pageSize") Integer pageSize) {
+        LOGGER.info("{}, {}", pageNumber, pageSize);
         JSONObject result = new JSONObject();
-        List<UserInfoVO> users = userService.listPage(startid, pageSize);
+        List<UserInfoVO> users = userService.listPage(pageNumber, pageSize);
         result.put("status", 1);
         result.put("message", "success");
         result.put("data", users);

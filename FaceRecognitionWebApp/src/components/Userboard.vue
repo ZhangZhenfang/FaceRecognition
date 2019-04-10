@@ -1,5 +1,10 @@
 <template>
   <div>
+    <div class="bread-div">
+      <el-breadcrumb separator-class="el-icon-arrow-right">
+        <el-breadcrumb-item v-for="bread in breads[breadIndex]" v-bind:key="bread.path" :to="bread.path">{{ bread.title }}</el-breadcrumb-item>
+      </el-breadcrumb>
+    </div>
     <div id="adduser-div">
       <el-button size="small" type="primary" icon="el-icon-plus" @click="outdialogVisible = true">新建用户</el-button>
       <el-dialog title="新建用户" :visible.sync="outdialogVisible" width="30%" @close="handleClose">
@@ -23,7 +28,7 @@
         </el-table-column>
         <el-table-column prop="faces" label="">
           <template slot-scope="scope">
-            <router-link :to="{ name: 'Userinfo', query: { userid: scope.row.userid, username: scope.row.username }}">详细信息</router-link>
+            <router-link :to="{ name: 'Userinfo', params: { breads: breads }, query: { userid: scope.row.userid, username: scope.row.username }}">详细信息</router-link>
           </template>
         </el-table-column>
         <el-table-column prop="faces" label="">
@@ -32,8 +37,9 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-pagination @current-change="handleCurrentChange" layout="prev, pager, next" :page-size=10 :total="countuser">
-      </el-pagination>
+      <div id="page-div">
+        <el-pagination @current-change="handleCurrentChange" layout="prev, pager, next" :page-size=10 :total="countuser"></el-pagination>
+      </div>
       <el-dialog title="编辑用户" :visible.sync="updatedialogVisible" width="30%" @close="handleClose">
         <el-input ref="adduserinput" v-model="u.username" placeholder="请输入用户名"></el-input>
         <p id="message">{{ message }}</p>
@@ -43,7 +49,6 @@
         </span>
       </el-dialog>
     </div>
-    
   </div>
 </template>
 
@@ -52,7 +57,26 @@ export default {
   name: 'Userboard',
   data () {
     return {
-      u:{},
+      breadIndex: 'userboard',
+      breads: {
+        userboard: [
+          {
+            path: 'Userboard',
+            title: '用户管理'
+          }
+        ],
+        userinfo: [
+          {
+            path: 'Userboard',
+            title: '用户管理'
+          },
+          {
+            path: 'Userinfo',
+            title: '用户详情'
+          }
+        ]
+      },
+      u: {},
       updatedialogVisible: false,
       message: '',
       username: '',
@@ -79,12 +103,15 @@ export default {
     }
   },
   methods: {
+    changeBread (index) {
+      this.breadIndex = index
+    },
     editUser (user) {
       this.u = user
       this.updatedialogVisible = true
     },
     handleClose () {
-      this.message = '',
+      this.message = ''
       this.username = ''
     },
     updateUser () {
@@ -119,12 +146,11 @@ export default {
       console.log(row.name)
     },
     handleCurrentChange (val) {
-      var u = this.tableData[this.tableData.length - 1]
-      console.log(u.date, val)
+      this.listNextPage(val, 10)
     },
-    listNextPage (startid, pageSize) {
+    listNextPage (pageNumber, pageSize) {
       this.axios.post('http://localhost:8080/user/listAllUser', this.qs.stringify({
-        startid: startid,
+        pageNumber: pageNumber,
         pageSize: pageSize
       })).then((response) => {
         console.log(response)
@@ -149,7 +175,7 @@ export default {
   mounted () {
     this.$emit('changeBread', 'userboard')
     this.countAllUser()
-    this.listNextPage(0, 10)
+    this.listNextPage(1, 10)
   }
 }
 </script>
@@ -164,5 +190,14 @@ export default {
 }
 #message {
   color: red;
+}
+#page-div {
+  width: 100%;
+  margin-top: 10px;
+  background-color: white;
+  text-align: center;
+}
+.bread-div {
+  font-size: 17px;
 }
 </style>

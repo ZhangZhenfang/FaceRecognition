@@ -1,5 +1,10 @@
 <template>
   <div>
+    <div class="bread-div">
+      <el-breadcrumb separator-class="el-icon-arrow-right">
+        <el-breadcrumb-item v-for="bread in breads[breadIndex]" v-bind:key="bread.path" :to="bread.path">{{ bread.title }}</el-breadcrumb-item>
+      </el-breadcrumb>
+    </div>
     <div id="addface-div">
       <div id="currentuser-div">
         当前用户：{{ username }}, 共{{ faces.length }}张
@@ -42,6 +47,8 @@ export default {
   name: 'Userinfo',
   data () {
     return {
+      breads: {},
+      breadIndex: '',
       userid: 0,
       username: '',
       outdialogVisible: false,
@@ -122,7 +129,8 @@ export default {
     }
   },
   mounted () {
-    this.$emit('changeBread', 'userinfo')
+    this.breads = this.$route.params.breads
+    this.breadIndex = 'userinfo'
     this.userid = this.$route.query.userid
     this.username = this.$route.query.username
     this.getFacesByUserid(this.userid)

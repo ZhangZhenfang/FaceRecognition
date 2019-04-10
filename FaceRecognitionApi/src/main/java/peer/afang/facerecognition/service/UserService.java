@@ -46,11 +46,11 @@ public interface UserService {
 
     /**
      * 分页查询user
-     * @param startid
+     * @param pageNumber
      * @param pageSize
      * @return
      */
-    List<UserInfoVO> listPage(Integer startid, Integer pageSize);
+    List<UserInfoVO> listPage(Integer pageNumber, Integer pageSize);
 
     /**
      * 更新用户信息

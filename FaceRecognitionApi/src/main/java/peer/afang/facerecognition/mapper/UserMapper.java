@@ -73,9 +73,9 @@ public interface UserMapper {
 
     /**
      * 分页查询user
-     * @param startid
-     * @param pageSize
+     * @param start
+     * @param end
      * @return
      */
-    List<User> listPage(@Param(value = "startid") Integer startid, @Param(value = "pageSize") Integer pageSize);
+    List<User> listPage(@Param(value = "start") Integer start, @Param(value = "end") Integer end);
 }

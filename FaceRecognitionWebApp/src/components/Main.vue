@@ -6,13 +6,10 @@
     </el-header>
     <el-container>
       <el-aside width="150px">
-        <Menu></Menu>
+        <Menu :menuIndex="menuIndex" ></Menu>
       </el-aside>
       <el-main>
-        <el-breadcrumb separator-class="el-icon-arrow-right">
-          <el-breadcrumb-item v-for="bread in breads[breadIndex]" v-bind:key="bread.path" :to="bread.path">{{ bread.title }}</el-breadcrumb-item>
-        </el-breadcrumb>
-        <router-view @changeBread="changeBread"/>
+        <router-view @changeMenuIndex="changeMenuIndex"/>
       </el-main>
     </el-container>
     </el-container>
@@ -27,45 +24,13 @@ export default {
   name: 'Main',
   data () {
     return {
-      breadIndex: 'index',
-      breads: {
-        index: [
-          {
-            path: '/',
-            title: '首页'
-          }
-        ],
-        userboard: [
-          {
-            path: '/',
-            title: '首页'
-          },
-          {
-            path: 'Userboard',
-            title: '用户管理'
-          }
-        ],
-        userinfo: [
-          {
-            path: '/',
-            title: '首页'
-          },
-          {
-            path: 'Userboard',
-            title: '用户管理'
-          },
-          {
-            path: 'Userinfo',
-            title: '用户详情'
-          }
-        ]
-      },
+      menuIndex: '1',
       message: 'main'
     }
   },
   methods: {
-    changeBread (index) {
-      this.breadIndex = index
+    changeMenuIndex (index) {
+      this.menuIndex = index
     }
   },
   mounted () {

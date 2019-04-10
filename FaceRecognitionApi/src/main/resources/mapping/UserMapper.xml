@@ -76,7 +76,6 @@
   <select id="listPage" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
-    from user
-    where userid > #{startid, jdbcType=INTEGER} order by userid asc limit #{pageSize, jdbcType=INTEGER}
+    from user order by userid asc limit #{start, jdbcType=INTEGER}, #{end, jdbcType=INTEGER}
   </select>
 </mapper>
