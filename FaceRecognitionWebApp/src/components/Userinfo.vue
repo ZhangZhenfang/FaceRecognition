@@ -10,8 +10,9 @@
         当前用户：{{ username }}, 共{{ faces.length }}张
       </div>
       <div id="newface-div">
-        <el-button type="primary" size="small" icon="el-icon-plus" @click="outdialogVisible = true">添加人脸</el-button>
-        <el-dialog title="提示" :visible.sync="outdialogVisible" width="30%" :before-close="handleClose">
+        <el-button type="primary" size="small" icon="el-icon-plus" @click="outdialogVisible = true">添加人脸图像</el-button>
+        <el-button type="primary" size="small" icon="el-icon-plus" @click="videodialogVisible = true">视频添加人脸</el-button>
+        <el-dialog title="添加人脸" :visible.sync="outdialogVisible" width="30%" :before-close="handleClose">
           <el-upload action="https://jsonplaceholder.typicode.com/posts/" list-type="picture-card" multiple
             :on-preview="handlePictureCardPreview" :on-remove="handleRemove" :auto-upload="false" ref="upload" :http-request="uploadfile">
             <i class="el-icon-plus"></i>
@@ -23,6 +24,10 @@
             <el-button type="primary" @click="upload()">上 传</el-button>
             <el-button type="primary" @click="handleClose">确 定</el-button>
           </span>
+        </el-dialog>
+
+        <el-dialog title="添加人脸" :visible.sync="videodialogVisible" width="30%" :before-close="handleClose">
+          <Video></Video>
         </el-dialog>
       </div>
     </div>
@@ -43,10 +48,14 @@
 </template>
 
 <script>
+import Video from './Video'
+
 export default {
   name: 'Userinfo',
+  components: { Video },
   data () {
     return {
+      videodialogVisible: false,
       breads: {},
       breadIndex: '',
       userid: 0,
@@ -139,7 +148,7 @@ export default {
 
 <style>
 #addface-div {
-  width:200px;
+  width:600px;
   padding-top: 10px;
   padding-bottom: 10px;
   padding-left: 0px;
@@ -150,6 +159,7 @@ export default {
 }
 #newface-div {
   margin-top: 5px;
+  width: 100%;
 }
 #userface-div {
   width: 290px;

@@ -4,44 +4,39 @@
     <meta charset="utf-8">
     <script type="text/javascript" src="js/jquery-3.2.1.min.js"></script>
     <title>title</title>
-    <style>
-    .booth {
-        width:500px;
-        background:#ccc;
-        border: 0px solid #ddd;
-        margin: 0 auto;
-    }
-    </style>
 </head>
 <body>
     <video id="video"></video>
     <button id="btn" onclick="start()">start</button>
     <button id="stopbtn" onclick="stop()">stop</button>
     <canvas id="canvas"></canvas>
-    <img id="img" width="500" height="300"/>
+    <img id="img" width="320" height="240"/>
 </body>
 <script>
-    let convas = document.querySelector("#canvas")
-    let video = document.querySelector("#video")
-    let img = document.querySelector("#img")
-    let btn = document.querySelector("button")
-    let context = canvas.getContext('2d')
-    let width = 500
-    let height = 0
-    let streaming = false
+    var convas = document.querySelector("#canvas")
+    var video = document.querySelector("#video")
+    var img = document.querySelector("#img")
+    var btn = document.querySelector("button")
+    var context = canvas.getContext('2d')
+    var width = 320
+    var height = 240
+    var streaming = false
     var interveal
-    // let img = new Image()
+
     navigator.mediaDevices.getUserMedia({video: true, audio: false}).then(stream => {
         video.srcObject = stream
         video.play()
         interveal = setInterval(snapAndUpload, 200)
     })
+
     function start() {
         interveal = setInterval(snapAndUpload, 200)
     }
+
     function stop() {
         clearInterval(interveal)
     }
+
     function snapAndUpload() {
         var file = takecapture()
         var formData = new FormData()
@@ -60,9 +55,10 @@
             }
         })
     }
+    
     function takecapture() {
         if (streaming) {
-            context.drawImage(video, 0, 0, 500, 300)
+            context.drawImage(video, 0, 0, 320, 240)
             return DataURL2Blob(canvas.toDataURL('img/png'), 'png')
         }
     }
@@ -74,15 +70,14 @@
         for (var i = 0; i < bytes.length; i++) {
             ia[i] = bytes.charCodeAt(i)
         }
-        return new Blob([ab], {type : 'image/' + type})
+        return new Blob([ab], { type : 'image/' + type })
     }
-    // btn.addEventListener('click', snapAndUpload, false) // 按钮点击事件
 
     // 监听视频流就位事件,即视频可以播放了
     video.addEventListener('canplay', function (ev) {
         if (!streaming) {
-            height = video.videoHeight / (video.videoWidth / width)
-            console.log(height)
+            // height = video.videoHeight
+            // width = video.videoWidth
             video.setAttribute('width', width)
             video.setAttribute('height', height)
             canvas.setAttribute('width', width)

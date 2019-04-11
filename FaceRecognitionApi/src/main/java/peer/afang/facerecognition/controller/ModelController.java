@@ -41,6 +41,7 @@ public class ModelController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ModelController.class);
 
+    private CascadeClassifier cascadeClassifier;
     @Resource
     private Path path;
 
@@ -117,7 +118,9 @@ public class ModelController {
         }
 
         Mat m = Imgcodecs.imread(tmpPath);
-        CascadeClassifier cascadeClassifier = new CascadeClassifier(path.getOpencvCasPath());
+        if (this.cascadeClassifier == null) {
+            loadDetector();
+        }
         MatOfRect matOfRect = new MatOfRect();
         cascadeClassifier.detectMultiScale(m, matOfRect);
         List<Rect> rects = matOfRect.toList();
@@ -153,5 +156,11 @@ public class ModelController {
         Imgcodecs.imencode(".png", m, matOfByte);
         byte[] base64Bytes = Base64.encodeBase64(matOfByte.toArray());
         return new String(base64Bytes);
+    }
+
+    private synchronized void loadDetector() {
+        if (this.cascadeClassifier == null) {
+            cascadeClassifier = new CascadeClassifier(path.getOpencvCasPath());
+        }
     }
 }
