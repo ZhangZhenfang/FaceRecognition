@@ -11,6 +11,10 @@ public class Face {
 
     private Date time;
 
+    private String srcpath;
+
+    private String facepath;
+
     public Integer getFaceid() {
         return faceid;
     }
@@ -43,6 +47,22 @@ public class Face {
         this.time = time;
     }
 
+    public String getSrcpath() {
+        return srcpath;
+    }
+
+    public void setSrcpath(String srcpath) {
+        this.srcpath = srcpath;
+    }
+
+    public String getFacepath() {
+        return facepath;
+    }
+
+    public void setFacepath(String facepath) {
+        this.facepath = facepath;
+    }
+
     @Override
     public String toString() {
         return "Face{" +
@@ -50,6 +70,8 @@ public class Face {
                 ", userid=" + userid +
                 ", imagename='" + imagename + '\'' +
                 ", time=" + time +
+                ", srcpath='" + srcpath + '\'' +
+                ", facepath='" + facepath + '\'' +
                 '}';
     }
 }

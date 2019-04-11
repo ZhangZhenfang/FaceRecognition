@@ -8,6 +8,7 @@ import peer.afang.facerecognition.mapper.FaceMapper;
 import peer.afang.facerecognition.pojo.Face;
 import peer.afang.facerecognition.property.Path;
 import peer.afang.facerecognition.service.FaceService;
+import peer.afang.facerecognition.util.FileUtil;
 import peer.afang.facerecognition.vo.FaceVO;
 
 import javax.annotation.Resource;
@@ -101,7 +102,17 @@ public class FaceServiceImpl implements FaceService {
 
     @Override
     public Integer deleteFace(Integer faceid) {
-        return faceMapper.deleteByPrimaryKey(faceid);
+        Face face = faceMapper.selectByPrimaryKey(faceid);
+        Integer i = faceMapper.deleteByPrimaryKey(faceid);
+        boolean b1 = FileUtil.deleteFileOnExit(path.getUserFacePath() + face.getSrcpath());
+        boolean b2 = FileUtil.deleteFileOnExit(path.getUserFacePath() + face.getFacepath());
+        LOGGER.info(face.toString());
+        LOGGER.info("{}", b1);
+        LOGGER.info("{}", b2);
+        if (b1 && b2){
+            return i;
+        }
+        return null;
     }
 
     private void checkDir(String path) {

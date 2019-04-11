@@ -143,7 +143,7 @@ export default {
       })
     },
     handleClick (row) {
-      console.log(row.name)
+      // console.log(row.name)
     },
     handleCurrentChange (val) {
       this.listNextPage(val, 10)
@@ -153,7 +153,7 @@ export default {
         pageNumber: pageNumber,
         pageSize: pageSize
       })).then((response) => {
-        console.log(response)
+        // console.log(response)
         if (response.data.status === 1) {
           this.tableData = response.data.data
         } else {
@@ -163,7 +163,7 @@ export default {
     },
     countAllUser () {
       this.axios.get('http://localhost:8080/user/countAllUser').then((response) => {
-        console.log(response)
+        // console.log(response)
         if (response.data.status === 1) {
           this.countuser = response.data.data
         } else {

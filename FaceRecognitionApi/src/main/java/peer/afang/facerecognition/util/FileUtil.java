@@ -16,4 +16,19 @@ public class FileUtil {
         is.close();
         os.close();
     }
+
+    public static boolean deleteFileOnExit(String path) {
+        File file = new File(path);
+        if (file.exists() && file.isFile()) {
+            file.delete();
+        }
+        return !file.exists();
+    }
+    public static boolean deleteDirOnExit(String path) {
+        File file = new File(path);
+        if (file.exists() && file.isDirectory()) {
+            file.delete();
+        }
+        return !file.exists();
+    }
 }

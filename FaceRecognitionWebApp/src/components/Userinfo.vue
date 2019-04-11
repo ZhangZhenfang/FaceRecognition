@@ -59,7 +59,6 @@ export default {
   },
   methods: {
     deleteFace (faceid) {
-      console.log(faceid)
       this.axios.delete('http://localhost:8080/face/face/' + faceid).then((response) => {
         if (response.status === 200) {
           if (response.data.status === 1) {
@@ -76,7 +75,7 @@ export default {
       })
     },
     getFacesByUserid (userid) {
-      console.log(userid)
+      // console.log(userid)
       this.axios.get('http://localhost:8080/face/listByUserid?userid=' + userid).then((response) => {
         if (response.status === 200) {
           if (response.data.status === 1) {
@@ -98,7 +97,7 @@ export default {
         onUploadProgress: file.onProgress
       }
       this.axios.post('http://localhost:8080/face/addFace', filedata, config).then((response) => {
-        console.log(response.data.status)
+        // console.log(response.data.status)
         if (response.data.status === 1) {
           this.faces.push(response.data.data)
           file.onSuccess(response)
@@ -121,7 +120,7 @@ export default {
         .catch(_ => {})
     },
     handleRemove (file, fileList) {
-      console.log(file, fileList)
+      // console.log(file, fileList)
     },
     handlePictureCardPreview (file) {
       this.dialogImageUrl = file.url

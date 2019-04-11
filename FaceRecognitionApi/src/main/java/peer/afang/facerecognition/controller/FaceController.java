@@ -117,7 +117,10 @@ public class FaceController {
     public JSONObject deleteFace(@PathVariable(value = "faceid") Integer faceid) {
         LOGGER.info("delete {}", faceid);
         Integer integer = faceService.deleteFace(faceid);
-        return ResponseUtil.wrapResponse(1, "删除成功", integer);
+        if (integer != null) {
+            return ResponseUtil.wrapResponse(1, "删除成功", integer);
+        }
+        return ResponseUtil.wrapResponse(2, "删除失败", integer);
     }
 
     /**

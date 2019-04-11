@@ -6,9 +6,11 @@
     <result column="userid" jdbcType="INTEGER" property="userid" />
     <result column="imagename" jdbcType="VARCHAR" property="imagename" />
     <result column="time" jdbcType="TIMESTAMP" property="time" />
+    <result column="srcpath" jdbcType="VARCHAR" property="srcpath" />
+    <result column="facepath" jdbcType="VARCHAR" property="facepath" />
   </resultMap>
   <sql id="Base_Column_List">
-    faceid, userid, imagename, time
+    faceid, userid, imagename, time, srcpath, facepath
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -21,9 +23,9 @@
     where faceid = #{faceid,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="peer.afang.facerecognition.pojo.Face" useGeneratedKeys="true" keyColumn="faceid" keyProperty="faceid">
-    insert into face (faceid, userid, imagename
+    insert into face (faceid, userid, imagename, time, srcpath, facepath
       )
-    values (#{faceid,jdbcType=INTEGER}, #{userid,jdbcType=INTEGER}, #{imagename,jdbcType=VARCHAR}
+    values (#{faceid,jdbcType=INTEGER}, #{userid,jdbcType=INTEGER}, #{imagename,jdbcType=VARCHAR}, #{srcpath,jdbcType=VARCHAR}, #{facepath,jdbcType=VARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="peer.afang.facerecognition.pojo.Face" useGeneratedKeys="true" keyColumn="faceid" keyProperty="faceid">
@@ -41,6 +43,12 @@
       <if test="time != null">
         time,
       </if>
+      <if test="srcpath != null">
+        srcpath,
+      </if>
+      <if test="facepath != null">
+        facepath,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="faceid != null">
@@ -54,6 +62,12 @@
       </if>
       <if test="time != null">
         #{time,jdbcType=VARCHAR},
+      </if>
+      <if test="srcpath != null">
+        #{srcpath,jdbcType=VARCHAR},
+      </if>
+      <if test="facepath != null">
+        #{facepath,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
