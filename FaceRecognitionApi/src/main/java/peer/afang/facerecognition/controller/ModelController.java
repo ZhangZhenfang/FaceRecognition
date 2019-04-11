@@ -134,10 +134,10 @@ public class ModelController {
         String s = HttpClientUtil.PostFiles("http://localhost:12580/upload", paths, new HashMap<>(16));
         if (s != null) {
             String substring = s.substring(1, s.length() - 1);
-            String[] split = substring.split(",");
+            String[] split = substring.split(" ");
             i = 0;
             for (Rect rect : rects) {
-                User byId = userService.getById(Integer.parseInt(split[i]) + 1);
+                User byId = userService.getById(Integer.parseInt(split[i++]) + 1);
                 HashMap<String, String> p = new HashMap<>();
                 p.put("text", byId.getUsername());
                 String post = HttpClientUtil.get("http://localhost:12580/text2Mat", p);

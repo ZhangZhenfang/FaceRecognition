@@ -6,9 +6,9 @@
     <title>title</title>
     <style>
     .booth {
-        width:400px;
+        width:500px;
         background:#ccc;
-        border: 10px solid #ddd;
+        border: 0px solid #ddd;
         margin: 0 auto;
     }
     </style>
@@ -18,7 +18,7 @@
     <button id="btn" onclick="start()">start</button>
     <button id="stopbtn" onclick="stop()">stop</button>
     <canvas id="canvas"></canvas>
-    <img id="img" width="320" height="240"/>
+    <img id="img" width="500" height="300"/>
 </body>
 <script>
     let convas = document.querySelector("#canvas")
@@ -26,7 +26,7 @@
     let img = document.querySelector("#img")
     let btn = document.querySelector("button")
     let context = canvas.getContext('2d')
-    let width = 320
+    let width = 500
     let height = 0
     let streaming = false
     var interveal
@@ -34,10 +34,10 @@
     navigator.mediaDevices.getUserMedia({video: true, audio: false}).then(stream => {
         video.srcObject = stream
         video.play()
-        interveal = setInterval(snapAndUpload, 1000)
+        interveal = setInterval(snapAndUpload, 200)
     })
     function start() {
-        interveal = setInterval(snapAndUpload, 1000)
+        interveal = setInterval(snapAndUpload, 200)
     }
     function stop() {
         clearInterval(interveal)
@@ -62,7 +62,7 @@
     }
     function takecapture() {
         if (streaming) {
-            context.drawImage(video, 0, 0, 320, 240)
+            context.drawImage(video, 0, 0, 500, 300)
             return DataURL2Blob(canvas.toDataURL('img/png'), 'png')
         }
     }

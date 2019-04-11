@@ -57,7 +57,6 @@ def update():
 @app.route('/text2Mat', methods=['GET'])
 def text2Mat():
     t = request.args.get("text")
-    print(t)
     mat = FontUtil.text2Mat(t, 20, 50, 13)
     mat.save("./tmp.bmp")
     with open("./tmp.bmp", 'rb') as f:

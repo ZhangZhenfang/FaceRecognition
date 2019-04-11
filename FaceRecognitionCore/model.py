@@ -135,41 +135,41 @@ class FaceRecognitionModel:
         threshold = 0.98
         print(epoch)
 
-        with tf.Session() as sess:
-            sess.run(tf.global_variables_initializer())
-            index = 0
-            epoch_index = 1
-            for i in range(100):
-                if index + batch_size >= epoch:
-                    input_x = train[index: epoch]
-                    input_y = train_labels[index: epoch]
-                    index = 0
-                    epoch_index += 1
-                    l = list(zip(train, train_labels))
-                    np.random.shuffle(l)
-                    train, train_labels = zip(*l)
-                else:
-                    input_x = train[index:index + batch_size]
-                    input_y = train_labels[index:index + batch_size]
-                    index += batch_size
-                _, accuracy = sess.run([self.train_step, self.train_accuracy],
-                feed_dict={self.x: input_x, self.y: input_y, self.keep_prob: 0.5})
-                # saver.save(sess, './mnist_model/model.ckpt')
-
-                l = list(zip(test, test_labels))
+        # with tf.Session() as sess:
+        self.sess.run(tf.global_variables_initializer())
+        index = 0
+        epoch_index = 1
+        for i in range(100):
+            if index + batch_size >= epoch:
+                input_x = train[index: epoch]
+                input_y = train_labels[index: epoch]
+                index = 0
+                epoch_index += 1
+                l = list(zip(train, train_labels))
                 np.random.shuffle(l)
-                test, test_labels = zip(*l)
-                y_max_, y_conv_max_, train_accuracy_ = sess.run([self.y_max,
-                                                                 self.y_conv_max,
-                                                                 self.train_accuracy],
-                                                                feed_dict={self.x: test,
-                                                                           self.y: test_labels,
-                                                                           self.keep_prob: 1.0})
-                print("epoch:{} batch:{} train_accuracy:{:.3f} test_accuracy:{:.3f}".format(epoch_index,
-                                                                                            i,
-                                                                                            accuracy,
-                                                                                            train_accuracy_))
-            self.saver.save(sess, self.save_path + '/model.ckpt')
+                train, train_labels = zip(*l)
+            else:
+                input_x = train[index:index + batch_size]
+                input_y = train_labels[index:index + batch_size]
+                index += batch_size
+            _, accuracy = self.sess.run([self.train_step, self.train_accuracy],
+            feed_dict={self.x: input_x, self.y: input_y, self.keep_prob: 0.5})
+            # saver.save(sess, './mnist_model/model.ckpt')
+
+            l = list(zip(test, test_labels))
+            np.random.shuffle(l)
+            test, test_labels = zip(*l)
+            y_max_, y_conv_max_, train_accuracy_ = self.sess.run([self.y_max,
+                                                             self.y_conv_max,
+                                                             self.train_accuracy],
+                                                            feed_dict={self.x: test,
+                                                                       self.y: test_labels,
+                                                                       self.keep_prob: 1.0})
+            print("epoch:{} batch:{} train_accuracy:{:.3f} test_accuracy:{:.3f}".format(epoch_index,
+                                                                                        i,
+                                                                                        accuracy,
+                                                                                        train_accuracy_))
+        self.saver.save(self.sess, self.save_path + '/model.ckpt')
 
     def predit(self, input, label):
         if self.loaded == False:
@@ -237,7 +237,7 @@ class FaceRecognitionModel:
                                                                                         i,
                                                                                         accuracy,
                                                                                         train_accuracy_))
-            if train_accuracy_ >= threshold:
+            if (train_accuracy_ >= threshold) & (i > 50):
                 self.saver.save(self.sess, self.save_path + '/model.ckpt')
                 break
         return
