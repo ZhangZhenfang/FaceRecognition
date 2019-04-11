@@ -19,6 +19,14 @@
     </properties>
 
     <dependencies>
+
+        <!-- https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx-freetype -->
+        <dependency>
+            <groupId>com.badlogicgames.gdx</groupId>
+            <artifactId>gdx-freetype</artifactId>
+            <version>1.9.8</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
         <dependency>
             <groupId>com.alibaba</groupId>

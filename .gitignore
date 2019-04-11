@@ -19,6 +19,8 @@ HELP.md
 /FaceRecognitionApi/src/main/resources/static/userface/
 
 /FaceRecognitionCore/m1/
+/FaceRecognitionCore/tmp.bmp
+/FaceRecognitionCore/models/
 /FaceRecognitionCore/m2/
 /FaceRecognitionCore/m3/
 /FaceRecognitionCore/m4/
@@ -35,6 +37,9 @@ HELP.md
 /.nb-gradle/
 /build/
 
+test/
+train/
+userface/
 ### VS Code ###
 .vscode
 /FaceRecognitionWebApp/.DS_Store

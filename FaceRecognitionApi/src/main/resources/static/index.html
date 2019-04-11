@@ -34,10 +34,10 @@
     navigator.mediaDevices.getUserMedia({video: true, audio: false}).then(stream => {
         video.srcObject = stream
         video.play()
-        interveal = setInterval(snapAndUpload, 500)
+        interveal = setInterval(snapAndUpload, 1000)
     })
     function start() {
-        interveal = setInterval(snapAndUpload, 500)
+        interveal = setInterval(snapAndUpload, 1000)
     }
     function stop() {
         clearInterval(interveal)
@@ -47,7 +47,7 @@
         var formData = new FormData()
         formData.append('data', file)
         $.ajax({
-            url: 'http://localhost:8080/face/detect',
+            url: 'http://localhost:8080/model/detect',
             data: formData,
             type: 'POST',
             contentType: false,

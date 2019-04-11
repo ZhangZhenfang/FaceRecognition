@@ -3,6 +3,7 @@ import tensorflow as tf
 import numpy as np
 import properties
 import math
+import os
 
 
 class FaceRecognitionModel:
@@ -180,12 +181,12 @@ class FaceRecognitionModel:
         return y_conv_, y_conv_max_
 
     def update(self):
-        train, train_labels = data_set.read_data_set2(self.super_parms.get("train_path"),
+        train, train_labels = data_set.read_data_set(self.super_parms.get("train_path"),
                                                      self.input_height,
                                                      self.input_width,
                                                      self.input_channel,
                                                      self.label_length)
-        test, test_labels = data_set.read_data_set2(self.super_parms.get("test_path"),
+        test, test_labels = data_set.read_data_set(self.super_parms.get("test_path"),
                                                    self.input_height,
                                                    self.input_width,
                                                    self.input_channel,
@@ -201,7 +202,10 @@ class FaceRecognitionModel:
         train, train_labels = zip(*l)
         if self.loaded == False:
             self.loaded = True
-            self.saver.restore(self.sess, self.save_path + "/model.ckpt")
+            if os.path.exists(self.save_path + "/model.ckpt"):
+                self.saver.restore(self.sess, self.save_path + "/model.ckpt")
+            else:
+                self.sess.run(tf.global_variables_initializer())
         index = 0
         epoch_index = 1
         for i in range(100):

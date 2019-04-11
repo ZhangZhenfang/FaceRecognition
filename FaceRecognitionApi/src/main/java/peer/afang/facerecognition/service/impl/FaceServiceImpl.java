@@ -51,10 +51,13 @@ public class FaceServiceImpl implements FaceService {
         FileOutputStream os;
         try {
             face.setImagename("tmpname");
+            face.setSrcpath("tmppath");
+            face.setFacepath("tmppath");
             face.setTime(new Date());
             faceMapper.insertSelective(face);
-            LOGGER.info(face.toString());
             face.setImagename(face.getUserid() + "_" + face.getFaceid() + ".bmp");
+            face.setSrcpath(face.getUserid() + "/src/" + face.getImagename());
+            face.setFacepath(face.getUserid() + "/face/" + face.getImagename());
             is = new FileInputStream(new File(srcPath));
             os = new FileOutputStream(new File(tmpSrcDir + face.getUserid() + "_" +
                     face.getFaceid() + ".bmp"));

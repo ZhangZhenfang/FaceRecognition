@@ -5,13 +5,16 @@ from gevent import pywsgi
 import data_set
 import model
 import numpy as np
+from font_util import FontUtil
+import base64
 
 monkey.patch_all()
 os.environ["CUDA_VISIBLE_DEVICES"] = "" #不使用GPU
 
-model = model.FaceRecognitionModel("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms2.properties")
+model = model.FaceRecognitionModel("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms2.properties",
+                                   "E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/models/1")
 app = Flask(__name__)
-
+app.config['JSON_AS_ASCII'] = False
 
 @app.route('/')
 def index():
@@ -49,6 +52,17 @@ def upload():
 def update():
     model.update()
     return "success"
+
+
+@app.route('/text2Mat', methods=['GET'])
+def text2Mat():
+    t = request.args.get("text")
+    print(t)
+    mat = FontUtil.text2Mat(t, 20, 50, 13)
+    mat.save("./tmp.bmp")
+    with open("./tmp.bmp", 'rb') as f:
+        encode = base64.b64encode(f.read())
+    return str(encode)
 
 
 if __name__ == "__main__":
