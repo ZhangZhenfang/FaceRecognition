@@ -13,7 +13,7 @@ def read_data_set(path, height, width, channel, result_length) :
         image_open = Image.open(path + "/" + f)
         if image_open.mode == "L" :
             image_open = image_open.convert("RGB")
-        array = np.array(image_open) / 256
+        array = np.array(image_open) / 255
         train[i] = array
         zeros = np.zeros(result_length)
         end = f.index("_")
@@ -35,7 +35,7 @@ def read_data_set2(path, height, width, channel, result_length) :
         image_open = Image.open(path + "/" + f)
         if image_open.mode == "L" :
             image_open = image_open.convert("RGB")
-        array = np.array(image_open) / 256
+        array = np.array(image_open) / 255
         train[i] = array
         zeros = np.zeros(result_length)
         end = f.index("_")
@@ -51,11 +51,11 @@ def read_data(paths, height, width, channel, result_length):
     i = 0
     for f in paths:
         image_open = Image.open(f)
-        if image_open.mode == "RGB" :
-            image_open = image_open.convert("L")
+        # if image_open.mode == "RGB" :
+        #     image_open = image_open.convert("L")
         if image_open.mode == "L" :
             image_open = image_open.convert("RGB")
-        array = np.array(image_open) / 256
+        array = np.array(image_open) / 255
         result[i] = array
         i += 1
     return result, labels;

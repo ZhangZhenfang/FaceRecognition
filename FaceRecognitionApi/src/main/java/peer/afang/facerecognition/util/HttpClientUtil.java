@@ -78,7 +78,40 @@ public class HttpClientUtil {
     }
 
     public static String post(String uri, HashMap<String, String> parms) {
-        return null;
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        CloseableHttpResponse response = null;
+        HttpPost post = new HttpPost(uri);
+        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(1000).setSocketTimeout(1200).build();
+        post.setConfig(requestConfig);
+        MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
+        Set<String> strings = parms.keySet();
+        for (String key : strings) {
+            multipartEntityBuilder.addTextBody(key, parms.get(key));
+        }
+        HttpEntity httpEntity = multipartEntityBuilder.build();
+        post.setEntity(httpEntity);
+        StringBuilder sb = new StringBuilder();
+        try {
+            response = client.execute(post);
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode == 200) {
+                BufferedReader bufferedReader = new BufferedReader(
+                        new InputStreamReader(response.getEntity().getContent()));
+                String str = "";
+                while (!StringUtils.isEmpty(str = bufferedReader.readLine())) {
+                    sb.append(str);
+                }
+                client.close();
+                if(response!=null){
+                    response.close();
+                }
+
+            }
+
+        } catch (IOException e) {
+            LOGGER.error("HttpClient IO异常", e);
+        }
+        return sb.toString();
     }
 
     public static String get(String uri, HashMap<String, String> parms) {

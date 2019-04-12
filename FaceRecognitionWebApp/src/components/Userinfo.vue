@@ -11,7 +11,7 @@
       </div>
       <div id="newface-div">
         <el-button type="primary" size="small" icon="el-icon-plus" @click="outdialogVisible = true">添加人脸图像</el-button>
-        <el-button type="primary" size="small" icon="el-icon-plus" @click="videodialogVisible = true">视频添加人脸</el-button>
+        <el-button type="primary" size="small" icon="el-icon-plus" @click="handleOpenVideo">视频添加人脸</el-button>
         <el-dialog title="添加人脸" :visible.sync="outdialogVisible" width="30%" :before-close="handleClose">
           <el-upload action="https://jsonplaceholder.typicode.com/posts/" list-type="picture-card" multiple
             :on-preview="handlePictureCardPreview" :on-remove="handleRemove" :auto-upload="false" ref="upload" :http-request="uploadfile">
@@ -26,8 +26,8 @@
           </span>
         </el-dialog>
 
-        <el-dialog title="添加人脸" :visible.sync="videodialogVisible" width="30%" :before-close="handleClose">
-          <Video></Video>
+        <el-dialog title="添加人脸" :visible.sync="videodialogVisible" width="400px" :before-close="handleCloseVideo">
+          <Video :stream="videoStream" :username="username" :faces="faces"></Video>
         </el-dialog>
       </div>
     </div>
@@ -55,6 +55,7 @@ export default {
   components: { Video },
   data () {
     return {
+      videoStream: {},
       videodialogVisible: false,
       breads: {},
       breadIndex: '',
@@ -111,10 +112,10 @@ export default {
           this.faces.push(response.data.data)
           file.onSuccess(response)
         } else if (response.data.status === 3) {
-          this.message(file.file.name + '未检测到人脸')
+          this.$message(file.file.name + '未检测到人脸')
           file.onError(response)
         } else if (response.data.status === 4) {
-          this.message(file.file.name + '检测到多张人脸')
+          this.$message(file.file.name + '检测到多张人脸')
           file.onError(response)
         }
       })
@@ -128,12 +129,26 @@ export default {
         })
         .catch(_ => {})
     },
+    handleOpenVideo () {
+      this.videodialogVisible = true
+      navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(stream => {
+        this.videoStream = stream
+      })
+    },
+    handleCloseVideo (done) {
+      this.videoStream.getTracks()[0].stop()
+      this.videoStream = null
+      this.videodialogVisible = false
+    },
     handleRemove (file, fileList) {
       // console.log(file, fileList)
     },
     handlePictureCardPreview (file) {
       this.dialogImageUrl = file.url
       this.dialogVisible = true
+    },
+    getVideoStream (stream) {
+      this.videoStream = stream
     }
   },
   mounted () {

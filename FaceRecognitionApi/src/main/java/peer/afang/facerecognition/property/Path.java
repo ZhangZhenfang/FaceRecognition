@@ -16,6 +16,7 @@ public class Path {
     private String opencvPath;
     private String opencvCasPath;
     private String userFacePath;
+    private String trainPath;
 
     public String getUserFacePath() {
         return userFacePath;
@@ -47,5 +48,13 @@ public class Path {
 
     public void setOpencvCasPath(String opencvCasPath) {
         this.opencvCasPath = opencvCasPath;
+    }
+
+    public String getTrainPath() {
+        return trainPath;
+    }
+
+    public void setTrainPath(String trainPath) {
+        this.trainPath = trainPath;
     }
 }

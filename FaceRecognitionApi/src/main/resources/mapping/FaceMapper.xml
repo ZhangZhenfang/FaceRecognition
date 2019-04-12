@@ -80,13 +80,21 @@
       <if test="imagename != null">
         imagename = #{imagename,jdbcType=VARCHAR},
       </if>
+      <if test="srcpath != null">
+        srcpath = #{srcpath,jdbcType=VARCHAR},
+      </if>
+      <if test="facepath != null">
+        facepath = #{facepath,jdbcType=VARCHAR}
+      </if>
     </set>
     where faceid = #{faceid,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="peer.afang.facerecognition.pojo.Face">
     update face
     set userid = #{userid,jdbcType=INTEGER},
-      imagename = #{imagename,jdbcType=VARCHAR}
+      imagename = #{imagename,jdbcType=VARCHAR},
+      srcpath = #{srcpath,jdbcType=VARCHAR},
+      facepath = #{facepath,jdbcType=VARCHAR}
     where faceid = #{faceid,jdbcType=INTEGER}
   </update>
 

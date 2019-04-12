@@ -10,26 +10,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import peer.afang.facerecognition.pojo.User;
 import peer.afang.facerecognition.property.Path;
 import peer.afang.facerecognition.service.UserService;
-import peer.afang.facerecognition.util.FaceDetectUtil;
-import peer.afang.facerecognition.util.FileUtil;
-import peer.afang.facerecognition.util.HttpClientUtil;
-import peer.afang.facerecognition.util.MatUtil;
+import peer.afang.facerecognition.util.*;
 
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author ZhangZhenfang
@@ -74,9 +71,11 @@ public class ModelController {
         if ("face".equals(type)) {
             strings = new ArrayList<>();
             strings.add(outPath);
+            LOGGER.info("{}", strings);
             String s = HttpClientUtil.PostFiles("http://localhost:12580/upload", strings, new HashMap<>());
             result.put("status", 1);
             result.put("message", "识别成功");
+            result.put("data", s);
         } else if ("image".equals(type)) {
             strings = FaceDetectUtil.detectFaceAndSub(outPath);
 
@@ -102,28 +101,10 @@ public class ModelController {
      * @return
      */
     @ResponseBody
-    @RequestMapping(value = "/detect", method = RequestMethod.POST)
-    public String detect(MultipartFile data) {
-        if (data == null) {
-            return "";
-        }
-        String tmpPath = path.getTmpPath() + data.getName() + Thread.currentThread().getName() + ".png";
-        File f = new File(tmpPath);
-        try (InputStream is = data.getInputStream(); FileOutputStream os = new FileOutputStream(f)) {
-            long length;
-            byte[] bytes = new byte[512];
-            while ((length = is.read(bytes)) != -1) { os.write(bytes); }
-        } catch (IOException e) {
-            LOGGER.error("IO异常", e);
-        }
-
-        Mat m = Imgcodecs.imread(tmpPath);
-        if (this.cascadeClassifier == null) {
-            loadDetector();
-        }
-        MatOfRect matOfRect = new MatOfRect();
-        cascadeClassifier.detectMultiScale(m, matOfRect);
-        List<Rect> rects = matOfRect.toList();
+    @RequestMapping(value = "/detectPlus", method = {RequestMethod.POST, RequestMethod.GET})
+    public String detectPlus(@RequestParam(value = "data") MultipartFile data) {
+        Mat m = getMat(data);
+        List<Rect> rects = detectFun(data, m);
         int i = 0;
         List<String> paths = new ArrayList<>();
         for (Rect rect : rects) {
@@ -134,15 +115,18 @@ public class ModelController {
             Imgproc.rectangle(m, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y +
                     rect.height), new Scalar(0, 255, 0));
         }
+        for (String s : paths) {
+            MatUtil.eHist(s, s);
+        }
         String s = HttpClientUtil.PostFiles("http://localhost:12580/upload", paths, new HashMap<>(16));
-        if (s != null) {
+        if (!StringUtils.isEmpty(s)) {
             String substring = s.substring(1, s.length() - 1);
             String[] split = substring.split(" ");
             i = 0;
             for (Rect rect : rects) {
                 User byId = userService.getById(Integer.parseInt(split[i++]) + 1);
                 HashMap<String, String> p = new HashMap<>();
-                p.put("text", byId.getUsername());
+                p.put("text", byId == null ? "未知" : byId.getUsername());
                 String post = HttpClientUtil.get("http://localhost:12580/text2Mat", p);
                 if (post != null && post.length() > 3) {
                     byte[] decode = java.util.Base64.getDecoder().decode(post.substring(2, post.length() - 1));
@@ -156,6 +140,101 @@ public class ModelController {
         Imgcodecs.imencode(".png", m, matOfByte);
         byte[] base64Bytes = Base64.encodeBase64(matOfByte.toArray());
         return new String(base64Bytes);
+    }
+
+    /**
+     * 检测人脸并将结果返回
+     * @param data
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping(value = "/detect", method = {RequestMethod.POST, RequestMethod.GET})
+    public String detect(@RequestParam(value = "data") MultipartFile data) {
+        Mat m = getMat(data);
+        List<Rect> rects = detectFun(data, m);
+        int i = 0;
+        for (Rect rect : rects) {
+            Imgproc.rectangle(m, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y +
+                    rect.height), new Scalar(0, 255, 0));
+        }
+        MatOfByte matOfByte = new MatOfByte();
+        Imgcodecs.imencode(".png", m, matOfByte);
+        byte[] base64Bytes = Base64.encodeBase64(matOfByte.toArray());
+        return new String(base64Bytes);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "trainModel")
+    public JSONObject train() {
+        HashMap<String, String> p = new HashMap<>();
+        p.put("batch_size", "20");
+        String post = HttpClientUtil.post("http://localhost:12580/train", p);
+
+        return ResponseUtil.wrapResponse(1, "trainsuccess", post);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "updateModel")
+    public JSONObject updateModel() {
+        return ResponseUtil.wrapResponse(1, "updatesuccess", "");
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "prepareData")
+    public JSONObject prepareData(@RequestParam(value = "equalHist") Boolean equalHist) {
+        String srcDir = path.getUserFacePath();
+        String outDir = path.getTrainPath();
+        File src = new File(srcDir);
+        File out = new File(outDir);
+        if (!src.exists()) {
+            return ResponseUtil.wrapResponse(2, "源文件及不存在", "");
+        }
+        LinkedList<File> files = new LinkedList<>();
+        files.add(src);
+        File f;
+        while (!files.isEmpty()) {
+            f = files.pop();
+            System.out.println(f.getName());
+            if (f.isFile()){
+                MatUtil.eHist(f.getAbsolutePath(), outDir + f.getName());
+            } else if (f.isDirectory() && f.getName().endsWith("face") || isnumber(f.getName())) {
+                for (File file : f.listFiles()) {
+                    files.add(file);
+                }
+            }
+        }
+        return ResponseUtil.wrapResponse(1, "updatesuccess", "");
+    }
+    private boolean isnumber(String str) {
+        for (int i = 0; i < str.length(); i++) {
+            if (!Character.isDigit(str.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private Mat getMat(MultipartFile data) {
+        String tmpPath = path.getTmpPath() + data.getName() + Thread.currentThread().getName() + ".png";
+        File f = new File(tmpPath);
+        try (InputStream is = data.getInputStream(); FileOutputStream os = new FileOutputStream(f)) {
+            long length;
+            byte[] bytes = new byte[512];
+            while ((length = is.read(bytes)) != -1) { os.write(bytes); }
+        } catch (IOException e) {
+            LOGGER.error("IO异常", e);
+        }
+        return Imgcodecs.imread(tmpPath);
+    }
+
+    private List<Rect> detectFun(MultipartFile data, Mat m) {
+        if (this.cascadeClassifier == null) {
+            loadDetector();
+        }
+        MatOfRect matOfRect = new MatOfRect();
+        cascadeClassifier.detectMultiScale(m, matOfRect);
+        List<Rect> rects = matOfRect.toList();
+        return rects;
     }
 
     private synchronized void loadDetector() {

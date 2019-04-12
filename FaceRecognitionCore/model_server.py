@@ -12,7 +12,7 @@ monkey.patch_all()
 os.environ["CUDA_VISIBLE_DEVICES"] = "" #不使用GPU
 
 model = model.FaceRecognitionModel("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms2.properties",
-                                   "E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/models/1")
+                                   "E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/models/2")
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 
@@ -51,6 +51,14 @@ def upload():
 @app.route('/update', methods=['GET'])
 def update():
     model.update()
+    return "success"
+
+
+@app.route('/train', methods=['POST'])
+def train():
+    batch_size = int(request.form.get('batch_size'))
+    model.super_parms.put('batch_size', batch_size)
+    # model.update()
     return "success"
 
 

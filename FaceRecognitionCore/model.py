@@ -119,18 +119,18 @@ class FaceRecognitionModel:
         self.sess = tf.Session()
 
     def train(self):
-        train, train_labels = data_set.read_data_set2(self.super_parms.get("train_path"),
+        train, train_labels = data_set.read_data_set(self.super_parms.get("train_path"),
                                                      self.input_height,
                                                      self.input_width,
                                                      self.input_channel,
                                                      self.label_length)
-        test, test_labels = data_set.read_data_set2(self.super_parms.get("test_path"),
+        test, test_labels = data_set.read_data_set(self.super_parms.get("test_path"),
                                                    self.input_height,
                                                    self.input_width,
                                                    self.input_channel,
                                                    self.label_length)
         epoch = train.shape[0]
-        batch_size = 20
+        batch_size = int(self.super_parms.get("batch_size"))
         times = epoch / batch_size
         threshold = 0.98
         print(epoch)
@@ -193,7 +193,7 @@ class FaceRecognitionModel:
                                                    self.label_length)
 
         epoch = train.shape[0]
-        batch_size = 20
+        batch_size = 6
         times = epoch / batch_size
         threshold = 0.98
         print(epoch)
