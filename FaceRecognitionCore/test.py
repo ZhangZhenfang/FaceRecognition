@@ -5,7 +5,7 @@ import tensorflow as tf
 import data_set
 import numpy as np
 import properties
-import model
+# import model
 # path = "E:/faces/s1"
 # color = "E:/faces/color/source0-99/000"
 #
@@ -177,7 +177,9 @@ import json
 #         print("Detection {}, score: {}, face_type:{}".format(
 #             d, scores[i], idx[i]))
 
-recognition_model = model.FaceRecognitionModel(
-    "E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms2.properties",
-    "E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/models/2")
-recognition_model.train()
+# recognition_model = model.FaceRecognitionModel(
+#     "E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms2.properties",
+#     "E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/models/2")
+# recognition_model.train()
+for line in open("VERSION"):
+    print(line)

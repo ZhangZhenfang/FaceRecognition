@@ -1,7 +1,5 @@
 <template>
   <div id="addfacevideo-div">
-    <!-- <button id="btn" @click="start()">start</button>
-    <button id="stopbtn" @click="stop()">stop</button> -->
     <div id="canvas-div">
       <video v-show="showVideo" id="video"></video>
       <canvas v-show="showCanvas" id="canvas"></canvas>

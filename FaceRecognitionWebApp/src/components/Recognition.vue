@@ -1,0 +1,96 @@
+<template>
+  <div id="recognition-div">
+    <div id="recognitioncanvas-div">
+      <video v-show="showVideo" id="recognitionvideo"></video>
+      <canvas v-show="showCanvas" id="recognitioncanvas"></canvas>
+      <img v-show="showImg" id="recognitionimg" width="640" height="480"/>
+    </div>
+    <div id="recognitionvideo-op-div">
+      <el-button @click="handleOpenVideo">开启摄像头</el-button>
+      <el-button @click="handleCloseVideo">关闭摄像头</el-button>
+    </div>
+  </div>
+</template>
+
+<script>
+import { setInterval } from 'timers';
+export default {
+  name: 'Recognition',
+  data () {
+    return {
+      showVideo: false,
+      showCanvas: false,
+      showImg: true,
+      stream: {},
+      canvas: {},
+      img: {},
+      video: {},
+      height: 240,
+      width: 320,
+      internal: {}
+    }
+  },
+  methods: {
+    handleOpenVideo () {
+      navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(stream => {
+        this.stream = stream
+        this.video.srcObject = this.stream
+        this.video.play()
+        this.internal = setInterval(this.snapAndUpload, 300)
+      })
+    },
+    handleCloseVideo (done) {
+      this.stream.getTracks()[0].stop()
+      this.stream = null
+      clearInterval(this.internal)
+      this.internal = {}
+    },
+    snapAndUpload () {
+      var file = this.takecapture()
+      this.currentPic = file
+      var formData = new FormData()
+      formData.append('data', file)
+      this.axios.post('http://localhost:8080/model/detectPlus', formData).then(response => {
+        this.img.src = 'data:image/png;base64,' + response.data
+      })
+    },
+    takecapture () {
+      this.showVideo = false
+      this.showImg = true
+      if (this.streaming) {
+        this.context.drawImage(this.video, 0, 0, 320, 240)
+        return this.DataURL2Blob(this.canvas.toDataURL('img/png'), 'png')
+      }
+    },
+
+    DataURL2Blob (dataURL, type) {
+      var bytes = window.atob(dataURL.split(',')[1])
+      var ab = new ArrayBuffer(bytes.length)
+      var ia = new Uint8Array(ab)
+      for (var i = 0; i < bytes.length; i++) {
+        ia[i] = bytes.charCodeAt(i)
+      }
+      return new Blob([ab], { type: 'image/' + type })
+    }
+  },
+  mounted () {
+    this.canvas = document.getElementById('recognitioncanvas')
+    this.video = document.getElementById('recognitionvideo')
+    this.img = document.getElementById('recognitionimg')
+    this.context = this.canvas.getContext('2d')
+    this.video.addEventListener('canplay', (ev) => {
+      if (!this.streaming) {
+        this.video.setAttribute('width', this.width)
+        this.video.setAttribute('height', this.height)
+        this.canvas.setAttribute('width', this.width)
+        this.canvas.setAttribute('height', this.height)
+        this.streaming = true
+      }
+    }, false)
+  }
+}
+</script>
+
+<style>
+
+</style>

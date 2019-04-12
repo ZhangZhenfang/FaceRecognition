@@ -4,6 +4,8 @@ import HelloWorld from '@/components/HelloWorld'
 import Main from '@/components/Main'
 import Userboard from '@/components/Userboard'
 import Userinfo from '@/components/Userinfo'
+import ModelControl from '@/components/ModelControl'
+import Recognition from '@/components/Recognition'
 
 Vue.use(Router)
 
@@ -28,6 +30,16 @@ export default new Router({
           path: '/userinfo',
           name: 'Userinfo',
           component: Userinfo
+        },
+        {
+          path: '/modelcontrol',
+          name: 'ModelControl',
+          component: ModelControl
+        },
+        {
+          path: '/recognition',
+          name: 'Recognition',
+          component: Recognition
         }
       ]
     }

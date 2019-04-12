@@ -82,24 +82,7 @@ export default {
       username: '',
       outdialogVisible: false,
       countuser: 2000,
-      tableData: [{
-        userid: 1,
-        username: '张振方',
-        time: 'asdf',
-        faces: '12'
-      },
-      {
-        userid: 2,
-        username: '张振方',
-        time: 'asdf',
-        faces: '12'
-      },
-      {
-        userid: 3,
-        username: '张振方',
-        time: 'asdf',
-        faces: '12'
-      }]
+      tableData: []
     }
   },
   methods: {
