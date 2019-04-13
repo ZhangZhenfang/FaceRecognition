@@ -1,6 +1,12 @@
 package peer.afang.facerecognition.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.concurrent.FutureCallback;
+import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
+import org.apache.http.impl.nio.client.HttpAsyncClients;
+import org.apache.http.util.EntityUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -118,7 +124,7 @@ public class ModelController {
         for (String s : paths) {
             MatUtil.eHist(s, s);
         }
-        String s = HttpClientUtil.PostFiles("http://localhost:12580/upload", paths, new HashMap<>(16));
+        String s = HttpClientUtil.PostFiles("http://localhost:12580/predict", paths, new HashMap<>(16));
         if (!StringUtils.isEmpty(s)) {
             String substring = s.substring(1, s.length() - 1);
             String[] split = substring.split(" ");
@@ -164,54 +170,13 @@ public class ModelController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "trainModel")
-    public JSONObject train() {
-        HashMap<String, String> p = new HashMap<>();
-        p.put("batch_size", "20");
-        String post = HttpClientUtil.post("http://localhost:12580/train", p);
-
-        return ResponseUtil.wrapResponse(1, "trainsuccess", post);
-    }
-
-    @ResponseBody
-    @RequestMapping(value = "updateModel")
-    public JSONObject updateModel() {
-        return ResponseUtil.wrapResponse(1, "updatesuccess", "");
-    }
-
-    @ResponseBody
-    @RequestMapping(value = "prepareData")
-    public JSONObject prepareData(@RequestParam(value = "equalHist") Boolean equalHist) {
-        String srcDir = path.getUserFacePath();
-        String outDir = path.getTrainPath();
-        File src = new File(srcDir);
-        File out = new File(outDir);
-        if (!src.exists()) {
-            return ResponseUtil.wrapResponse(2, "源文件及不存在", "");
+    @RequestMapping(value = "restore", method = RequestMethod.GET)
+    public JSONObject restore() {
+        String s = HttpClientUtil.get("http://localhost:12580/restore", new HashMap<>());
+        if ("success".equals(s)) {
+            return ResponseUtil.wrapResponse(1, "部署成功", "");
         }
-        LinkedList<File> files = new LinkedList<>();
-        files.add(src);
-        File f;
-        while (!files.isEmpty()) {
-            f = files.pop();
-            System.out.println(f.getName());
-            if (f.isFile()){
-                MatUtil.eHist(f.getAbsolutePath(), outDir + f.getName());
-            } else if (f.isDirectory() && f.getName().endsWith("face") || isnumber(f.getName())) {
-                for (File file : f.listFiles()) {
-                    files.add(file);
-                }
-            }
-        }
-        return ResponseUtil.wrapResponse(1, "updatesuccess", "");
-    }
-    private boolean isnumber(String str) {
-        for (int i = 0; i < str.length(); i++) {
-            if (!Character.isDigit(str.charAt(i))) {
-                return false;
-            }
-        }
-        return true;
+        return ResponseUtil.wrapResponse(2, "部署失败", "");
     }
 
     private Mat getMat(MultipartFile data) {

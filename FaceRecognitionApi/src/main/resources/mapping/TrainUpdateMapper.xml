@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="peer.afang.facerecognition.mapper.TrainUpdateMapper">
+    <resultMap id="BaseResultMap" type="peer.afang.facerecognition.pojo.TrainUpdate">
+        <id column="trainupdateid" jdbcType="INTEGER" property="trainupdateid" />
+        <result column="time" jdbcType="TIMESTAMP" property="time" />
+        <result column="status" jdbcType="VARCHAR" property="status" />
+        <result column="param" jdbcType="VARCHAR" property="param" />
+        <result column="log" jdbcType="VARCHAR" property="log" />
+        <result column="version" jdbcType="VARCHAR" property="version" />
+    </resultMap>
+    <sql id="Base_Column_List">
+    trainupdateid, time, status, param, log, version
+  </sql>
+    <select id="getById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from train_update
+        where trainupdateid = #{trainupdateid,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteById" parameterType="java.lang.Integer">
+    delete from train_update
+    where trainupdateid = #{trainupdateid,jdbcType=INTEGER}
+  </delete>
+    <insert id="insert" parameterType="peer.afang.facerecognition.pojo.TrainUpdate" useGeneratedKeys="true" keyColumn="faceid" keyProperty="trainupdateid">
+    insert into train_update (time, status, param, log, version
+      )
+    values (#{time,jdbcType=TIMESTAMP}, #{status,jdbcType=VARCHAR}, #{param,jdbcType=VARCHAR}, #{log,jdbcType=VARCHAR}, #{version,jdbcType=VARCHAR}
+      )
+  </insert>
+    <update id="updateById" parameterType="peer.afang.facerecognition.pojo.TrainUpdate">
+    update train_update
+    set time = #{time,jdbcType=TIMESTAMP},
+      status = #{status,jdbcType=VARCHAR},
+      param = #{param,jdbcType=VARCHAR},
+      log = #{log,jdbcType=VARCHAR},
+      version = #{version,jdbcType=VARCHAR}
+    where trainupdateid = #{trainupdateid,jdbcType=INTEGER}
+  </update>
+
+    <select id="listAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from train_update
+    </select>
+
+    <select id="getLast" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from train_update order by trainupdateid desc limit 1
+    </select>
+</mapper>

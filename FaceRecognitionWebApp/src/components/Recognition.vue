@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { setInterval } from 'timers';
+import { setInterval, setTimeout } from 'timers';
 export default {
   name: 'Recognition',
   data () {
@@ -27,7 +27,8 @@ export default {
       video: {},
       height: 240,
       width: 320,
-      internal: {}
+      internal: {},
+      stop: false
     }
   },
   methods: {
@@ -36,22 +37,28 @@ export default {
         this.stream = stream
         this.video.srcObject = this.stream
         this.video.play()
-        this.internal = setInterval(this.snapAndUpload, 300)
+        setTimeout(this.snapAndUpload(), 200)
+        // this.internal = setInterval(this.snapAndUpload, 300)
       })
     },
     handleCloseVideo (done) {
       this.stream.getTracks()[0].stop()
       this.stream = null
       clearInterval(this.internal)
-      this.internal = {}
+      // this.internal = {}
+      this.stop = true
     },
     snapAndUpload () {
+      // var snapAndUpload = this.snapAndUpload
       var file = this.takecapture()
       this.currentPic = file
       var formData = new FormData()
       formData.append('data', file)
       this.axios.post('http://localhost:8080/model/detectPlus', formData).then(response => {
         this.img.src = 'data:image/png;base64,' + response.data
+        if (!this.stop) {
+          setTimeout(this.snapAndUpload, 300)
+        }
       })
     },
     takecapture () {

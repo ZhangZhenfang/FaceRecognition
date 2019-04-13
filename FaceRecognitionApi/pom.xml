@@ -20,6 +20,12 @@
 
     <dependencies>
 
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpasyncclient</artifactId>
+            <version>4.1.1</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/com.badlogicgames.gdx/gdx-freetype -->
         <dependency>
             <groupId>com.badlogicgames.gdx</groupId>

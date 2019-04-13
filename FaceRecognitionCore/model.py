@@ -4,17 +4,29 @@ import numpy as np
 import properties
 import math
 import os
-
+import status_handler
 
 class FaceRecognitionModel:
 
-    def __init__(self, propertityPath, save_path):
+    def __init__(self, propertityPath, save_path, batch_size, label_length):
         self.save_path = save_path
         self.super_parms = properties.parse(propertityPath)
         self.input_height = int(self.super_parms.get("input_height"))
         self.input_width = int(self.super_parms.get("input_width"))
         self.input_channel = int(self.super_parms.get("input_channel"))
-        self.label_length = int(self.super_parms.get("label_length"))
+        self.steps = []
+        f = open('VERSION')
+        self.current_version = int(f.readline())
+        # self.save_path = '{}{}{}'.format(save_path, '/', current_version)
+        label_length_ = int(f.readline())
+        if label_length != 0:
+            self.label_length = label_length
+        else:
+            self.label_length = label_length_
+        if batch_size != 0:
+            self.batch_size = batch_size
+        else:
+            self.batch_size = int(self.super_parms.get("batch_size"))
         conv1_filters = int(self.super_parms.get("conv1_filters"))
         conv2_filters = int(self.super_parms.get("conv2_filters"))
         conv3_filters = int(self.super_parms.get("conv3_filters"))
@@ -118,7 +130,13 @@ class FaceRecognitionModel:
         self.loaded = False
         self.sess = tf.Session()
 
-    def train(self):
+    def train(self, url, id):
+        self.steps.clear()
+        f = open('VERSION', 'r')
+        last_version = f.readline()
+        print(last_version)
+        last_version = int(last_version)
+        f.close()
         train, train_labels = data_set.read_data_set(self.super_parms.get("train_path"),
                                                      self.input_height,
                                                      self.input_width,
@@ -130,7 +148,7 @@ class FaceRecognitionModel:
                                                    self.input_channel,
                                                    self.label_length)
         epoch = train.shape[0]
-        batch_size = int(self.super_parms.get("batch_size"))
+        batch_size = self.batch_size
         times = epoch / batch_size
         threshold = 0.98
         print(epoch)
@@ -139,7 +157,7 @@ class FaceRecognitionModel:
         self.sess.run(tf.global_variables_initializer())
         index = 0
         epoch_index = 1
-        for i in range(100):
+        for i in range(200):
             if index + batch_size >= epoch:
                 input_x = train[index: epoch]
                 input_y = train_labels[index: epoch]
@@ -159,28 +177,55 @@ class FaceRecognitionModel:
             l = list(zip(test, test_labels))
             np.random.shuffle(l)
             test, test_labels = zip(*l)
-            y_max_, y_conv_max_, train_accuracy_ = self.sess.run([self.y_max,
+            y_max_, y_conv_max_, test_accuracy_ = self.sess.run([self.y_max,
                                                              self.y_conv_max,
                                                              self.train_accuracy],
                                                             feed_dict={self.x: test,
                                                                        self.y: test_labels,
                                                                        self.keep_prob: 1.0})
-            print("epoch:{} batch:{} train_accuracy:{:.3f} test_accuracy:{:.3f}".format(epoch_index,
+            step_status = "epoch:{} batch:{} train_accuracy:{:.3f} test_accuracy:{:.3f}".format(epoch_index,
                                                                                         i,
                                                                                         accuracy,
-                                                                                        train_accuracy_))
-        self.saver.save(self.sess, self.save_path + '/model.ckpt')
+                                                                                        test_accuracy_)
+            self.steps.append(step_status)
+            print(step_status)
+            status_handler.handleTrainStep(url, id, step_status)
 
-    def predit(self, input, label):
+            if (accuracy >= threshold) & (test_accuracy_ >= threshold) & (i > 50):
+
+                break
+        current_version = str(last_version + 1)
+        self.saver.save(self.sess, self.save_path + '/' + current_version + '/model.ckpt')
+        f = open('VERSION', 'w')
+        f.write(current_version + '\n')
+        f.write(str(self.label_length) + '\n')
+        f.write(self.save_path + '/' + current_version + '/model.ckpt\n')
+        for s in self.steps:
+            f.write(s + '\n')
+        f.close()
+        return current_version, self.steps
+
+    def predict(self, input, label):
         if self.loaded == False:
             self.loaded = True
-            self.saver.restore(self.sess, self.save_path + "/model.ckpt")
+            v = str(self.current_version)
+            self.saver.restore(self.sess, self.save_path + '/' + v + "/model.ckpt")
         y_conv_, y_conv_max_ = self.sess.run([self.y_conv, self.y_conv_max], feed_dict={self.x: input,
                                                                                        self.y: label,
                                                                                        self.keep_prob: 1.0})
         return y_conv_, y_conv_max_
 
-    def update(self):
+    def update(self, url, id):
+        self.steps.clear()
+        f = open('VERSION', 'r')
+        last_version = f.readline()
+        f.readline()
+        last_path = f.readline()
+        last_path = last_path.replace('\n', '')
+        last_version = int(last_version)
+        current_version = last_version + 1
+        current_version = str(current_version)
+        f.close()
         train, train_labels = data_set.read_data_set(self.super_parms.get("train_path"),
                                                      self.input_height,
                                                      self.input_width,
@@ -200,11 +245,14 @@ class FaceRecognitionModel:
         l = list(zip(train, train_labels))
         np.random.shuffle(l)
         train, train_labels = zip(*l)
-        if self.loaded == False:
+        if self.loaded == False: # 如果未加载则加载参数或者重新初始化参数
             self.loaded = True
-            if os.path.exists(self.save_path + "/model.ckpt"):
-                self.saver.restore(self.sess, self.save_path + "/model.ckpt")
-            else:
+            # print(last_path + '.index')
+            if os.path.exists(last_path + '.index'): # 存在则restore
+                print('restore')
+                self.saver.restore(self.sess, last_path)
+            else: # 不存在则重新初始化参数
+                print('init')
                 self.sess.run(tf.global_variables_initializer())
         index = 0
         epoch_index = 1
@@ -227,17 +275,29 @@ class FaceRecognitionModel:
             l = list(zip(test, test_labels))
             np.random.shuffle(l)
             test, test_labels = zip(*l)
-            y_max_, y_conv_max_, train_accuracy_ = self.sess.run([self.y_max,
+            y_max_, y_conv_max_, test_accuracy_ = self.sess.run([self.y_max,
                                                              self.y_conv_max,
                                                              self.train_accuracy],
                                                             feed_dict={self.x: test,
                                                                        self.y: test_labels,
                                                                        self.keep_prob: 1.0})
-            print("epoch:{} batch:{} train_accuracy:{:.3f} test_accuracy:{:.3f}".format(epoch_index,
+            step_status = "epoch:{} batch:{} train_accuracy:{:.3f} test_accuracy:{:.3f}".format(epoch_index,
                                                                                         i,
                                                                                         accuracy,
-                                                                                        train_accuracy_))
-            if (train_accuracy_ >= threshold) & (i > 50):
-                self.saver.save(self.sess, self.save_path + '/model.ckpt')
+                                                                                        test_accuracy_)
+            self.steps.append(step_status)
+            print(step_status)
+            status_handler.handleTrainStep(url, id, step_status)
+            if (accuracy >= threshold) & (test_accuracy_ >= threshold) & (i > 20):
                 break
-        return
+        print(self.save_path + '/' + current_version + '/model.ckpt')
+        self.saver.save(self.sess, self.save_path + '/' + current_version + '/model.ckpt')
+        f = open('VERSION', 'w')
+        f.write(current_version + '\n')
+        f.write(str(self.label_length) + '\n')
+        f.write(self.save_path + '/' + current_version + '/model.ckpt\n')
+        for s in self.steps:
+            f.write(s + '\n')
+        f.close()
+        return current_version, self.steps
+
