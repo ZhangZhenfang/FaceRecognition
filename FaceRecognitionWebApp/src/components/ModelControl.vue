@@ -8,7 +8,6 @@
 </template>
 
 <script>
-import { setInterval, setTimeout } from 'timers';
 export default {
   name: 'ModelControl',
   data () {
@@ -39,11 +38,10 @@ export default {
         if (response.data.status === 1) {
           this.trainupdateid = response.data.data
         }
-        this.interval = setTimeout(this.getSteps, 1000)
+        setTimeout(this.getSteps, 1000)
       })
     },
     getSteps () {
-      var that = this
       this.axios.post('http://localhost:8080/status/getSteps', this.qs.stringify({
         trainupdateid: this.trainupdateid
       })).then(response => {

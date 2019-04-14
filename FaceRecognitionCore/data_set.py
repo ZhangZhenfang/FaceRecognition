@@ -40,7 +40,7 @@ def read_data_set2(path, height, width, channel, result_length) :
         zeros = np.zeros(result_length)
         end = f.index("_")
         print(end)
-        zeros[int(f[1:end])] = 1
+        zeros[int(f[1:end]) - 1] = 1
         labels[i] = zeros
         i += 1
     return (train, labels)
@@ -60,3 +60,9 @@ def read_data(paths, height, width, channel, result_length):
         i += 1
     return result, labels;
 
+
+def shuffle(train, label):
+    l = list(zip(train, label))
+    np.random.shuffle(l)
+    train_, label_ = zip(*l)
+    return train_, label_

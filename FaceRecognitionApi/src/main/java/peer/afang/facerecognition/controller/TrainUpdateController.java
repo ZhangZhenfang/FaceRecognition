@@ -101,11 +101,13 @@ public class TrainUpdateController {
             public void failed(final Exception ex) {
                 System.out.println(httpPost.getRequestLine() + "->" + ex);
                 System.out.println(" callback thread id is : " + Thread.currentThread().getId());
+                trainUpdateService.failed(id, "tmp", "tmp");
             }
             @Override
             public void cancelled() {
                 System.out.println(httpPost.getRequestLine() + " cancelled");
                 System.out.println(" callback thread id is : " + Thread.currentThread().getId());
+                trainUpdateService.failed(id, "tmp", "tmp");
             }
         });
 

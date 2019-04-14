@@ -176,12 +176,15 @@ import json
 #     for i, d in enumerate(dets):
 #         print("Detection {}, score: {}, face_type:{}".format(
 #             d, scores[i], idx[i]))
+#
+# recognition_model = model.FaceRecognitionModel(
+#     "E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms2.properties",
+#     "E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/models", 0, 0)
+# recognition_model.train("", "", 20)
 
-recognition_model = model.FaceRecognitionModel(
-    "E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms2.properties",
-    "E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/models", 0, 0)
-# recognition_model.train()
-recognition_model.update()
+# with tf.Session() as sess:
+#     print(tf.__version__)
+# recognition_model.update()
 # for line in open("VERSION"):
 #     print(line)
 
@@ -189,3 +192,21 @@ recognition_model.update()
 # f.write('asdf\n')
 # f.write('asdf\n')
 # f.close()
+
+import new_model
+super_params = {
+    'input_height': 128,
+    'input_width': 128,
+    'input_channel': 3,
+    'conv1_filter_size': 3,
+    'conv2_filter_size': 3,
+    'conv3_filter_size': 3,
+    'conv1_filter_num': 32,
+    'conv2_filter_num': 63,
+    'conv3_filter_num': 64,
+    'fc1_length': 1024,
+    'out_length': 10,
+    'batch_size': 100,
+    'epoch': 10
+}
+new_model.train_model(super_params)

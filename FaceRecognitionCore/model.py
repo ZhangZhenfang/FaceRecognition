@@ -6,9 +6,11 @@ import math
 import os
 import status_handler
 
+
 class FaceRecognitionModel:
 
     def __init__(self, propertityPath, save_path, batch_size, label_length):
+        print("init")
         self.save_path = save_path
         self.super_parms = properties.parse(propertityPath)
         self.input_height = int(self.super_parms.get("input_height"))
@@ -44,73 +46,73 @@ class FaceRecognitionModel:
         # x_image = tf.reshape(x, [-1, height, width, 3])
         self.keep_prob = tf.placeholder(tf.float32, name="keep_prob")
         # 卷积层1卷积核
-        W_conv1 = tf.Variable(tf.truncated_normal([conv1_filter_size, conv1_filter_size, self.input_channel,
-                                                   conv1_filters], stddev=0.1))
+        self.W_conv1 = tf.Variable(tf.truncated_normal([conv1_filter_size, conv1_filter_size, self.input_channel,
+                                                   conv1_filters], stddev=0.1), name='W_conv1')
         # 卷积层1偏置
-        b_conv1 = tf.constant(0.1, shape=[conv1_filters])
+        self.b_conv1 = tf.constant(0.1, shape=[conv1_filters])
 
         # 卷积层1卷积后经过激活函数relu的结果
-        h_conv1 = tf.nn.relu(tf.nn.conv2d(self.x, W_conv1, strides=[1, 1, 1, 1], padding='SAME') + b_conv1)
+        self.h_conv1 = tf.nn.relu(tf.nn.conv2d(self.x, self.W_conv1, strides=[1, 1, 1, 1], padding='SAME') + self.b_conv1, name='h_conv1')
         # 进行卷积层1的池化操作
-        h_pool1 = tf.nn.max_pool(h_conv1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+        self.h_pool1 = tf.nn.max_pool(self.h_conv1, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME', name='h_pool1')
         # h_pool1 = tf.nn.dropout(h_pool1, keep_prob)
         # 卷积层2卷积核
-        W_conv2 = tf.Variable(tf.truncated_normal([conv2_filter_size, conv2_filter_size, conv1_filters, conv2_filters],
-                                                  stddev=0.1))
+        self.W_conv2 = tf.Variable(tf.truncated_normal([conv2_filter_size, conv2_filter_size, conv1_filters, conv2_filters],
+                                                  stddev=0.1), name='W_conv2')
         # 卷积层2偏置
-        b_conv2 = tf.constant(0.1, shape=[conv2_filters])
+        self.b_conv2 = tf.constant(0.1, shape=[conv2_filters])
 
         # 卷积层2卷积后经过relu激活函数的结果
-        h_conv2 = tf.nn.relu(tf.nn.conv2d(h_pool1, W_conv2, strides=[1, 1, 1, 1], padding='SAME') + b_conv2)
+        self.h_conv2 = tf.nn.relu(tf.nn.conv2d(self.h_pool1, self.W_conv2, strides=[1, 1, 1, 1], padding='SAME') + self.b_conv2, name='h_conv2')
         # 进行卷积层2池化操作
-        h_pool2 = tf.nn.max_pool(h_conv2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+        self.h_pool2 = tf.nn.max_pool(self.h_conv2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME', name='h_pool2')
         # h_pool2 = tf.nn.dropout(h_pool2, keep_prob)
 
-        W_conv3 = tf.Variable(tf.truncated_normal([conv3_filter_size, conv3_filter_size, conv2_filters, conv3_filters],
-                                                  stddev=0.1))
-        b_conv3 = tf.constant(0.1, shape=[conv3_filters])
+        self.W_conv3 = tf.Variable(tf.truncated_normal([conv3_filter_size, conv3_filter_size, conv2_filters, conv3_filters],
+                                                  stddev=0.1), name='W_conv3')
+        self.b_conv3 = tf.constant(0.1, shape=[conv3_filters])
 
-        h_conv3 = tf.nn.relu(tf.nn.conv2d(h_pool2, W_conv3, strides=[1, 1, 1, 1], padding='SAME') + b_conv3)
-        h_pool3 = tf.nn.max_pool(h_conv3, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
-        h_pool3 = tf.nn.dropout(h_pool3, self.keep_prob)
+        self.h_conv3 = tf.nn.relu(tf.nn.conv2d(self.h_pool2, self.W_conv3, strides=[1, 1, 1, 1], padding='SAME') + self.b_conv3, name='h_conv3')
+        self.h_pool3 = tf.nn.max_pool(self.h_conv3, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME', name='h_pool3')
+        self.h_pool3_d = tf.nn.dropout(self.h_pool3, self.keep_prob, name='h_pool3_d')
         # 全连接层1权重定义
-        W_fc1 = tf.Variable(tf.truncated_normal([math.ceil(self.input_height / 8) * math.ceil(self.input_width / 8)
-                                                 * conv3_filters, 1024], stddev=0.1))
+        self.W_fc1 = tf.Variable(tf.truncated_normal([math.ceil(self.input_height / 8) * math.ceil(self.input_width / 8)
+                                                 * conv3_filters, 1024], stddev=0.1), name='W_fc1')
         # 全连接层1偏置定义
-        b_fc1 = tf.constant(0.1, shape=[1024])
+        self.b_fc1 = tf.constant(0.1, shape=[1024])
 
         # 对卷积层2的输出展开
-        h_pool3 = tf.reshape(h_pool3, [-1, math.ceil(self.input_height / 8)
+        self.h_pool3_flat = tf.reshape(self.h_pool3_d, [-1, math.ceil(self.input_height / 8)
                                        * math.ceil(self.input_width / 8)
-                                       * conv3_filters])
+                                       * conv3_filters], name='h_pool3_flat')
         # 全连接层1，上一层的输出矩阵乘权重后加偏置后经过激活函数
-        h_fc1 = tf.nn.relu(tf.matmul(h_pool3, W_fc1) + b_fc1)
+        self.h_fc1 = tf.nn.relu(tf.matmul(self.h_pool3_flat, self.W_fc1) + self.b_fc1, name='h_fc1')
 
         # dropout可解决过拟合问题
 
-        h_fc1 = tf.nn.dropout(h_fc1, self.keep_prob)
+        self.h_fc1_d = tf.nn.dropout(self.h_fc1, self.keep_prob, name='h_fc1_d')
 
         # 全连接层2权重
-        W_fc2 = tf.Variable(tf.truncated_normal([1024, self.label_length], stddev=0.1))
+        self.W_fc2 = tf.Variable(tf.truncated_normal([1024, self.label_length], stddev=0.1), name='W_fc2')
         # 全连接层2偏置
-        b_fc2 = tf.constant(0.1, shape=[self.label_length])
+        self.b_fc2 = tf.constant(0.1, shape=[self.label_length])
 
         # 输出
-        self.y_conv = tf.matmul(h_fc1, W_fc2) + b_fc2
+        self.y_conv = tf.add(tf.matmul(self.h_fc1_d, self.W_fc2), self.b_fc2, name='y_conv')
 
         # 交叉熵
-        cross_entry = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=self.y, logits=self.y_conv))
+        self.cross_entry = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=self.y, logits=self.y_conv), name='cross_entry')
         # 选择优化器对交叉熵进行最小化优化
-        self.train_step = tf.train.AdamOptimizer(learn_rate).minimize(cross_entry, name="train_step")
+        self.train_step = tf.train.AdamOptimizer(learn_rate).minimize(self.cross_entry, name="train_step")
 
         # 计算正确的个数，向量对应的位置的数进行比较，相等则对应位置为True
         self.y_max = tf.argmax(self.y, 1, name="y_max")
         self.y_conv_max = tf.argmax(self.y_conv, 1, name="y_conv_max")
         # 预测值
-        prediction = tf.argmax(self.y_conv, 1)
-        correct_prediction = tf.equal(self.y_max, self.y_conv_max)
+        self.prediction = tf.argmax(self.y_conv, 1, name='preditiction')
+        self.correct_prediction = tf.equal(self.y_max, self.y_conv_max, name='correct_prediction')
         # 计算训练准确率，将True转为1，然后计算平均值
-        self.train_accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32), name="train_accuracy")
+        self.train_accuracy = tf.reduce_mean(tf.cast(self.correct_prediction, tf.float32), name="train_accuracy")
 
         inputs = {
                     'input_x': tf.saved_model.utils.build_tensor_info(self.x),
@@ -129,8 +131,14 @@ class FaceRecognitionModel:
         self.saver = tf.train.Saver()
         self.loaded = False
         self.sess = tf.Session()
+        # if self.loaded == False:
+        #     v = str(self.current_version)
+        #     if os.path.exists(self.save_path + '/' + v):
+        #         self.loaded = True
+        #         print(self.save_path + '/' + v + "/model.ckpt")
+        #         self.saver.restore(self.sess, self.save_path + '/' + v + "/model.ckpt")
 
-    def train(self, url, id):
+    def train(self, url, id, times):
         self.steps.clear()
         f = open('VERSION', 'r')
         last_version = f.readline()
@@ -149,7 +157,6 @@ class FaceRecognitionModel:
                                                    self.label_length)
         epoch = train.shape[0]
         batch_size = self.batch_size
-        times = epoch / batch_size
         threshold = 0.98
         print(epoch)
 
@@ -157,7 +164,7 @@ class FaceRecognitionModel:
         self.sess.run(tf.global_variables_initializer())
         index = 0
         epoch_index = 1
-        for i in range(200):
+        for i in range(times):
             if index + batch_size >= epoch:
                 input_x = train[index: epoch]
                 input_y = train_labels[index: epoch]
@@ -189,7 +196,8 @@ class FaceRecognitionModel:
                                                                                         test_accuracy_)
             self.steps.append(step_status)
             print(step_status)
-            status_handler.handleTrainStep(url, id, step_status)
+            if url != '':
+                status_handler.handleTrainStep(url, id, step_status)
 
             if (accuracy >= threshold) & (test_accuracy_ >= threshold) & (i > 50):
 
@@ -209,11 +217,19 @@ class FaceRecognitionModel:
         if self.loaded == False:
             self.loaded = True
             v = str(self.current_version)
+            print(self.save_path + '/' + v + "/model.ckpt")
             self.saver.restore(self.sess, self.save_path + '/' + v + "/model.ckpt")
         y_conv_, y_conv_max_ = self.sess.run([self.y_conv, self.y_conv_max], feed_dict={self.x: input,
                                                                                        self.y: label,
                                                                                        self.keep_prob: 1.0})
         return y_conv_, y_conv_max_
+
+    def uninstall(self):
+        self.sess.close()
+
+    def restore(self):
+        v = str(self.current_version)
+        self.saver.restore(self.sess, self.save_path + '/' + v + "/model.ckpt")
 
     def update(self, url, id):
         self.steps.clear()
@@ -252,7 +268,7 @@ class FaceRecognitionModel:
                 print('restore')
                 self.saver.restore(self.sess, last_path)
             else: # 不存在则重新初始化参数
-                print('init')
+                print('initinit')
                 self.sess.run(tf.global_variables_initializer())
         index = 0
         epoch_index = 1

@@ -11,11 +11,12 @@ import base64
 monkey.patch_all()
 os.environ["CUDA_VISIBLE_DEVICES"] = "" #不使用GPU
 
-server_model = model.FaceRecognitionModel("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms2.properties",
-                                   "E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/models",
-                                   0, 0)
+
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
+app.server_model = model.FaceRecognitionModel("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms2.properties",
+                                   "E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/models",
+                                   0, 0)
 
 @app.route('/')
 def index():
@@ -29,22 +30,25 @@ def response_request():
 
 @app.route('/restore')
 def restore():
-    server_model = model.FaceRecognitionModel("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms2.properties",
+    del app.server_model
+    app.server_model.uninstall()
+    app.server_model = model.FaceRecognitionModel("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms2.properties",
                                    "E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/models",
                                    0, 0)
+    app.server_model.restore()
     return "success"
 
 
 @app.route('/predict', methods=['POST'])
 def upload():
-    super_parms = server_model.super_parms
+    super_parms = app.server_model.super_parms
     imgs = request.files.getlist('data')
     input_height = int(super_parms.get("input_height"))
     input_width = int(super_parms.get("input_width"))
     input_channel = int(super_parms.get("input_channel"))
     label_length = int(super_parms.get("label_length"))
     input, label = data_set.read_data(imgs, input_height, input_width, input_channel, label_length)
-    y_conv_, y_conv_max_ = server_model.predict(input, label)
+    y_conv_, y_conv_max_ = app.server_model.predict(input, label)
     print(y_conv_)
     np_sum = np.sum(y_conv_)
     print(np_sum)
