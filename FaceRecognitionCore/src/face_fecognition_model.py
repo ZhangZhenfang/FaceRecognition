@@ -1,9 +1,7 @@
-import data_set
 import tensorflow as tf
 import numpy as np
-import properties
+from src import properties, data_set, saver_loader_util as slutil
 import math
-import saver_loader_util as slutil
 
 
 class FaceRecognitionModel:
@@ -118,15 +116,15 @@ class FaceRecognitionModel:
 
     def train(self):
         train, train_labels = data_set.read_data_set2(self.super_parms.get("train_path"),
-                                                     self.input_height,
-                                                     self.input_width,
-                                                     self.input_channel,
-                                                     self.label_length)
+                                                      self.input_height,
+                                                      self.input_width,
+                                                      self.input_channel,
+                                                      self.label_length)
         test, test_labels = data_set.read_data_set2(self.super_parms.get("test_path"),
-                                                   self.input_height,
-                                                   self.input_width,
-                                                   self.input_channel,
-                                                   self.label_length)
+                                                    self.input_height,
+                                                    self.input_width,
+                                                    self.input_channel,
+                                                    self.label_length)
         epoch = train.shape[0]
         batch_size = 20
         times = epoch / batch_size

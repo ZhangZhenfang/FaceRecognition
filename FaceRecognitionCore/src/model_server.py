@@ -2,8 +2,7 @@ import os
 from gevent import monkey
 from flask import Flask, request
 from gevent import pywsgi
-import model
-
+from src import model
 
 monkey.patch_all()
 os.environ["CUDA_VISIBLE_DEVICES"] = "" #不使用GPU

@@ -124,7 +124,11 @@ public class ModelController {
         for (String s : paths) {
             MatUtil.eHist(s, s);
         }
-        String s = HttpClientUtil.PostFiles("http://localhost:12580/predict", paths, new HashMap<>(16));
+        HashMap<String, String> params = new HashMap<>(16);
+        params.put("height", String.valueOf(128));
+        params.put("width", String.valueOf(128));
+        params.put("channel", String.valueOf(3));
+        String s = HttpClientUtil.PostFiles("http://localhost:12580/predict", paths, params);
         if (!StringUtils.isEmpty(s)) {
             String substring = s.substring(1, s.length() - 1);
             String[] split = substring.split(" ");

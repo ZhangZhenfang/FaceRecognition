@@ -1,10 +1,8 @@
-import data_set
 import tensorflow as tf
 import numpy as np
-import properties
+from src import properties, data_set, status_handler
 import math
 import os
-import status_handler
 
 
 class FaceRecognitionModel:

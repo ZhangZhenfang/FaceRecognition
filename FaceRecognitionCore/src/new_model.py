@@ -1,6 +1,8 @@
 import tensorflow as tf
-import data_set
+from src import data_set, status_handler
 import math
+import numpy as np
+import os
 
 
 def define_model(x, super_params):
@@ -73,8 +75,10 @@ def define_model(x, super_params):
 
 
 def train_model(super_params):
-
-    x = tf.placeholder(tf.float32, shape=[None, 128, 128, 3], name="x")
+    input_height = super_params['input_height']
+    input_width = super_params['input_width']
+    input_chaneel = super_params['input_chaneel']
+    x = tf.placeholder(tf.float32, shape=[None, input_height, input_width, input_chaneel], name="x")
     y_ = tf.placeholder(tf.float32, shape=[None, super_params['out_length']], name="y_")
 
     initial_learning_rate = 0.001
@@ -94,7 +98,6 @@ def train_model(super_params):
     tf.add_to_collection("predict", y_fc2)
 
     with tf.Session() as sess:
-
         sess.run(tf.global_variables_initializer())
         print("------------------------------------------------------")
         X, Y = data_set.read_data_set('E:/vscodeworkspace/FaceRecognition/train', 128, 128, 3, super_params['out_length'])
@@ -116,7 +119,80 @@ def train_model(super_params):
         print("------------------------------------------------------")
 
 
-def load_model():
+def update_model(super_params, url, id):
+    log = []
+    input_height = super_params['input_height']
+    input_width = super_params['input_width']
+    input_chaneel = super_params['input_channel']
+    x = tf.placeholder(tf.float32, shape=[None, input_height, input_width, input_chaneel], name="x")
+    y_ = tf.placeholder(tf.float32, shape=[None, super_params['out_length']], name="y_")
+
+    initial_learning_rate = 0.001
+    y_fc2 = define_model(x, super_params)
+
+    loss_temp = tf.losses.softmax_cross_entropy(onehot_labels=y_, logits=y_fc2)
+    cross_entropy_loss = tf.reduce_mean(loss_temp, name='cross_entropy_loss')
+
+    train_step = tf.train.AdamOptimizer(learning_rate=initial_learning_rate, beta1=0.9, beta2=0.999,
+                                        epsilon=1e-08).minimize(cross_entropy_loss)
+
+    correct_prediction = tf.equal(tf.argmax(y_fc2, 1), tf.argmax(y_, 1))
+    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32), name='accuracy')
+
+    # save model
+    # saver = tf.train.Saver(max_to_keep=4)
+    tf.add_to_collection("predict", y_fc2)
+
+    with tf.Session() as sess:
+        ckpt = tf.train.get_checkpoint_state('../model2/')
+        sess.run(tf.global_variables_initializer())
+        loader = tf.train.Saver(var_list=[var for var in tf.trainable_variables() if not var.name.startswith("fc2")],
+                               max_to_keep=4)
+        print(ckpt)
+        if ckpt != None:
+            if os.path.exists(ckpt.model_checkpoint_path):
+                print('restored')
+                loader.restore(sess, ckpt.model_checkpoint_path)
+        X, Y = data_set.read_data_set(super_params['train_set_path'], input_height, input_width, input_chaneel,
+                                      super_params['out_length'])
+        batch_size = super_params['batch_size']
+        print()
+        print('\n')
+        print(batch_size)
+        print(super_params['epoch'])
+        index = 0
+        for epoch in range(int(super_params['epoch'])):
+            while True:
+                if index + batch_size >= epoch:
+                    input_x = X[index: epoch]
+                    input_y = Y[index: epoch]
+                    index = 0
+                    l = list(zip(X, Y))
+                    np.random.shuffle(l)
+                    X, Y = zip(*l)
+                    train_step.run(feed_dict={x: input_x, y_: input_y})
+                    break
+                else:
+                    input_x = X[index:index + batch_size]
+                    input_y = Y[index:index + batch_size]
+                    index += batch_size
+                train_step.run(feed_dict={x: input_x, y_: input_y})
+
+            train_accuracy = accuracy.eval(feed_dict={x: X, y_: Y})
+            train_loss = cross_entropy_loss.eval(feed_dict={x: X, y_: Y})
+            step_info = "epoch:{} loss: {:.5f} accuracy:{:.5f}".format(epoch, train_loss, train_accuracy)
+            status_handler.handleTrainStep(url, id, step_info)
+            log.append(step_info)
+            print(step_info)
+            saver = tf.train.Saver(max_to_keep=4)
+            if epoch % 10 == 0:
+                saver.save(sess, "../model2/my-model", global_step=epoch)
+            if (train_loss < 0.001) & (train_accuracy > 0.98):
+                saver.save(sess, "../model2/my-model", global_step=epoch)
+                break
+        return log
+
+def load_model(super_params):
     X, Y = data_set.read_data_set('E:/vscodeworkspace/FaceRecognition/train', 128, 128, 3, 10)
     with tf.Session() as sess:
         # load the meta graph and weights

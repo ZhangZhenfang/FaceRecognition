@@ -2,10 +2,9 @@ import os
 from gevent import monkey
 from flask import Flask, request
 from gevent import pywsgi
-import data_set
-import model
+from src import model, data_set
 import numpy as np
-from font_util import FontUtil
+from src.font_util import FontUtil
 import base64
 
 monkey.patch_all()
@@ -16,7 +15,7 @@ app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 app.server_model = model.FaceRecognitionModel("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms2.properties",
                                    "E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/models",
-                                   0, 0)
+                                              0, 0)
 
 @app.route('/')
 def index():
@@ -34,7 +33,7 @@ def restore():
     app.server_model.uninstall()
     app.server_model = model.FaceRecognitionModel("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms2.properties",
                                    "E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/models",
-                                   0, 0)
+                                                  0, 0)
     app.server_model.restore()
     return "success"
 

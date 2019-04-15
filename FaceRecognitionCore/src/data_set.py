@@ -2,6 +2,7 @@ from PIL import Image
 import numpy as np
 import os
 
+
 def read_data_set(path, height, width, channel, result_length) :
     len1 = len(os.listdir(path))
     train = np.empty((len1, height, width, channel))
@@ -43,7 +44,8 @@ def read_data_set2(path, height, width, channel, result_length) :
         zeros[int(f[1:end]) - 1] = 1
         labels[i] = zeros
         i += 1
-    return (train, labels)
+    return train, labels
+
 
 def read_data(paths, height, width, channel, result_length):
     result = np.empty((len(paths), height, width, channel))
@@ -51,14 +53,12 @@ def read_data(paths, height, width, channel, result_length):
     i = 0
     for f in paths:
         image_open = Image.open(f)
-        # if image_open.mode == "RGB" :
-        #     image_open = image_open.convert("L")
         if image_open.mode == "L" :
             image_open = image_open.convert("RGB")
         array = np.array(image_open) / 255
         result[i] = array
         i += 1
-    return result, labels;
+    return result, labels
 
 
 def shuffle(train, label):

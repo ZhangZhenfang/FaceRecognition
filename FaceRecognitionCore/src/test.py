@@ -1,11 +1,3 @@
-import os
-from PIL import Image
-import saver_loader_util as slutil
-import tensorflow as tf
-import data_set
-import numpy as np
-import properties
-import model
 # path = "E:/faces/s1"
 # color = "E:/faces/color/source0-99/000"
 #
@@ -85,7 +77,6 @@ import model
 #     print(y_max_)
 #     print(y_conv_max_)
 
-import json
 # _, _, _, x_, y_ = data_set.read_train("E:/faces/other", 42)
 # np.set_printoptions(threshold=30912)
 # print(x_)
@@ -193,8 +184,11 @@ import json
 # f.write('asdf\n')
 # f.close()
 
-import new_model
+from src import new_model
+
 super_params = {
+    'train_set_path':'E:/vscodeworkspace/FaceRecognition/train',
+    'test_set_path':'E:/vscodeworkspace/FaceRecognition/train',
     'input_height': 128,
     'input_width': 128,
     'input_channel': 3,
@@ -205,8 +199,9 @@ super_params = {
     'conv2_filter_num': 63,
     'conv3_filter_num': 64,
     'fc1_length': 1024,
-    'out_length': 10,
+    'out_length': 8,
     'batch_size': 100,
-    'epoch': 10
+    'epoch': 50
 }
-new_model.train_model(super_params)
+# new_model.train_model(super_params)
+new_model.update_model(super_params)

@@ -22,7 +22,7 @@ import java.util.List;
 public class StatusController {
 
     private List<String> steps = new ArrayList<>();
-
+    
     @Resource
     TrainUpdateService trainUpdateService;
 
