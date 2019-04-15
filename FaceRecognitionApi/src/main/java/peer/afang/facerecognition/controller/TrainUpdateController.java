@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import peer.afang.facerecognition.pojo.TrainUpdate;
 import peer.afang.facerecognition.property.Path;
 import peer.afang.facerecognition.service.TrainUpdateService;
+import peer.afang.facerecognition.service.UserService;
 import peer.afang.facerecognition.service.impl.TrainUpdateServiceImpl;
 import peer.afang.facerecognition.util.HttpClientUtil;
 import peer.afang.facerecognition.util.MatUtil;
@@ -42,10 +43,12 @@ public class TrainUpdateController {
     private static final Logger LOGGER = LoggerFactory.getLogger(TrainUpdateController.class);
 
     @Resource
-    TrainUpdateService trainUpdateService;
+    private TrainUpdateService trainUpdateService;
 
     @Resource
-    Path path;
+    private UserService userService;
+    @Resource
+    private Path path;
 
     @ResponseBody
     @RequestMapping(value = "trainModel")
@@ -72,6 +75,8 @@ public class TrainUpdateController {
         List<NameValuePair> nvps = new ArrayList<>();
         nvps.add(new BasicNameValuePair("url", "http://localhost:8080/status/handler"));
         nvps.add(new BasicNameValuePair("id", trainUpdate.getTrainupdateid().toString()));
+        Long aLong = userService.countAll();
+        nvps.add(new BasicNameValuePair("out_length", String.valueOf(aLong)));
         try {
             httpPost.setEntity(new UrlEncodedFormEntity(nvps));
             httpPost.setHeader("ID", String.valueOf(trainUpdate.getTrainupdateid()));

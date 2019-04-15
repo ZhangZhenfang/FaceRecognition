@@ -45,6 +45,8 @@ def response_request():
 def update():
     url = request.form.get('url')
     id = request.form.get('id')
+    out_length = request.form.get('out_length')
+    super_params['out_length'] = int(out_length)
     # version, log = model.update(url, id)
     log = new_model.update_model(super_params, url, id)
     return "{}={}={}={}".format("success", id, 'tmp', log)

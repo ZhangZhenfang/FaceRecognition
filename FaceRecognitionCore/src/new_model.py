@@ -144,7 +144,7 @@ def update_model(super_params, url, id):
     tf.add_to_collection("predict", y_fc2)
 
     with tf.Session() as sess:
-        ckpt = tf.train.get_checkpoint_state('../model2/')
+        ckpt = tf.train.get_checkpoint_state('./model2/')
         sess.run(tf.global_variables_initializer())
         loader = tf.train.Saver(var_list=[var for var in tf.trainable_variables() if not var.name.startswith("fc2")],
                                max_to_keep=4)
@@ -161,6 +161,7 @@ def update_model(super_params, url, id):
         print(batch_size)
         print(super_params['epoch'])
         index = 0
+        saver = tf.train.Saver(max_to_keep=4)
         for epoch in range(int(super_params['epoch'])):
             while True:
                 if index + batch_size >= epoch:
@@ -184,13 +185,14 @@ def update_model(super_params, url, id):
             status_handler.handleTrainStep(url, id, step_info)
             log.append(step_info)
             print(step_info)
-            saver = tf.train.Saver(max_to_keep=4)
             if epoch % 10 == 0:
-                saver.save(sess, "../model2/my-model", global_step=epoch)
-            if (train_loss < 0.001) & (train_accuracy > 0.98):
-                saver.save(sess, "../model2/my-model", global_step=epoch)
+                print('save')
+                saver.save(sess, "./model2/my-model", global_step=epoch)
+            if train_accuracy > 0.98 & (train_loss < 0.001) :
                 break
-        return log
+                # saver.save(sess, "../model2/my-model", global_step=epoch)
+        saver.save(sess, "./model2/my-model", global_step=epoch)
+    return log
 
 def load_model(super_params):
     X, Y = data_set.read_data_set('E:/vscodeworkspace/FaceRecognition/train', 128, 128, 3, 10)
