@@ -1,12 +1,6 @@
 package peer.afang.facerecognition.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.concurrent.FutureCallback;
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-import org.apache.http.impl.nio.client.HttpAsyncClients;
-import org.apache.http.util.EntityUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -131,8 +125,10 @@ public class ModelController {
         String s = HttpClientUtil.PostFiles("http://localhost:12580/predict", paths, params);
         if (!StringUtils.isEmpty(s)) {
             String substring = s.substring(1, s.length() - 1);
-            String[] split = substring.split(" ");
+            substring = substring.trim();
+            String[] split = substring.split("\\s+");
             i = 0;
+            LOGGER.info("{}", Arrays.toString(split));
             for (Rect rect : rects) {
                 User byId = userService.getById(Integer.parseInt(split[i++]) + 1);
                 HashMap<String, String> p = new HashMap<>();

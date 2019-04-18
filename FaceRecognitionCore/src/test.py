@@ -184,7 +184,7 @@
 # f.write('asdf\n')
 # f.close()
 
-from src import new_model
+from src import face_model
 
 super_params = {
     'train_set_path':'E:/vscodeworkspace/FaceRecognition/train',
@@ -199,9 +199,9 @@ super_params = {
     'conv2_filter_num': 63,
     'conv3_filter_num': 64,
     'fc1_length': 1024,
-    'out_length': 8,
+    'out_length': 10,
     'batch_size': 100,
     'epoch': 50
 }
 # new_model.train_model(super_params)
-new_model.update_model(super_params)
+face_model.update_model(super_params, '', '')

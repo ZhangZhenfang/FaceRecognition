@@ -21,7 +21,6 @@ import peer.afang.facerecognition.pojo.TrainUpdate;
 import peer.afang.facerecognition.property.Path;
 import peer.afang.facerecognition.service.TrainUpdateService;
 import peer.afang.facerecognition.service.UserService;
-import peer.afang.facerecognition.service.impl.TrainUpdateServiceImpl;
 import peer.afang.facerecognition.util.HttpClientUtil;
 import peer.afang.facerecognition.util.MatUtil;
 import peer.afang.facerecognition.util.ResponseUtil;

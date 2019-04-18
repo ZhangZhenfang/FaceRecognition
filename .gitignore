@@ -17,7 +17,7 @@ HELP.md
 /FaceRecognitionApi/*.iml
 /FaceRecognitionApi/*.ipr
 /FaceRecognitionApi/src/main/resources/static/userface/
-
+/FaceRecognitionCore/logs/
 /FaceRecognitionCore/m1/
 /FaceRecognitionCore/tmp.bmp
 /FaceRecognitionCore/models/
@@ -28,7 +28,8 @@ HELP.md
 /FaceRecognitionCore/m4/
 /FaceRecognitionCore/m1.zip
 /FaceRecognitionCore/.idea
-/FaceRecognitionCore/__pycache__
+/FaceRecognitionCore/src/__pycache__/
+/FaceRecognitionCore/__pycache__/
 /FaceRecognitionCore/mnist_model
 /FaceRecognitionCore/MNIST_data
 ### NetBeans ###

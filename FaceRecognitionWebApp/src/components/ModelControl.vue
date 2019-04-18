@@ -1,6 +1,5 @@
 <template>
   <div id="modelcontrol-div">
-      <el-button @click="train" :disabled="disableBtn">训练模型</el-button>
       <el-button @click="update" :disabled="disableBtn">更新模型</el-button>
       <el-button @click="deploy" :disabled="disableBtn">部署模型</el-button>
       <div id="steps-div"><span v-html="steps"></span></div>

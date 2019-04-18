@@ -2,15 +2,34 @@ import os
 from gevent import monkey
 from flask import Flask, request
 from gevent import pywsgi
-from src import model
+from src.font_util import FontUtil
+import base64
+from src import face_model
 
 monkey.patch_all()
 os.environ["CUDA_VISIBLE_DEVICES"] = "" #不使用GPU
 
-model = model.FaceRecognitionModel("E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/super_parms2.properties",
-                                   "E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/models", 0, 0)
+
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
+
+super_params = {
+    'train_set_path':'E:/vscodeworkspace/FaceRecognition/train',
+    'test_set_path':'E:/vscodeworkspace/FaceRecognition/train',
+    'input_height': 128,
+    'input_width': 128,
+    'input_channel': 3,
+    'conv1_filter_size': 3,
+    'conv2_filter_size': 3,
+    'conv3_filter_size': 3,
+    'conv1_filter_num': 32,
+    'conv2_filter_num': 63,
+    'conv3_filter_num': 64,
+    'fc1_length': 1024,
+    'out_length': 8,
+    'batch_size': 100,
+    'epoch': 50
+}
 
 
 @app.route('/')
@@ -27,22 +46,21 @@ def response_request():
 def update():
     url = request.form.get('url')
     id = request.form.get('id')
-    print(id)
-    print(url)
-    version, log = model.update(url, id)
-    return "{}={}={}={}".format("success", id, version, log)
+    out_length = request.form.get('out_length')
+    super_params['out_length'] = int(out_length)
+    # version, log = model.update(url, id)
+    log = face_model.update_model(super_params, url, id)
+    return "{}={}={}={}".format("success", id, 'tmp', log)
 
 
-@app.route('/train', methods=['POST'])
-def train():
-    batch_size = request.form.get('batch_size')
-    label_length = request.form.get('label_length')
-    model.label_length = label_length
-    model.batch_size = batch_size
-    print(model.label_length)
-    print(model.batch_size)
-    # model.train()
-    return "success"
+@app.route('/text2Mat', methods=['GET'])
+def text_2_mat():
+    t = request.args.get("text")
+    mat = FontUtil.text2Mat(t, 20, 50, 13)
+    mat.save("./tmp.bmp")
+    with open("./tmp.bmp", 'rb') as f:
+        encode = base64.b64encode(f.read())
+    return str(encode)
 
 
 if __name__ == "__main__":
