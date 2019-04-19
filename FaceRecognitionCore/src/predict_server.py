@@ -55,24 +55,27 @@ def predict():
     X, Y = data_set.read_data(images, height, width, channel, 0)
     graph = tf.get_default_graph()
     input_x = graph.get_operation_by_name("x").outputs[0]
-    feed_dict = {"x:0":X}
+    keep_prob = graph.get_operation_by_name("keep_prob").outputs[0]
+    feed_dict = {"x:0":X, keep_prob: 0.8}
     pred_y = tf.get_collection("predict")
     pred = app.sess.run(pred_y, feed_dict)[0]
     pred_max = app.sess.run(tf.argmax(pred, 1))
+    pred_soft_max = app.sess.run(tf.nn.softmax(pred))
+    print("{}:{}\n{}:{}".format('max', pred, 'softmax', pred_soft_max))
     index_i = 0
     for i in pred:
-        if pred[index_i][pred_max[index_i]] < 5:
+        if pred_soft_max[index_i][pred_max[index_i]] < 0.9:
             pred_max[index_i] = -1
         index_i += 1
-    print(pred)
-    print(pred_max)
+    # print(pred)
+    # print(pred_max)
     return "{}".format(pred_max)
 
 
 @app.route('/text2Mat', methods=['GET'])
 def text_2_mat():
     t = request.args.get("text")
-    mat = FontUtil.text2Mat(t, 20, 50, 13)
+    mat = FontUtil.text2Mat(t, 15, len(t) * 12, 12)
     mat.save("./tmp.bmp")
     with open("./tmp.bmp", 'rb') as f:
         encode = base64.b64encode(f.read())

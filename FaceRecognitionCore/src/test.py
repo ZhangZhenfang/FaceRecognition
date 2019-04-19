@@ -199,9 +199,9 @@ super_params = {
     'conv2_filter_num': 63,
     'conv3_filter_num': 64,
     'fc1_length': 1024,
-    'out_length': 10,
+    'out_length': 12,
     'batch_size': 100,
     'epoch': 50
 }
 # new_model.train_model(super_params)
-face_model.update_model(super_params, '', '')
+face_model.update_model(super_params, '', '', False)

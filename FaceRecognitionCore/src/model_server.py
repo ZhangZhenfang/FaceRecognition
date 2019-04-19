@@ -49,14 +49,14 @@ def update():
     out_length = request.form.get('out_length')
     super_params['out_length'] = int(out_length)
     # version, log = model.update(url, id)
-    log = face_model.update_model(super_params, url, id)
+    log = face_model.update_model(super_params, url, id, True)
     return "{}={}={}={}".format("success", id, 'tmp', log)
 
 
 @app.route('/text2Mat', methods=['GET'])
 def text_2_mat():
     t = request.args.get("text")
-    mat = FontUtil.text2Mat(t, 20, 50, 13)
+    mat = FontUtil.text2Mat(t, 15, 35, 11)
     mat.save("./tmp.bmp")
     with open("./tmp.bmp", 'rb') as f:
         encode = base64.b64encode(f.read())
