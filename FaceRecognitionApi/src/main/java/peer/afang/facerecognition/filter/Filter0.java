@@ -32,7 +32,9 @@ public class Filter0 implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         LOGGER.debug("Filter0 inited");
+
         System.load(path.getOpencvPath());
+        LOGGER.info("{} loaded", path.getOpencvPath());
     }
 
     @Override
@@ -46,16 +48,21 @@ public class Filter0 implements Filter {
 
         if (originControlType == OriginControlTypeEnum.ALLOW_ALL.getType()) {
             response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+            response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, String.valueOf(true));
             response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, RequestMethod.DELETE.name());
             filterChain.doFilter(servletRequest, servletResponse);
         } else if (originControlType == OriginControlTypeEnum.BLACK.getType()) {
             if (!originControl.getOrigins().contains(origin)) {
                 response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+                response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, String.valueOf(true));
+                response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, RequestMethod.DELETE.name());
                 filterChain.doFilter(servletRequest, servletResponse);
             }
         } else {
             if (originControl.getOrigins().contains(origin)) {
                 response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+                response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, String.valueOf(true));
+                response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, RequestMethod.DELETE.name());
                 filterChain.doFilter(servletRequest, servletResponse);
             }
         }

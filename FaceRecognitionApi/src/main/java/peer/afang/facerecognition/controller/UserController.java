@@ -99,4 +99,15 @@ public class UserController {
         Long countAllUser = userService.countAll();
         return ResponseUtil.wrapResponse(1, "success", countAllUser);
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/getUserinfo", method = RequestMethod.POST)
+    public JSONObject isExist(@RequestParam(value = "userName") String userName) {
+        User byName = userService.getByName(userName);
+        if (byName == null) {
+            return ResponseUtil.wrapResponse(1, "", "");
+        } else {
+            return ResponseUtil.wrapResponse(1, "", byName);
+        }
+    }
 }

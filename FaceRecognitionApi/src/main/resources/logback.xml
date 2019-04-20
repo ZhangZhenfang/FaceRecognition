@@ -11,6 +11,10 @@
         </layout>
     </appender>
 
+    <logger name="org.springframework.web.multipart" level="DEBUG" additivity="false">
+        <appender-ref ref="consoleLog1"/>
+    </logger>
+
     <logger name="peer.afang.facerecognition" level="DEBUG" additivity="false">
         <appender-ref ref="consoleLog1"/>
     </logger>
