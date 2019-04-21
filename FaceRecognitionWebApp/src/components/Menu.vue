@@ -11,6 +11,9 @@
       <el-menu-item index="3">
         <span slot="title">人脸识别</span>
       </el-menu-item>
+      <el-menu-item index="4">
+        <span slot="title">活体检测</span>
+      </el-menu-item>
     </el-menu>
   </div>
 </template>
@@ -36,6 +39,9 @@ export default {
           break
         case '3':
           this.$router.push('/recognition')
+          break
+        case '4':
+          this.$router.push('/live')
           break
         default:
           this.$router.push('/')

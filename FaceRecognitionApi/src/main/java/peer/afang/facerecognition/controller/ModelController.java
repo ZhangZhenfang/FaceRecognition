@@ -2,7 +2,6 @@ package peer.afang.facerecognition.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.tomcat.util.codec.binary.Base64;
-import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.opencv.core.*;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
@@ -11,24 +10,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import peer.afang.facerecognition.pojo.User;
 import peer.afang.facerecognition.property.Path;
+import peer.afang.facerecognition.property.Urls;
 import peer.afang.facerecognition.service.UserService;
 import peer.afang.facerecognition.util.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.Part;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -46,8 +41,12 @@ public class ModelController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ModelController.class);
 
     private CascadeClassifier cascadeClassifier;
+
     @Resource
     private Path path;
+
+    @Resource
+    private Urls urls;
 
     @Resource
     private UserService userService;
@@ -79,7 +78,7 @@ public class ModelController {
             strings = new ArrayList<>();
             strings.add(outPath);
             LOGGER.info("{}", strings);
-            String s = HttpClientUtil.PostFiles("http://localhost:12580/upload", strings, new HashMap<>());
+            String s = HttpClientUtil.PostFiles(urls.getFace() + "/predict", strings, new HashMap<>());
             result.put("status", 1);
             result.put("message", "识别成功");
             result.put("data", s);
@@ -90,7 +89,7 @@ public class ModelController {
                 result.put("status", 3);
                 result.put("message", "图片中未检测到人脸");
             } else {
-                String s = HttpClientUtil.PostFiles("http://localhost:12580/upload", strings, new HashMap<>());
+                String s = HttpClientUtil.PostFiles(urls.getFace() + "/predict", strings, new HashMap<>());
                 result.put("status", 1);
                 result.put("message", "识别成功");
                 result.put("data", s);
@@ -129,7 +128,7 @@ public class ModelController {
         params.put("height", String.valueOf(128));
         params.put("width", String.valueOf(128));
         params.put("channel", String.valueOf(3));
-        String s = HttpClientUtil.PostFiles("http://localhost:12580/predict", paths, params);
+        String s = HttpClientUtil.PostFiles(urls.getFace() + "/predict", paths, params);
         if (!StringUtils.isEmpty(s)) {
             String substring = s.substring(1, s.length() - 1);
             substring = substring.trim();
@@ -140,7 +139,7 @@ public class ModelController {
                 User byId = userService.getById(Integer.parseInt(split[i++]) + 1);
                 HashMap<String, String> p = new HashMap<>();
                 p.put("text", byId == null ? "未知" : byId.getUsername());
-                String post = HttpClientUtil.get("http://localhost:12580/text2Mat", p);
+                String post = HttpClientUtil.get(urls.getFace() + "/text2Mat", p);
                 if (post != null && post.length() > 3) {
                     byte[] decode = java.util.Base64.getDecoder().decode(post.substring(2, post.length() - 1));
                     Mat mat = Imgcodecs.imdecode(new MatOfByte(decode), Imgcodecs.CV_LOAD_IMAGE_UNCHANGED);
@@ -203,7 +202,7 @@ public class ModelController {
         params.put("height", String.valueOf(128));
         params.put("width", String.valueOf(128));
         params.put("channel", String.valueOf(3));
-        String s = HttpClientUtil.PostFiles("http://localhost:12580/predict", paths, params);
+        String s = HttpClientUtil.PostFiles(urls.getFace() + "/predict", paths, params);
         if (!StringUtils.isEmpty(s)) {
             String substring = s.substring(1, s.length() - 1);
             substring = substring.trim();
@@ -221,9 +220,88 @@ public class ModelController {
     }
 
     @ResponseBody
+    @RequestMapping("fakeRealPlus")
+    public String fakeRealPlus(@RequestParam(value = "data") MultipartFile data) {
+        Mat m = getMat(data);
+        List<Rect> rects = detectFun(data, m);
+        int i = 0;
+        List<String> paths = new ArrayList<>();
+        for (Rect rect : rects) {
+            Mat submat = m.submat(rect.y, rect.y + rect.height, rect.x, rect.x + rect.width);
+            Imgproc.resize(submat, submat, new Size(128, 128));
+            Imgcodecs.imwrite(path.getTmpPath() + "/" + Thread.currentThread().getId() + "_" + i + ".png", submat);
+            paths.add(path.getTmpPath() + "/" + Thread.currentThread().getId() + "_" + i++ + ".png");
+            Imgproc.rectangle(m, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y +
+                    rect.height), new Scalar(0, 255, 0));
+        }
+        HashMap<String, String> params = new HashMap<>(16);
+        params.put("height", String.valueOf(128));
+        params.put("width", String.valueOf(128));
+        params.put("channel", String.valueOf(3));
+        String s = HttpClientUtil.PostFiles(urls.getFakeReal() + "/predict", paths, params);
+        if (!StringUtils.isEmpty(s)) {
+            String substring = s.substring(1, s.length() - 1);
+            substring = substring.trim();
+            String[] split = substring.split("\\s+");
+            i = 0;
+            LOGGER.info("{}", Arrays.toString(split));
+            for (Rect rect : rects) {
+                HashMap<String, String> p = new HashMap<>();
+                p.put("text", split[i++].equals("1") ? "REAL" : "FAKE");
+                String post = HttpClientUtil.get(urls.getFace() + "/text2Mat", p);
+                if (post != null && post.length() > 3) {
+                    byte[] decode = java.util.Base64.getDecoder().decode(post.substring(2, post.length() - 1));
+                    Mat mat = Imgcodecs.imdecode(new MatOfByte(decode), Imgcodecs.CV_LOAD_IMAGE_UNCHANGED);
+                    mat.convertTo(mat, m.type());
+                    MatUtil.copy(mat, m, rect.x, rect.y);
+                }
+            }
+        }
+        MatOfByte matOfByte = new MatOfByte();
+        Imgcodecs.imencode(".png", m, matOfByte);
+        byte[] base64Bytes = Base64.encodeBase64(matOfByte.toArray());
+        return new String(base64Bytes);
+    }
+
+
+    @ResponseBody
+    @RequestMapping("fakeReal")
+    public boolean fakeReal(@RequestParam(value = "data") MultipartFile data) {
+        Mat m = getMat(data);
+        List<Rect> rects = detectFun(data, m);
+        LOGGER.info("{}", rects.size());
+        if (rects.size() == 0 || rects.size() > 1) {
+            return false;
+        }
+        int i = 0;
+        List<String> paths = new ArrayList<>();
+        Rect rect = rects.get(0);
+        Mat submat = m.submat(rect.y, rect.y + rect.height, rect.x, rect.x + rect.width);
+        Imgproc.resize(submat, submat, new Size(128, 128));
+        Imgcodecs.imwrite(path.getTmpPath() + "/" + Thread.currentThread().getId() + "_" + i + ".png", submat);
+        paths.add(path.getTmpPath() + "/" + Thread.currentThread().getId() + "_" + i++ + ".png");
+        Imgproc.rectangle(m, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y +
+                rect.height), new Scalar(0, 255, 0));
+        HashMap<String, String> params = new HashMap<>(16);
+        params.put("height", String.valueOf(128));
+        params.put("width", String.valueOf(128));
+        params.put("channel", String.valueOf(3));
+        String s = HttpClientUtil.PostFiles(urls.getFakeReal() + "/predict", paths, params);
+        if (!StringUtils.isEmpty(s)) {
+            String substring = s.substring(1, s.length() - 1);
+            substring = substring.trim();
+            String[] split = substring.split("\\s+");
+            i = 0;
+            LOGGER.info("{}", Arrays.toString(split));
+            return split[i++].equals("1") ? true : false;
+        }
+        return false;
+    }
+
+    @ResponseBody
     @RequestMapping(value = "restore", method = RequestMethod.GET)
     public JSONObject restore() {
-        String s = HttpClientUtil.get("http://localhost:12580/restore", new HashMap<>());
+        String s = HttpClientUtil.get(urls.getFace() + "/restore", new HashMap<>());
         if ("success".equals(s)) {
             return ResponseUtil.wrapResponse(1, "部署成功", "");
         }

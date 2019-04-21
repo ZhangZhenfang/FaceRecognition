@@ -13,10 +13,10 @@ app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 
 app.sess = tf.Session()
-ckpt = tf.train.get_checkpoint_state('../model2/')
+ckpt = tf.train.get_checkpoint_state('../model3/')
 saver = tf.train.import_meta_graph(ckpt.model_checkpoint_path +'.meta')
 print(ckpt.model_checkpoint_path)
-saver.restore(app.sess, tf.train.latest_checkpoint("../model2/"))
+saver.restore(app.sess, tf.train.latest_checkpoint("../model3/"))
 
 
 @app.route('/')
@@ -33,7 +33,7 @@ def response_request():
 def restore():
     tf.reset_default_graph()
     app.sess = tf.Session()
-    ckpt = tf.train.get_checkpoint_state('../model2/')
+    ckpt = tf.train.get_checkpoint_state('../model3/')
     saver = tf.train.import_meta_graph(ckpt.model_checkpoint_path +'.meta')
     saver.restore(app.sess, ckpt.model_checkpoint_path)
     return "success"
@@ -56,7 +56,7 @@ def predict():
     graph = tf.get_default_graph()
     input_x = graph.get_operation_by_name("x").outputs[0]
     keep_prob = graph.get_operation_by_name("keep_prob").outputs[0]
-    feed_dict = {"x:0":X, keep_prob: 1.0}
+    feed_dict = {"x:0":X, keep_prob: 0.8}
     pred_y = tf.get_collection("predict")
     pred = app.sess.run(pred_y, feed_dict)[0]
     pred_max = app.sess.run(tf.argmax(pred, 1))
@@ -64,7 +64,7 @@ def predict():
     print("{}:{}\n{}:{}".format('max', pred, 'softmax', pred_soft_max))
     index_i = 0
     for i in pred:
-        if pred_soft_max[index_i][pred_max[index_i]] < 0.9:
+        if pred_soft_max[index_i][pred_max[index_i]] < 0.98:
             pred_max[index_i] = -1
         index_i += 1
     # print(pred)
@@ -84,7 +84,7 @@ def text_2_mat():
 
 if __name__ == "__main__":
 
-    server = pywsgi.WSGIServer(('127.0.0.1', 12580), app)
+    server = pywsgi.WSGIServer(('127.0.0.1', 12582), app)
     server.serve_forever()
 
 

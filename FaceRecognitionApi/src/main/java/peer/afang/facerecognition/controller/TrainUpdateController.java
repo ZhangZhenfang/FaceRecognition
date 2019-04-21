@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import peer.afang.facerecognition.pojo.TrainUpdate;
 import peer.afang.facerecognition.property.Path;
+import peer.afang.facerecognition.property.Urls;
 import peer.afang.facerecognition.service.TrainUpdateService;
 import peer.afang.facerecognition.service.UserService;
 import peer.afang.facerecognition.util.HttpClientUtil;
@@ -45,6 +46,8 @@ public class TrainUpdateController {
     private TrainUpdateService trainUpdateService;
 
     @Resource
+    private Urls urls;
+    @Resource
     private UserService userService;
     @Resource
     private Path path;
@@ -54,7 +57,7 @@ public class TrainUpdateController {
     public JSONObject train() {
         HashMap<String, String> p = new HashMap<>();
         p.put("batch_size", "20");
-        String post = HttpClientUtil.post("http://localhost:12580/train", p);
+        String post = HttpClientUtil.post(urls.getModel() + "/train", p);
 
         return ResponseUtil.wrapResponse(1, "trainsuccess", post);
     }
@@ -70,9 +73,9 @@ public class TrainUpdateController {
         trainUpdate = trainUpdateService.create();
         CloseableHttpAsyncClient httpclient = HttpAsyncClients.createDefault();
         httpclient.start();
-        HttpPost httpPost = new HttpPost("http://localhost:12581/update");
+        HttpPost httpPost = new HttpPost(urls.getModel() + "/update");
         List<NameValuePair> nvps = new ArrayList<>();
-        nvps.add(new BasicNameValuePair("url", "http://localhost:8080/status/handler"));
+        nvps.add(new BasicNameValuePair("url", "http://localhost:8082/status/handler"));
         nvps.add(new BasicNameValuePair("id", trainUpdate.getTrainupdateid().toString()));
         Long aLong = userService.countAll();
         nvps.add(new BasicNameValuePair("out_length", String.valueOf(aLong)));

@@ -34,7 +34,7 @@
     <div id="userface-div" v-for="face in this.faces" v-bind:key="face.id">
       <el-card :body-style='{ padding: "10px", height: "360px"}' width="100px">
         <div id="facdimg-div">
-          <img :src="'http://localhost:8080/' + face.url" class="image">
+          <img :src="'http://localhost:8082/' + face.url" class="image">
         </div>
         <div style="padding: 14px;">
           <div class="bottom clearfix">
@@ -69,7 +69,7 @@ export default {
   },
   methods: {
     deleteFace (faceid) {
-      this.axios.delete('http://localhost:8080/face/face/' + faceid).then((response) => {
+      this.axios.delete('http://localhost:8082/face/face/' + faceid).then((response) => {
         if (response.status === 200) {
           if (response.data.status === 1) {
             for (var i = 0; i < this.faces.length; i++) {
@@ -86,7 +86,7 @@ export default {
     },
     getFacesByUserid (userid) {
       // console.log(userid)
-      this.axios.get('http://localhost:8080/face/listByUserid?userid=' + userid).then((response) => {
+      this.axios.get('http://localhost:8082/face/listByUserid?userid=' + userid).then((response) => {
         if (response.status === 200) {
           if (response.data.status === 1) {
             this.faces = response.data.data
@@ -106,7 +106,7 @@ export default {
       var config = {
         onUploadProgress: file.onProgress
       }
-      this.axios.post('http://localhost:8080/face/addFace', filedata, config).then((response) => {
+      this.axios.post('http://localhost:8082/face/addFace', filedata, config).then((response) => {
         // console.log(response.data.status)
         if (response.data.status === 1) {
           this.faces.push(response.data.data)

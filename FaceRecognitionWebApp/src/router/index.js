@@ -6,6 +6,7 @@ import Userboard from '@/components/Userboard'
 import Userinfo from '@/components/Userinfo'
 import ModelControl from '@/components/ModelControl'
 import Recognition from '@/components/Recognition'
+import Live from '@/components/Live'
 
 Vue.use(Router)
 
@@ -25,6 +26,11 @@ export default new Router({
           path: '/userboard',
           name: 'Userboard',
           component: Userboard
+        },
+        {
+          path: '/live',
+          name: 'Live',
+          component: Live
         },
         {
           path: '/userinfo',

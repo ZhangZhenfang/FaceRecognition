@@ -98,7 +98,7 @@ export default {
       this.username = ''
     },
     updateUser () {
-      this.axios.post('http://localhost:8080/user/updateUser', this.qs.stringify(this.u)).then((response) => {
+      this.axios.post('http://localhost:8082/user/updateUser', this.qs.stringify(this.u)).then((response) => {
         if (response.data.status === 1) {
           this.updatedialogVisible = false
           this.$message(response.data.message)
@@ -113,7 +113,7 @@ export default {
         this.$refs['adduserinput'].focus()
         return
       }
-      this.axios.post('http://localhost:8080/user/addUser', this.qs.stringify({
+      this.axios.post('http://localhost:8082/user/addUser', this.qs.stringify({
         userName: this.username
       })).then((response) => {
         if (response.data.status === 1) {
@@ -132,7 +132,7 @@ export default {
       this.listNextPage(val, 10)
     },
     listNextPage (pageNumber, pageSize) {
-      this.axios.post('http://localhost:8080/user/listAllUser', this.qs.stringify({
+      this.axios.post('http://localhost:8082/user/listAllUser', this.qs.stringify({
         pageNumber: pageNumber,
         pageSize: pageSize
       })).then((response) => {
@@ -145,7 +145,7 @@ export default {
       })
     },
     countAllUser () {
-      this.axios.get('http://localhost:8080/user/countAllUser').then((response) => {
+      this.axios.get('http://localhost:8082/user/countAllUser').then((response) => {
         // console.log(response)
         if (response.data.status === 1) {
           this.countuser = response.data.data
