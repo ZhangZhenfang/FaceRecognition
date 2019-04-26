@@ -9,8 +9,6 @@ def read_data_set(path, height, width, channel, result_length) :
     labels = np.empty((len1, result_length))
     i = 0
     for f in os.listdir(path) :
-        # print(f)
-        # print(result_length)
         image_open = Image.open(path + "/" + f)
         if image_open.mode == "L" :
             image_open = image_open.convert("RGB")
@@ -18,8 +16,7 @@ def read_data_set(path, height, width, channel, result_length) :
         train[i] = array
         zeros = np.zeros(result_length)
         end = f.index("_")
-        # print(end)
-        # zeros[int(f[0:end]) - 1] = 1
+        # 转为One-Hot编码格式
         zeros[int(f[0:end]) - 1] = 1
         labels[i] = zeros
         i += 1

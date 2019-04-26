@@ -23,6 +23,7 @@ def define_model(x, super_params, keep_prob):
     conv_out_height = super_params['input_height']
     conv_out_width = super_params['input_width']
 
+    # 定义卷积层1
     with tf.variable_scope("conv1"):
         conv_out_height = math.ceil(conv_out_height / 2)
         conv_out_width = math.ceil(conv_out_width / 2)
@@ -33,7 +34,7 @@ def define_model(x, super_params, keep_prob):
         biases = bias_variable([num])
         conv1 = tf.nn.relu(conv2d(x, weights) + biases)
         pool1 = max_pool_2d(conv1)
-
+    # 定义卷积层2
     with tf.variable_scope("conv2"):
         conv_out_height = math.ceil(conv_out_height / 2)
         conv_out_width = math.ceil(conv_out_width / 2)
@@ -44,7 +45,7 @@ def define_model(x, super_params, keep_prob):
         biases = bias_variable([num])
         conv2 = tf.nn.relu(conv2d(pool1, weights) + biases)
         pool2 = max_pool_2d(conv2)
-
+    # 定义卷积层3
     with tf.variable_scope("conv3"):
         conv_out_height = math.ceil(conv_out_height / 2)
         conv_out_width = math.ceil(conv_out_width / 2)
@@ -55,7 +56,7 @@ def define_model(x, super_params, keep_prob):
         biases = bias_variable([num])
         conv3 = tf.nn.relu(conv2d(pool2, weights) + biases)
         pool3 = max_pool_2d(conv3)
-
+    # 定义全连接层1
     with tf.variable_scope("fc1"):
         fc1_length = super_params['fc1_length']
         input_channel = super_params['conv3_filter_num']
@@ -63,9 +64,8 @@ def define_model(x, super_params, keep_prob):
         biases = bias_variable([fc1_length])
         fc1_flat = tf.reshape(pool3, [-1, conv_out_height * conv_out_width * input_channel])
         fc1 = tf.nn.relu(tf.matmul(fc1_flat, weights) + biases)
-        # fc1_drop = tf.nn.dropout(fc1, 0.5)
         fc1_drop = tf.nn.dropout(fc1, keep_prob)
-
+    # 定义全连接层1
     with tf.variable_scope("fc2"):
         fc1_length = super_params['fc1_length']
         out_length = super_params['out_length']
@@ -76,33 +76,34 @@ def define_model(x, super_params, keep_prob):
 
 
 def update_model(super_params, url, id, flag):
+    # 每次训练重置Graph
     tf.reset_default_graph()
     log = []
     input_height = super_params['input_height']
     input_width = super_params['input_width']
     input_chaneel = super_params['input_channel']
+    # 输入数据X，将作为模型的输入数据
     x = tf.placeholder(tf.float32, shape=[None, input_height, input_width, input_chaneel], name="x")
+    # 输入数据Y
     y_ = tf.placeholder(tf.float32, shape=[None, super_params['out_length']], name="y_")
     keep_prob = tf.placeholder(tf.float32, name='keep_prob')
     initial_learning_rate = 0.001
+    # 定义模型结构并且获取输出层
     y_fc2 = define_model(x, super_params, keep_prob)
-
+    # 定义损失函数
     loss_temp = tf.losses.softmax_cross_entropy(onehot_labels=y_, logits=y_fc2)
+    # 计算平均损失值
     cross_entropy_loss = tf.reduce_mean(loss_temp, name='cross_entropy_loss')
-
+    # 反向传播调整参数
     train_step = tf.train.AdamOptimizer(learning_rate=initial_learning_rate, beta1=0.9, beta2=0.999,
                                         epsilon=1e-08).minimize(cross_entropy_loss)
-
+    # 计算训练数据的正确率
     correct_prediction = tf.equal(tf.argmax(y_fc2, 1), tf.argmax(y_, 1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32), name='accuracy')
 
-    # save model
-    saver = tf.train.Saver(max_to_keep=4)
     tf.add_to_collection("predict", y_fc2)
 
     with tf.Session() as sess:
-        # merged = tf.summary.merge_all(name='merged') #将图形、训练过程等数据合并在一起
-        # print(merged)
         writer = tf.summary.FileWriter('logs', sess.graph) #将训练日志写入到logs文件夹下
         train_accuracy_scalar = tf.summary.scalar('train_accuracy', accuracy)
         train_loss_scalar = tf.summary.scalar('train_loss', cross_entropy_loss)
@@ -112,10 +113,10 @@ def update_model(super_params, url, id, flag):
         loader = tf.train.Saver(var_list=[var for var in tf.trainable_variables() if not var.name.startswith("fc2")],
                                max_to_keep=4)
         print(ckpt)
-        # if ckpt:
-        if os.path.exists(ckpt.model_checkpoint_path + '.meta'):
-            print('restored')
-            loader.restore(sess, ckpt.model_checkpoint_path)
+        if ckpt:
+            if os.path.exists(ckpt.model_checkpoint_path + '.meta'):
+                print('restored')
+                loader.restore(sess, ckpt.model_checkpoint_path)
         X, Y = data_set.read_data_set(super_params['train_set_path'], input_height, input_width, input_chaneel,
                                       super_params['out_length'])
         batch_size = super_params['batch_size']
