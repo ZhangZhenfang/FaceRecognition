@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
@@ -131,12 +130,16 @@ public class TrainUpdateController {
         if (!src.exists()) {
             return ResponseUtil.wrapResponse(2, "源文件夹不存在", "");
         }
+        File[] files1 = out.listFiles();
+        for (File f : files1) {
+            f.deleteOnExit();
+        }
         LinkedList<File> files = new LinkedList<>();
         files.add(src);
         File f;
         while (!files.isEmpty()) {
             f = files.pop();
-            System.out.println(f.getName());
+//            System.out.println(f.getName());
             if (f.isFile()){
                 MatUtil.eHist(f.getAbsolutePath(), outDir + f.getName());
             } else if (f.isDirectory() && f.getName().endsWith("face") || isnumber(f.getName())) {

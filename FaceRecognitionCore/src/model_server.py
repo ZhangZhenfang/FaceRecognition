@@ -45,11 +45,16 @@ def response_request():
 @app.route('/update', methods=['POST'])
 def update():
     url = request.form.get('url')
+    flag = False
+    if url != "":
+        flag = True
+    print(url)
+    print(flag)
     id = request.form.get('id')
     out_length = request.form.get('out_length')
     super_params['out_length'] = int(out_length)
     # version, log = model.update(url, id)
-    log = face_model.update_model(super_params, url, id, True)
+    log = face_model.update_model(super_params, url, id, flag)
     return "{}={}={}={}".format("success", id, 'tmp', log)
 
 

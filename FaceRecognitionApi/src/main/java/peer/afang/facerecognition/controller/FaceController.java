@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import peer.afang.facerecognition.conf.ModelUpdateTask;
 import peer.afang.facerecognition.pojo.Face;
 import peer.afang.facerecognition.pojo.User;
 import peer.afang.facerecognition.property.Path;
@@ -92,6 +93,7 @@ public class FaceController {
             result.put("data", faceVO);
         }
         deleteFiles(tmpDir);
+        ModelUpdateTask.flag = true;
         return result;
     }
 
@@ -120,6 +122,7 @@ public class FaceController {
         if (integer != null) {
             return ResponseUtil.wrapResponse(1, "删除成功", integer);
         }
+        ModelUpdateTask.flag = true;
         return ResponseUtil.wrapResponse(2, "删除失败", integer);
     }
 
