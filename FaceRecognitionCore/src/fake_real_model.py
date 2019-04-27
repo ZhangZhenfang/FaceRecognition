@@ -1,5 +1,5 @@
 import tensorflow as tf
-from src import data_set, status_handler
+from . import data_set, status_handler
 import math
 import numpy as np
 import os

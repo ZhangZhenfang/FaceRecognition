@@ -41,13 +41,6 @@ def restore():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    # re = request.form.get('restore')
-    # if re == "True":
-    #     tf.reset_default_graph()
-    #     app.sess = tf.Session()
-    #     ckpt = tf.train.get_checkpoint_state('../model2/')
-    #     saver = tf.train.import_meta_graph(ckpt.model_checkpoint_path +'.meta')
-    #     saver.restore(app.sess, ckpt.model_checkpoint_path)
     images = request.files.getlist('data')
     height = int(request.form.get('height'))
     width = int(request.form.get('width'))
@@ -67,8 +60,6 @@ def predict():
         if pred_soft_max[index_i][pred_max[index_i]] < 0.98:
             pred_max[index_i] = -1
         index_i += 1
-    # print(pred)
-    # print(pred_max)
     return "{}".format(pred_max)
 
 
@@ -84,7 +75,7 @@ def text_2_mat():
 
 if __name__ == "__main__":
 
-    server = pywsgi.WSGIServer(('127.0.0.1', 12582), app)
+    server = pywsgi.WSGIServer(('0.0.0.0', 12582), app)
     server.serve_forever()
 
 

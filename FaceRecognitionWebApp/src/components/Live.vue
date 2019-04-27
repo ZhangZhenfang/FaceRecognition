@@ -52,7 +52,7 @@ export default {
       var formData = new FormData()
       console.log(file)
       formData.append('data', file)
-      this.axios.post('http://localhost:8082/model/fakeReal', formData).then(response => {
+      this.axios.post('http://localhost:8082/model/fakeRealPlus', formData).then(response => {
         this.img.src = 'data:image/png;base64,' + response.data
         if (!this.stop) {
           setTimeout(this.snapAndUpload, 300)
