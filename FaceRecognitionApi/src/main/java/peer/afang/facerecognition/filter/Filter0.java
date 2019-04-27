@@ -1,5 +1,6 @@
 package peer.afang.facerecognition.filter;
 
+import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -42,27 +43,42 @@ public class Filter0 implements Filter {
             throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
-
+        Object user = request.getSession().getAttribute("user");
         int originControlType = originControl.getOriginControlType();
         String origin = request.getHeader("Origin");
-
+        String method = request.getMethod();
+        LOGGER.info("{}, {}", origin, method);
+        if (user == null && !request.getRequestURI().endsWith("login")) {
+            response.setHeader("Content-Type", "application/json");
+            JSONObject jo = new JSONObject();
+            jo.put("status", 0);
+            response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+            response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, String.valueOf(true));
+            response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, method);
+            response.setHeader("Access-Control-Allow-Headers", "x-requested-with,content-type");
+            response.getWriter().write(jo.toString());
+            return;
+        }
         if (originControlType == OriginControlTypeEnum.ALLOW_ALL.getType()) {
             response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
             response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, String.valueOf(true));
-            response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, RequestMethod.DELETE.name());
+            response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, method);
+            response.setHeader("Access-Control-Allow-Headers", "x-requested-with,content-type");
             filterChain.doFilter(servletRequest, servletResponse);
         } else if (originControlType == OriginControlTypeEnum.BLACK.getType()) {
             if (!originControl.getOrigins().contains(origin)) {
                 response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
                 response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, String.valueOf(true));
-                response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, RequestMethod.DELETE.name());
+                response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, method);
+                response.setHeader("Access-Control-Allow-Headers", "x-requested-with,content-type");
                 filterChain.doFilter(servletRequest, servletResponse);
             }
         } else {
             if (originControl.getOrigins().contains(origin)) {
                 response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
                 response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, String.valueOf(true));
-                response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, RequestMethod.DELETE.name());
+                response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, method);
+                response.setHeader("Access-Control-Allow-Headers", "x-requested-with,content-type");
                 filterChain.doFilter(servletRequest, servletResponse);
             }
         }

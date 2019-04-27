@@ -7,6 +7,7 @@
 </template>
 
 <script>
+import urls from '../json/urls'
 export default {
   name: 'ModelControl',
   data () {
@@ -21,7 +22,7 @@ export default {
     train () {
     },
     deploy () {
-      this.axios.get('http://localhost:8082/model/restore').then(response => {
+      this.axios.get(urls.api + '/model/restore').then(response => {
         console.log(response)
         if (response.data.status === 1) {
           this.$message('部署成功')
@@ -32,7 +33,7 @@ export default {
     },
     update () {
       this.disableBtn = true
-      this.axios.get('http://localhost:8082/trainupdate/update').then(response => {
+      this.axios.get(urls.api + '/trainupdate/update').then(response => {
         console.log(response)
         if (response.data.status === 1) {
           this.trainupdateid = response.data.data
@@ -41,7 +42,7 @@ export default {
       })
     },
     getSteps () {
-      this.axios.post('http://localhost:8082/status/getSteps', this.qs.stringify({
+      this.axios.post(urls.api + '/status/getSteps', this.qs.stringify({
         trainupdateid: this.trainupdateid
       })).then(response => {
         if (response.data.status === 1) {

@@ -7,6 +7,7 @@ import Userinfo from '@/components/Userinfo'
 import ModelControl from '@/components/ModelControl'
 import Recognition from '@/components/Recognition'
 import Live from '@/components/Live'
+import Login from '@/components/Login'
 
 Vue.use(Router)
 
@@ -16,6 +17,11 @@ export default new Router({
       path: '/hello',
       name: 'HelloWorld',
       component: HelloWorld
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      component: Login
     },
     {
       path: '/',

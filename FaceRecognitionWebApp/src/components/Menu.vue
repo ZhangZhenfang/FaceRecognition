@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <div id="menu-div">
+    <div id="account">
+      {{ account }} <el-button type="text" @click="logout">注销</el-button>
+    </div>
     <el-menu :default-active="menuIndex" class="el-menu-vertical-demo" @select="handleSelect" background-color="#545c64"
       text-color="#fff" active-text-color="#ffd04b">
       <el-menu-item index="1">
@@ -19,10 +22,31 @@
 </template>
 
 <script>
+import urls from '../json/urls'
 export default {
   name: 'Menu',
   props: ['menuIndex'],
+  data () {
+    return {
+      account: 'account'
+    }
+  },
   methods: {
+    logout () {
+      // console.log('logout')
+      this.axios.post(urls.api + '/login/logout').then(response => {
+        // this.account = response.data.data
+        console.log(response.data.status)
+        if (response.data.status === 0 || response.data.status === 1) {
+          this.$router.push('/login')
+        }
+      })
+    },
+    getAccountInfo () {
+      this.axios.post(urls.api + '/login/getAccountInfo').then(response => {
+        this.account = response.data.data
+      })
+    },
     handleOpen (key, keyPath) {
       console.log(key, keyPath)
     },
@@ -50,6 +74,7 @@ export default {
   },
   mounted () {
     this.handleSelect('1')
+    this.getAccountInfo()
   }
 }
 </script>

@@ -2,7 +2,6 @@
   <div>
     <el-container>
     <el-header>
-      this is header
     </el-header>
     <el-container>
       <el-aside width="150px">
@@ -43,7 +42,7 @@ export default {
   background-color: #B3C0D1;
   color: #333;
   text-align: center;
-  height: 20px;
+  height: 5px;
 }
 .el-aside {
   background-color: #545c64;

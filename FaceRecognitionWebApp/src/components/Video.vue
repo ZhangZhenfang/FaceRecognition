@@ -14,6 +14,7 @@
 </template>
 
 <script>
+import urls from '../json/urls'
 export default {
   props: ['stream', 'username', 'faces'],
   name: 'Video',
@@ -42,7 +43,7 @@ export default {
       var filedata = new FormData()
       filedata.append('data', this.currentPic)
       filedata.append('userName', this.username)
-      this.axios.post('http://localhost:8082/face/addFace', filedata).then((response) => {
+      this.axios.post(urls.api + '/face/addFace', filedata).then((response) => {
         if (response.data.status === 1) {
           this.faces.push(response.data.data)
           this.$message(response.data.message)
@@ -64,7 +65,7 @@ export default {
       this.currentPic = file
       var formData = new FormData()
       formData.append('data', file)
-      this.axios.post('http://localhost:8082/model/detect', formData).then(response => {
+      this.axios.post(urls.api + '/model/detect', formData).then(response => {
         this.img.src = 'data:image/png;base64,' + response.data
       })
     },

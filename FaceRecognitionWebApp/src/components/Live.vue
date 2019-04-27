@@ -13,6 +13,7 @@
 </template>
 
 <script>
+import urls from '../json/urls'
 export default {
   name: 'Live',
   data () {
@@ -52,7 +53,7 @@ export default {
       var formData = new FormData()
       console.log(file)
       formData.append('data', file)
-      this.axios.post('http://localhost:8082/model/fakeRealPlus', formData).then(response => {
+      this.axios.post(urls.api + '/model/fakeRealPlus', formData).then(response => {
         this.img.src = 'data:image/png;base64,' + response.data
         if (!this.stop) {
           setTimeout(this.snapAndUpload, 300)

@@ -49,7 +49,7 @@
 
 <script>
 import Video from './Video'
-
+import urls from '../json/urls'
 export default {
   name: 'Userinfo',
   components: { Video },
@@ -69,7 +69,7 @@ export default {
   },
   methods: {
     deleteFace (faceid) {
-      this.axios.delete('http://localhost:8082/face/face/' + faceid).then((response) => {
+      this.axios.delete(urls.api + '/face/face/' + faceid).then((response) => {
         if (response.status === 200) {
           if (response.data.status === 1) {
             for (var i = 0; i < this.faces.length; i++) {
@@ -86,7 +86,7 @@ export default {
     },
     getFacesByUserid (userid) {
       // console.log(userid)
-      this.axios.get('http://localhost:8082/face/listByUserid?userid=' + userid).then((response) => {
+      this.axios.get(urls.api + '/face/listByUserid?userid=' + userid).then((response) => {
         if (response.status === 200) {
           if (response.data.status === 1) {
             this.faces = response.data.data
@@ -106,7 +106,7 @@ export default {
       var config = {
         onUploadProgress: file.onProgress
       }
-      this.axios.post('http://localhost:8082/face/addFace', filedata, config).then((response) => {
+      this.axios.post(urls.api + '/face/addFace', filedata, config).then((response) => {
         // console.log(response.data.status)
         if (response.data.status === 1) {
           this.faces.push(response.data.data)
