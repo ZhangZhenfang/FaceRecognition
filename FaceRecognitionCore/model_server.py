@@ -2,9 +2,9 @@ import os
 from gevent import monkey
 from flask import Flask, request
 from gevent import pywsgi
-from src.font_util import FontUtil
+from font_util import FontUtil
 import base64
-from src import face_model
+import face_model
 
 monkey.patch_all()
 os.environ["CUDA_VISIBLE_DEVICES"] = "" #不使用GPU
@@ -16,6 +16,8 @@ app.config['JSON_AS_ASCII'] = False
 super_params = {
     'train_set_path':'E:/vscodeworkspace/FaceRecognition/train',
     'test_set_path':'E:/vscodeworkspace/FaceRecognition/train',
+    # 'train_set_path':'C:/Users/Administrator/Desktop/facedata/train',
+    # 'test_set_path':'C:/Users/Administrator/Desktop/facedata/train',
     'input_height': 128,
     'input_width': 128,
     'input_channel': 3,

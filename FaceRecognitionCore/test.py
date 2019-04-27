@@ -184,11 +184,13 @@
 # f.write('asdf\n')
 # f.close()
 
-from src import face_model
+import face_model
 
 super_params = {
     'train_set_path':'E:/vscodeworkspace/FaceRecognition/train',
     'test_set_path':'E:/vscodeworkspace/FaceRecognition/train',
+    # 'train_set_path':'C:/Users/Administrator/Desktop/facedata/train',
+    # 'test_set_path':'C:/Users/Administrator/Desktop/facedata/train',
     'input_height': 128,
     'input_width': 128,
     'input_channel': 3,

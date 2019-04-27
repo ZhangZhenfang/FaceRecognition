@@ -2,8 +2,8 @@ import os
 from gevent import monkey
 from flask import Flask, request
 from gevent import pywsgi
-from src import data_set
-from src.font_util import FontUtil
+import data_set
+from font_util import FontUtil
 import base64
 import tensorflow as tf
 monkey.patch_all()

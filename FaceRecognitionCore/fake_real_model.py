@@ -1,5 +1,5 @@
 import tensorflow as tf
-from . import data_set, status_handler
+import data_set, status_handler
 import math
 import numpy as np
 import os
@@ -206,6 +206,8 @@ def load_model(super_params):
 super_params = {
     'train_set_path':'C:/Users/fang/Desktop/train',
     'test_set_path':'C:/Users/fang/Desktop/train',
+    # 'train_set_path':'C:/Users/Administrator/Desktop/facedata/train',
+    # 'test_set_path':'C:/Users/Administrator/Desktop/facedata/train',
     'input_height': 128,
     'input_width': 128,
     'input_channel': 3,
