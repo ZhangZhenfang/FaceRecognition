@@ -48,38 +48,47 @@ public class Filter0 implements Filter {
         String origin = request.getHeader("Origin");
         String method = request.getMethod();
         LOGGER.info("{}, {}", origin, method);
-        if (user == null && !request.getRequestURI().endsWith("login")) {
-            response.setHeader("Content-Type", "application/json");
-            JSONObject jo = new JSONObject();
-            jo.put("status", 0);
-            response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
-            response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, String.valueOf(true));
-            response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, method);
-            response.setHeader("Access-Control-Allow-Headers", "x-requested-with,content-type");
-            response.getWriter().write(jo.toString());
-            return;
-        }
-        if (originControlType == OriginControlTypeEnum.ALLOW_ALL.getType()) {
+        String url = request.getRequestURL().toString();
+        if (url.contains("css") || url.contains("js") || url.contains("font") || url.contains("index") || url.contains("localhost")) {
             response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
             response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, String.valueOf(true));
             response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, method);
             response.setHeader("Access-Control-Allow-Headers", "x-requested-with,content-type");
             filterChain.doFilter(servletRequest, servletResponse);
-        } else if (originControlType == OriginControlTypeEnum.BLACK.getType()) {
-            if (!originControl.getOrigins().contains(origin)) {
-                response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
-                response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, String.valueOf(true));
-                response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, method);
-                response.setHeader("Access-Control-Allow-Headers", "x-requested-with,content-type");
-                filterChain.doFilter(servletRequest, servletResponse);
-            }
         } else {
-            if (originControl.getOrigins().contains(origin)) {
+            if (user == null && !request.getRequestURI().endsWith("login")) {
+                response.setHeader("Content-Type", "application/json");
+                JSONObject jo = new JSONObject();
+                jo.put("status", 0);
+                response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+                response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, String.valueOf(true));
+                response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, method);
+                response.setHeader("Access-Control-Allow-Headers", "x-requested-with,content-type");
+                response.getWriter().write(jo.toString());
+                return;
+            }
+            if (originControlType == OriginControlTypeEnum.ALLOW_ALL.getType()) {
                 response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
                 response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, String.valueOf(true));
                 response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, method);
                 response.setHeader("Access-Control-Allow-Headers", "x-requested-with,content-type");
                 filterChain.doFilter(servletRequest, servletResponse);
+            } else if (originControlType == OriginControlTypeEnum.BLACK.getType()) {
+                if (!originControl.getOrigins().contains(origin)) {
+                    response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+                    response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, String.valueOf(true));
+                    response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, method);
+                    response.setHeader("Access-Control-Allow-Headers", "x-requested-with,content-type");
+                    filterChain.doFilter(servletRequest, servletResponse);
+                }
+            } else {
+                if (originControl.getOrigins().contains(origin)) {
+                    response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+                    response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, String.valueOf(true));
+                    response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, method);
+                    response.setHeader("Access-Control-Allow-Headers", "x-requested-with,content-type");
+                    filterChain.doFilter(servletRequest, servletResponse);
+                }
             }
         }
     }

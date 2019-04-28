@@ -149,7 +149,7 @@ public class ModelController {
             }
         }
         MatOfByte matOfByte = new MatOfByte();
-        Imgcodecs.imencode(".png", m, matOfByte);
+        Imgcodecs.imencode(".jpg", m, matOfByte);
         byte[] base64Bytes = Base64.encodeBase64(matOfByte.toArray());
         return new String(base64Bytes);
     }

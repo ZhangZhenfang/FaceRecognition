@@ -107,7 +107,7 @@ def update_model(super_params, url, id, flag):
         train_accuracy_scalar = tf.summary.scalar('train_accuracy', accuracy)
         train_loss_scalar = tf.summary.scalar('train_loss', cross_entropy_loss)
 
-        ckpt = tf.train.get_checkpoint_state('../model3/')
+        ckpt = tf.train.get_checkpoint_state('./model3/')
         sess.run(tf.global_variables_initializer())
         loader = tf.train.Saver(var_list=[var for var in tf.trainable_variables() if not var.name.startswith("fc2")],
                                max_to_keep=4)
@@ -152,10 +152,10 @@ def update_model(super_params, url, id, flag):
             log.append(step_info)
             print(step_info)
             if epoch % 10 == 0:
-                saver.save(sess, "../model3/my-model", global_step=epoch)
+                saver.save(sess, "./model3/my-model", global_step=epoch)
             if (train_accuracy > 0.98) & (train_loss < 0.001) :
                 break
-        saver.save(sess, "../model3/my-model", global_step=epoch)
+        saver.save(sess, "./model3/my-model", global_step=epoch)
     return log
 
 
