@@ -37,7 +37,7 @@ export default {
         this.video.srcObject = this.stream
         this.video.play()
         this.stop = false
-        setTimeout(this.snapAndUpload, 500)
+        setTimeout(this.snapAndUpload, 200)
       })
     },
     handleCloseVideo (done) {
@@ -54,7 +54,7 @@ export default {
       console.log(file)
       formData.append('data', file)
       this.axios.post(urls.api + '/model/fakeRealPlus', formData).then(response => {
-        this.img.src = 'data:image/png;base64,' + response.data
+        this.img.src = 'data:image/jpg;base64,' + response.data
         if (!this.stop) {
           setTimeout(this.snapAndUpload, 300)
         }
@@ -65,7 +65,7 @@ export default {
       this.showImg = true
       if (this.streaming) {
         this.context.drawImage(this.video, 0, 0, 320, 240)
-        return this.DataURL2Blob(this.canvas.toDataURL('img/png'), 'png')
+        return this.DataURL2Blob(this.canvas.toDataURL('img/jpg'), 'jpg')
       }
     },
 

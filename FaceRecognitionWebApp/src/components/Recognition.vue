@@ -37,7 +37,7 @@ export default {
         this.video.srcObject = this.stream
         this.video.play()
         this.stop = false
-        setTimeout(this.snapAndUpload, 500)
+        setTimeout(this.snapAndUpload, 200)
       })
     },
     handleCloseVideo (done) {

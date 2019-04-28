@@ -49,7 +49,9 @@ public class Filter0 implements Filter {
         String method = request.getMethod();
         LOGGER.info("{}, {}", origin, method);
         String url = request.getRequestURL().toString();
-        if (url.contains("css") || url.contains("js") || url.contains("font") || url.contains("index") || url.contains("localhost")) {
+        String uri = request.getRequestURI();
+        if (uri.contains("face/") || uri.contains("model/fakeReal") || uri.contains("model/verify") || url.contains("css")
+                || url.contains("js") || url.contains("font") || url.contains("index") || url.contains("localhost")) {
             response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
             response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, String.valueOf(true));
             response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, method);
