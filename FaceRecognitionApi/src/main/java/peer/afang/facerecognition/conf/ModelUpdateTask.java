@@ -128,7 +128,9 @@ public class ModelUpdateTask {
         }
         File[] files1 = out.listFiles();
         for (File f : files1) {
-            f.deleteOnExit();
+            if (f.exists()) {
+                f.delete();
+            }
         }
         LinkedList<File> files = new LinkedList<>();
         files.add(src);

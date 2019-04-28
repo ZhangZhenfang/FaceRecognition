@@ -132,7 +132,7 @@ public class TrainUpdateController {
         }
         File[] files1 = out.listFiles();
         for (File f : files1) {
-            f.deleteOnExit();
+            f.delete();
         }
         LinkedList<File> files = new LinkedList<>();
         files.add(src);
