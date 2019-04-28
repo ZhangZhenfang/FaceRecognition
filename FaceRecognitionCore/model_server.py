@@ -71,5 +71,5 @@ def text_2_mat():
 
 
 if __name__ == "__main__":
-    server = pywsgi.WSGIServer(('127.0.0.1', 12581), app)
+    server = pywsgi.WSGIServer(('0.0.0.0', 12581), app)
     server.serve_forever()
