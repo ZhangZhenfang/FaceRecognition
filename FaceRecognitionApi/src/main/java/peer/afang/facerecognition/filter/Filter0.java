@@ -50,8 +50,8 @@ public class Filter0 implements Filter {
         String url = request.getRequestURL().toString();
         String uri = request.getRequestURI();
         LOGGER.info("{}, {}, {}", origin, method, uri);
-        if (uri.contains("face/") || uri.contains("model/fakeReal") || origin.equals("https://www.the15373.com")
-                || origin.equals("http://localhost:8081") || uri.contains("model/verify") || url.contains("css")
+        if (uri.contains("face/") || uri.contains("model/fakeReal") || uri.contains("model/verify") || origin.equals("https://www.the15373.com")
+                || origin.equals("http://localhost:8081") || url.contains("css")
                 || url.contains("js") || url.contains("font") || url.contains("index") || url.contains("localhost")) {
             response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
             response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, String.valueOf(true));
