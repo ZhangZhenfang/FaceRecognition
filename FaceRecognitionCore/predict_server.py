@@ -49,7 +49,7 @@ def predict():
     graph = tf.get_default_graph()
     input_x = graph.get_operation_by_name("x").outputs[0]
     keep_prob = graph.get_operation_by_name("keep_prob").outputs[0]
-    feed_dict = {"x:0":X, keep_prob: 1.0}
+    feed_dict = {"x:0":X, keep_prob: 0.8}
     pred_y = tf.get_collection("predict")
     pred = app.sess.run(pred_y, feed_dict)[0]
     pred_max = app.sess.run(tf.argmax(pred, 1))

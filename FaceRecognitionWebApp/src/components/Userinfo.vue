@@ -34,7 +34,7 @@
     <div id="userface-div" v-for="face in this.faces" v-bind:key="face.id">
       <el-card :body-style='{ padding: "10px", height: "360px"}' width="100px">
         <div id="facdimg-div">
-          <img :src="'http://localhost:8082/' + face.url" class="image">
+          <img :src="faceserver + '/' + face.url" class="image">
         </div>
         <div style="padding: 14px;">
           <div class="bottom clearfix">
@@ -55,6 +55,7 @@ export default {
   components: { Video },
   data () {
     return {
+      faceserver: '',
       videoStream: {},
       videodialogVisible: false,
       breads: {},
@@ -152,6 +153,7 @@ export default {
     }
   },
   mounted () {
+    this.faceserver = urls.api
     this.breads = this.$route.params.breads
     this.breadIndex = 'userinfo'
     this.userid = this.$route.query.userid
