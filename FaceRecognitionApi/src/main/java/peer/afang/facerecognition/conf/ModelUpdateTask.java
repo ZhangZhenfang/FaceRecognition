@@ -60,7 +60,7 @@ public class ModelUpdateTask {
 
 
     Lock lock = new ReentrantLock();
-    @Scheduled(cron = "0 0/3 * * * ? ")
+    @Scheduled(cron = "0 0/5 * * * ? ")
     private void f() {
         LOGGER.info("{}{}", "ModelUpdateTask", ModelUpdateTask.flag);
         if (ModelUpdateTask.flag) {
@@ -97,7 +97,7 @@ public class ModelUpdateTask {
                             String[] split = content.split("=");
                             Integer id = Integer.parseInt(split[1]);
                             trainUpdateService.success(id, split[2], split[3]);
-                            HttpClientUtil.get(urls.getFace() + "/trainupdate/update", new HashMap<>());
+                            HttpClientUtil.get(urls.getFace() + "/model/restore", new HashMap<>());
                         } else {
                             trainUpdateService.failed(id, "tmp", "tmp");
                         }

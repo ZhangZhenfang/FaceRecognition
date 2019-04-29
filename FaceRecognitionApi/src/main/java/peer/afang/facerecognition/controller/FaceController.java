@@ -91,9 +91,9 @@ public class FaceController {
             result.put("status", 1);
             result.put("message", "上传成功");
             result.put("data", faceVO);
+            ModelUpdateTask.flag = true;
         }
         deleteFiles(tmpDir);
-        ModelUpdateTask.flag = true;
         return result;
     }
 

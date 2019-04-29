@@ -201,7 +201,7 @@ super_params = {
     'conv2_filter_num': 64,
     'conv3_filter_num': 64,
     'fc1_length': 1024,
-    'out_length': 13,
+    'out_length': 20,
     'batch_size': 100,
     'epoch': 100
 }
