@@ -97,7 +97,7 @@ public class ModelUpdateTask {
                             String[] split = content.split("=");
                             Integer id = Integer.parseInt(split[1]);
                             trainUpdateService.success(id, split[2], split[3]);
-                            HttpClientUtil.get(urls.getFace() + "/model/restore", new HashMap<>());
+                            HttpClientUtil.get(urls.getFace() + "/restore", new HashMap<>());
                         } else {
                             trainUpdateService.failed(id, "tmp", "tmp");
                         }

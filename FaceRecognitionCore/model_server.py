@@ -30,7 +30,7 @@ super_params = {
     'fc1_length': 1024,
     'out_length': 20,
     'batch_size': 100,
-    'epoch': 60
+    'epoch': 10
 }
 
 

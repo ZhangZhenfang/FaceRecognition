@@ -71,13 +71,23 @@ def define_model(x, super_params, keep_prob):
         out_length = super_params['out_length']
         weights = weight_variable([fc1_length, out_length])
         biases = bias_variable([out_length])
-        fc2 = tf.matmul(fc1_drop, weights) + biases
+        fc2 = tf.add(tf.matmul(fc1_drop, weights), biases, name="out")
     return fc2
 
 
 def update_model(super_params, url, id, flag):
+
+    # loader = tf.train.Saver(var_list=[var for var in tf.trainable_variables() if not var.name.startswith("fc2")],
+    #                                max_to_keep=4)
+    ckpt = tf.train.get_checkpoint_state('./model1/')
+    out = 0
+    if ckpt:
+        tf.train.import_meta_graph(ckpt.model_checkpoint_path +'.meta')
+        graph = tf.get_default_graph()
+        out = graph.get_tensor_by_name("fc2/out:0").shape[1]
     # 每次训练重置Graph
     tf.reset_default_graph()
+
     log = []
     input_height = super_params['input_height']
     input_width = super_params['input_width']
@@ -108,9 +118,13 @@ def update_model(super_params, url, id, flag):
         train_accuracy_scalar = tf.summary.scalar('train_accuracy', accuracy)
         train_loss_scalar = tf.summary.scalar('train_loss', cross_entropy_loss)
 
-        ckpt = tf.train.get_checkpoint_state('./model2/')
+        ckpt = tf.train.get_checkpoint_state('./model1/')
         sess.run(tf.global_variables_initializer())
-        loader = tf.train.Saver(var_list=[var for var in tf.trainable_variables() if not var.name.startswith("fc2")],
+        if out != super_params['out_length']:
+            loader = tf.train.Saver(var_list=[var for var in tf.trainable_variables() if not var.name.startswith("fc2")],
+                               max_to_keep=4)
+        else:
+            loader = tf.train.Saver(var_list=[var for var in tf.trainable_variables()],
                                max_to_keep=4)
         print(ckpt)
         if ckpt:
@@ -153,10 +167,10 @@ def update_model(super_params, url, id, flag):
             log.append(step_info)
             print(step_info)
             if epoch % 10 == 0:
-                saver.save(sess, "./model2/my-model", global_step=epoch)
+                saver.save(sess, "./model1/my-model", global_step=epoch)
             if (train_accuracy > 0.98) & (train_loss < 0.001) :
                 break
-        saver.save(sess, "./model2/my-model", global_step=epoch)
+        saver.save(sess, "./model1/my-model", global_step=epoch)
     return log
 
 

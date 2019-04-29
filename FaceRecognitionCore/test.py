@@ -208,3 +208,12 @@ super_params = {
 # new_model.train_model(super_params)
 face_model.update_model(super_params, '', '', False)
 
+# import tensorflow as tf
+# ckpt = tf.train.get_checkpoint_state('./model1/')
+# saver = tf.train.import_meta_graph(ckpt.model_checkpoint_path +'.meta')
+#
+# graph = tf.get_default_graph()
+# fc2 = graph.get_tensor_by_name("fc2/out:0")
+
+# with tf.Session() as sess:
+# print(fc2.shape[1])
