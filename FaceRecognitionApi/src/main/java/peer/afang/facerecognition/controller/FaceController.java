@@ -120,9 +120,9 @@ public class FaceController {
         LOGGER.info("delete {}", faceid);
         Integer integer = faceService.deleteFace(faceid);
         if (integer != null) {
+            ModelUpdateTask.flag = true;
             return ResponseUtil.wrapResponse(1, "删除成功", integer);
         }
-        ModelUpdateTask.flag = true;
         return ResponseUtil.wrapResponse(2, "删除失败", integer);
     }
 

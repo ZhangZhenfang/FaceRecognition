@@ -21,6 +21,7 @@ import peer.afang.facerecognition.property.Path;
 import peer.afang.facerecognition.property.Urls;
 import peer.afang.facerecognition.service.TrainUpdateService;
 import peer.afang.facerecognition.service.UserService;
+import peer.afang.facerecognition.util.HttpClientUtil;
 import peer.afang.facerecognition.util.MatUtil;
 import peer.afang.facerecognition.util.ResponseUtil;
 
@@ -29,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -58,7 +60,7 @@ public class ModelUpdateTask {
 
 
     Lock lock = new ReentrantLock();
-    @Scheduled(cron = "0 0/2 * * * ? ")
+    @Scheduled(cron = "0 0/3 * * * ? ")
     private void f() {
         LOGGER.info("{}{}", "ModelUpdateTask", ModelUpdateTask.flag);
         if (ModelUpdateTask.flag) {
@@ -95,6 +97,7 @@ public class ModelUpdateTask {
                             String[] split = content.split("=");
                             Integer id = Integer.parseInt(split[1]);
                             trainUpdateService.success(id, split[2], split[3]);
+                            HttpClientUtil.get(urls.getFace() + "/trainupdate/update", new HashMap<>());
                         } else {
                             trainUpdateService.failed(id, "tmp", "tmp");
                         }

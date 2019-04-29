@@ -43,7 +43,6 @@ public class Filter0 implements Filter {
             throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
-        Object user = request.getSession().getAttribute("user");
         int originControlType = originControl.getOriginControlType();
         String origin = request.getHeader("Origin");
         String method = request.getMethod();
@@ -55,10 +54,11 @@ public class Filter0 implements Filter {
                 || url.contains("js") || url.contains("font") || url.contains("index") || url.contains("localhost")) {
             response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
             response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, String.valueOf(true));
-            response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, method);
+            response.setHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, method + ", DELETE");
             response.setHeader("Access-Control-Allow-Headers", "x-requested-with,content-type");
             filterChain.doFilter(servletRequest, servletResponse);
         } else {
+            Object user = request.getSession().getAttribute("user");
             if (user == null && !request.getRequestURI().endsWith("login")) {
                 response.setHeader("Content-Type", "application/json");
                 JSONObject jo = new JSONObject();
