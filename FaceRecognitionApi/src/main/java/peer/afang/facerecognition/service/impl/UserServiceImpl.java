@@ -54,8 +54,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserInfoVO> listPage(Integer pageNumber, Integer pageSize) {
         Integer start = (pageNumber - 1) * pageSize;
-        Integer end = start + pageSize;
-        List<User> users = userMapper.listPage(start, end);
+        Integer length = pageSize;
+        List<User> users = userMapper.listPage(start, length);
         List<UserInfoVO> result = new ArrayList<>();
         for (User user : users) {
             UserInfoVO userInfoVO = new UserInfoVO();

@@ -133,15 +133,20 @@ def update_model(super_params, url, id, flag):
                 loader.restore(sess, ckpt.model_checkpoint_path)
         X, Y = data_set.read_data_set(super_params['train_set_path'], input_height, input_width, input_chaneel,
                                       super_params['out_length'])
+        l = list(zip(X, Y))
+        np.random.shuffle(l)
+        X, Y = zip(*l)
+
         batch_size = super_params['batch_size']
 
         index = 0
         saver = tf.train.Saver(max_to_keep=4)
+        x_length = X.shape[0]
         for epoch in range(int(super_params['epoch'])):
             while True:
-                if index + batch_size >= epoch:
-                    input_x = X[index: epoch]
-                    input_y = Y[index: epoch]
+                if index + batch_size >= x_length:
+                    input_x = X[index: x_length]
+                    input_y = Y[index: x_length]
                     index = 0
                     l = list(zip(X, Y))
                     np.random.shuffle(l)
@@ -152,7 +157,7 @@ def update_model(super_params, url, id, flag):
                     input_x = X[index:index + batch_size]
                     input_y = Y[index:index + batch_size]
                     index += batch_size
-                train_step.run(feed_dict={x: input_x, y_: input_y})
+                train_step.run(feed_dict={x: input_x, y_: input_y, keep_prob: 0.5})
 
             train_accuracy = accuracy.eval(feed_dict={x: X, y_: Y, keep_prob: 0.5})
             train_loss = cross_entropy_loss.eval(feed_dict={x: X, y_: Y, keep_prob: 0.5})
