@@ -203,7 +203,7 @@ super_params = {
     'fc1_length': 1024,
     'out_length': 25,
     'batch_size': 100,
-    'epoch': 30
+    'epoch': 10
 }
 # new_model.train_model(super_params)
 face_model.update_model(super_params, '', '', False)

@@ -133,15 +133,15 @@ def update_model(super_params, url, id, flag):
                 loader.restore(sess, ckpt.model_checkpoint_path)
         X, Y = data_set.read_data_set(super_params['train_set_path'], input_height, input_width, input_chaneel,
                                       super_params['out_length'])
+        x_length = X.shape[0]
         l = list(zip(X, Y))
         np.random.shuffle(l)
         X, Y = zip(*l)
 
         batch_size = super_params['batch_size']
-
         index = 0
         saver = tf.train.Saver(max_to_keep=4)
-        x_length = X.shape[0]
+
         for epoch in range(int(super_params['epoch'])):
             while True:
                 if index + batch_size >= x_length:
