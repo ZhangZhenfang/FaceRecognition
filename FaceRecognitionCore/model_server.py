@@ -56,7 +56,7 @@ def update():
     out_length = request.form.get('out_length')
     super_params['out_length'] = int(out_length)
     # version, log = model.update(url, id)
-    log = face_model.update_model(super_params, url, id, flag)
+    log = face_model.update_model(super_params, url, id, flag, 'model1', 1)
     return "{}={}={}={}".format("success", id, 'tmp', log)
 
 

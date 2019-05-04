@@ -3,7 +3,7 @@ import numpy as np
 import os
 
 
-def read_data_set(path, height, width, channel, result_length) :
+def read_data_set(path, height, width, channel, result_length, start_index):
     len1 = len(os.listdir(path))
     train = np.empty((len1, height, width, channel))
     labels = np.empty((len1, result_length))
@@ -17,10 +17,26 @@ def read_data_set(path, height, width, channel, result_length) :
         zeros = np.zeros(result_length)
         end = f.index("_")
         # 转为One-Hot编码格式
-        zeros[int(f[0:end]) - 1] = 1
+        zeros[int(f[0:end]) - start_index] = 1
         labels[i] = zeros
         i += 1
     return (train, labels)
+
+
+def read_data_set_without_label(path, height, width, channel, result_length) :
+    len1 = len(os.listdir(path))
+    train = np.empty((len1, height, width, channel))
+    # labels = np.empty((len1, result_length))
+    i = 0
+    for f in os.listdir(path) :
+        image_open = Image.open(path + "/" + f)
+        if image_open.mode == "L" :
+            image_open = image_open.convert("RGB")
+        array = np.array(image_open) / 255
+        train[i] = array
+        i += 1
+    return train
+
 
 def read_data_set3(path, height, width, channel, result_length) :
     len1 = len(os.listdir(path))

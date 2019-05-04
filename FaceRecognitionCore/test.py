@@ -187,8 +187,8 @@
 import face_model
 
 super_params = {
-    'train_set_path':'E:/vscodeworkspace/FaceRecognition/train',
-    'test_set_path':'E:/vscodeworkspace/FaceRecognition/train',
+    'train_set_path':'E:\\vscodeworkspace\\facedata\data\\traindatahisted',
+    'test_set_path':'E:\\vscodeworkspace\\facedata\data\\traindatahisted',
     # 'train_set_path':'C:/Users/Administrator/Desktop/facedata/train',
     # 'test_set_path':'C:/Users/Administrator/Desktop/facedata/train',
     'input_height': 128,
@@ -201,12 +201,12 @@ super_params = {
     'conv2_filter_num': 64,
     'conv3_filter_num': 64,
     'fc1_length': 1024,
-    'out_length': 25,
+    'out_length': 7,
     'batch_size': 100,
-    'epoch': 10
+    'epoch': 20
 }
 # new_model.train_model(super_params)
-face_model.update_model(super_params, '', '', False)
+face_model.update_model(super_params, '', '', False, 'model4', 0)
 
 # import tensorflow as tf
 # ckpt = tf.train.get_checkpoint_state('./model1/')
