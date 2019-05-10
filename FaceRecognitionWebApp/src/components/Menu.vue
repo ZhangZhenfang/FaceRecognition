@@ -12,9 +12,12 @@
         <span slot="title">模型管理</span>
       </el-menu-item>
       <el-menu-item index="3">
-        <span slot="title">人脸识别</span>
+        <span slot="title">实时识别</span>
       </el-menu-item>
       <el-menu-item index="4">
+        <span slot="title">图片识别</span>
+      </el-menu-item>
+      <el-menu-item index="5">
         <span slot="title">活体检测</span>
       </el-menu-item>
     </el-menu>
@@ -65,6 +68,9 @@ export default {
           this.$router.push('/recognition')
           break
         case '4':
+          this.$router.push('/imageRecognition')
+          break
+        case '5':
           this.$router.push('/live')
           break
         default:

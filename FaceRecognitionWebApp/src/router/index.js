@@ -8,6 +8,7 @@ import ModelControl from '@/components/ModelControl'
 import Recognition from '@/components/Recognition'
 import Live from '@/components/Live'
 import Login from '@/components/Login'
+import ImageRecognition from '@/components/ImageRecognition'
 
 Vue.use(Router)
 
@@ -52,6 +53,11 @@ export default new Router({
           path: '/recognition',
           name: 'Recognition',
           component: Recognition
+        },
+        {
+          path: '/imageRecognition',
+          name: 'ImageRecognition',
+          component: ImageRecognition
         }
       ]
     }
