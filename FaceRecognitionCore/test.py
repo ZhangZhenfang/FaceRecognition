@@ -187,8 +187,8 @@
 import face_model
 
 super_params = {
-    'train_set_path':'E:\\vscodeworkspace\\facedata\data\\traindatahisted',
-    'test_set_path':'E:\\vscodeworkspace\\facedata\data\\traindatahisted',
+    'train_set_path':'E:\\vscodeworkspace\\facedata\\data\\traindatahisted',
+    'test_set_path':'E:\\vscodeworkspace\\facedata\\data\\testdatahisted',
     # 'train_set_path':'C:/Users/Administrator/Desktop/facedata/train',
     # 'test_set_path':'C:/Users/Administrator/Desktop/facedata/train',
     'input_height': 128,

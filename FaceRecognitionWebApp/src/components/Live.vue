@@ -41,8 +41,10 @@ export default {
       })
     },
     handleCloseVideo (done) {
-      if (this.stream !== undefined) {
+      if (this.stream !== undefined && this.stream != null) {
         this.stream.getTracks()[0].stop()
+      } else {
+        this.stop = true
       }
       this.stream = null
       this.stop = true

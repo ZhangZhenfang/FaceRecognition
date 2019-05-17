@@ -30,4 +30,4 @@ def resize2(src_dir, height, width):
 # format_name("E:\\vscodeworkspace\\facedata\\data\\srcface\\0_shitiandong", "0")
 # hist("E:\\vscodeworkspace\\facedata\\data\\traindata", "E:\\vscodeworkspace\\facedata\\data\\traindatahisted")
 # hist("E:\\vscodeworkspace\\facedata\\data\\testdata", "E:\\vscodeworkspace\\facedata\\data\\testdatahisted")
-resize2("E:\\vscodeworkspace\\facedata\\data\\testdatahisted", 128, 128)
+resize2("C:\\Users\\fang\\Desktop\\facedata\\dataset1\\test", 128, 128)
