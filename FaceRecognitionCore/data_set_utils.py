@@ -28,6 +28,6 @@ def resize2(src_dir, height, width):
             cv2.imwrite(src_dir + "/" + file, img)
 
 # format_name("E:\\vscodeworkspace\\facedata\\data\\srcface\\0_shitiandong", "0")
-# hist("E:\\vscodeworkspace\\facedata\\data\\traindata", "E:\\vscodeworkspace\\facedata\\data\\traindatahisted")
+hist("C:\\Users\\fang\\Desktop\\facedata\\dataset3\\test", "C:\\Users\\fang\\Desktop\\facedata\\dataset3\\testhisted")
 # hist("E:\\vscodeworkspace\\facedata\\data\\testdata", "E:\\vscodeworkspace\\facedata\\data\\testdatahisted")
-resize2("C:\\Users\\fang\\Desktop\\facedata\\dataset1\\test", 128, 128)
+# resize2("C:\\Users\\fang\\Desktop\\facedata\\dataset1\\test", 128, 128)

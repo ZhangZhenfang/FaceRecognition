@@ -180,15 +180,15 @@ def update_model(super_params, url, id, flag, model_name, start_index):
                 # input_y = tf.one_hot(input_y, depth=super_params['out_length'])
                 input_y = input_y.astype(int)
                 input_y = np.eye(int(super_params['out_length']))[input_y]
-                train_step.run(feed_dict={x: input_x, y_: input_y, keep_prob: 0.5})
+                train_step.run(feed_dict={x: input_x, y_: input_y, keep_prob: super_params['keep_prob']})
 
             test_x, test_y = test_set.next_bath()
             test_y = test_y.astype(int)
             test_y = np.eye(int(super_params['out_length']))[test_y]
-            train_accuracy = accuracy.eval(feed_dict={x: test_x, y_: test_y, keep_prob: 0.5})
-            train_loss = cross_entropy_loss.eval(feed_dict={x: test_x, y_: test_y, keep_prob: 0.5})
+            train_accuracy = accuracy.eval(feed_dict={x: test_x, y_: test_y, keep_prob: super_params['keep_prob']})
+            train_loss = cross_entropy_loss.eval(feed_dict={x: test_x, y_: test_y, keep_prob: super_params['keep_prob']})
             accuracy_scalar, loss_scalar = sess.run([train_accuracy_scalar, train_loss_scalar],
-                                                    feed_dict={x: test_x, y_: test_y, keep_prob: 0.5})
+                                                    feed_dict={x: test_x, y_: test_y, keep_prob: super_params['keep_prob']})
             writer.add_summary(accuracy_scalar, epoch)
             writer.add_summary(loss_scalar, epoch)
 
@@ -205,8 +205,8 @@ def update_model(super_params, url, id, flag, model_name, start_index):
     return log
 
 super_params = {
-    'train_set_path':'C:\\Users\\fang\\Desktop\\facedata\\dataset3\\train',
-    'test_set_path':'C:\\Users\\fang\\Desktop\\facedata\\dataset3\\test',
+    'train_set_path':'C:\\Users\\fang\\Desktop\\facedata\\dataset3\\trainhisted',
+    'test_set_path':'C:\\Users\\fang\\Desktop\\facedata\\dataset3\\testhisted',
     # 'train_set_path':'E:\\vscodeworkspace\\FaceRecognition\\train',
     # 'test_set_path':'E:\\vscodeworkspace\\FaceRecognition\\train',
     # 'train_set_path':'E:\\vscodeworkspace\\facedata\\data\\traindatahisted',
@@ -226,7 +226,8 @@ super_params = {
     'conv4_filter_num': 128,
     'fc1_length': 1024,
     'out_length': 25,
-    'batch_size': 8,
+    'keep_prob': 0.2,
+    'batch_size': 128,
     'epoch': 100,
     'start_index':1
 }

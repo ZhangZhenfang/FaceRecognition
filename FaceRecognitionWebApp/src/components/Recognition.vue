@@ -3,7 +3,7 @@
     <div id="recognitioncanvas-div">
       <video v-show="showVideo" id="recognitionvideo"></video>
       <canvas v-show="showCanvas" id="recognitioncanvas"></canvas>
-      <img v-show="showImg" id="recognitionimg" width="640" height="480"/>
+      <img v-show="showImg" alt="选择图片" id="recognitionimg" width="640" height="480"/>
     </div>
     <div id="recognitionvideo-op-div">
       <el-button @click="handleOpenVideo">开启摄像头</el-button>
@@ -46,6 +46,7 @@ export default {
       }
       this.stream = null
       this.stop = true
+      this.img.src = ''
     },
     snapAndUpload () {
       var file = this.takecapture()
@@ -54,8 +55,8 @@ export default {
       console.log(file)
       formData.append('data', file)
       this.axios.post(urls.api + '/model/detectPlus', formData).then(response => {
-        this.img.src = 'data:image/jpg;base64,' + response.data
         if (!this.stop) {
+          this.img.src = 'data:image/jpg;base64,' + response.data
           setTimeout(this.snapAndUpload, 300)
         }
       })

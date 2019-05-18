@@ -57,7 +57,7 @@ def predict():
     print("{}:{}\n{}:{}".format('max', pred, 'softmax', pred_soft_max))
     index_i = 0
     for i in pred:
-        if pred_soft_max[index_i][pred_max[index_i]] < 0.98:
+        if pred_soft_max[index_i][pred_max[index_i]] < 0.8:
             pred_max[index_i] = -1
         index_i += 1
     return "{}".format(pred_max)
