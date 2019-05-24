@@ -17,9 +17,9 @@
       <el-menu-item index="4">
         <span slot="title">图片识别</span>
       </el-menu-item>
-      <el-menu-item index="5">
+      <!-- <el-menu-item index="5">
         <span slot="title">活体检测</span>
-      </el-menu-item>
+      </el-menu-item> -->
     </el-menu>
   </div>
 </template>
@@ -70,9 +70,9 @@ export default {
         case '4':
           this.$router.push('/imageRecognition')
           break
-        case '5':
-          this.$router.push('/live')
-          break
+        // case '5':
+        //   this.$router.push('/live')
+        //   break
         default:
           this.$router.push('/')
       }

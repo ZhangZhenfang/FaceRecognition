@@ -205,8 +205,8 @@ def update_model(super_params, url, id, flag, model_name, start_index):
     return log
 
 super_params = {
-    'train_set_path':'E:\\facedata\\dataset1\\train',
-    'test_set_path':'E:\\facedata\\dataset1\\test',
+    'train_set_path':'C:\\Users\\fang\\Desktop\\facedata\\dataset3\\trainhisted',
+    'test_set_path':'C:\\Users\\fang\\Desktop\\facedata\\dataset3\\testhisted',
     # 'train_set_path':'E:\\vscodeworkspace\\FaceRecognition\\train',
     # 'test_set_path':'E:\\vscodeworkspace\\FaceRecognition\\train',
     # 'train_set_path':'E:\\vscodeworkspace\\facedata\\data\\traindatahisted',
@@ -224,12 +224,12 @@ super_params = {
     'conv2_filter_num': 64,
     'conv3_filter_num': 128,
     'conv4_filter_num': 128,
-    'fc1_length': 1024,
-    'out_length': 7,
-    'keep_prob': 0.5,
+    'fc1_length': 2048,
+    'out_length': 25,
+    'keep_prob': 1.0,
     'batch_size': 128,
-    'epoch': 100,
-    'start_index': 0
+    'epoch': 200,
+    'start_index':1
 }
 
 update_model(super_params, '', '', False, 'model4', 0)

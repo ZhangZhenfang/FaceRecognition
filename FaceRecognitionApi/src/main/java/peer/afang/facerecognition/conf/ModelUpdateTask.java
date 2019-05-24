@@ -60,15 +60,15 @@ public class ModelUpdateTask {
 
 
     Lock lock = new ReentrantLock();
-    @Scheduled(cron = "0 0/5 * * * ? ")
+    @Scheduled(cron = "0 0/2 * * * ? ")
     private void f() {
         LOGGER.info("{}{}", "ModelUpdateTask", ModelUpdateTask.flag);
         if (ModelUpdateTask.flag) {
-            ModelUpdateTask.flag = false;
             TrainUpdate trainUpdate = trainUpdateService.getLast();
             if ("training".equals(trainUpdate.getStatus()) || "create".equals(trainUpdate.getStatus())) {
                 return;
             }
+            ModelUpdateTask.flag = false;
             prepareData(true);
             trainUpdate = trainUpdateService.create();
             CloseableHttpAsyncClient httpclient = HttpAsyncClients.createDefault();

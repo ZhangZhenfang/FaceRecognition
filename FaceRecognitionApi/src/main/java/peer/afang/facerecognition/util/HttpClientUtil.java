@@ -40,7 +40,7 @@ public class HttpClientUtil {
         CloseableHttpClient client = HttpClientBuilder.create().build();
         CloseableHttpResponse response = null;
         HttpPost post = new HttpPost(uri);
-        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(1000).setSocketTimeout(1200).build();
+        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(1000).setSocketTimeout(3000).build();
         post.setConfig(requestConfig);
         MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
         for (String s : filePaths) {

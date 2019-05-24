@@ -1,9 +1,9 @@
 import tensorflow as tf
-import status_handler
+import data_set, status_handler
 import math
 import numpy as np
 import os
-from data_set import DataSet
+
 
 def define_model(x, super_params, keep_prob):
     def weight_variable(shape):
@@ -30,15 +30,10 @@ def define_model(x, super_params, keep_prob):
         size = super_params['conv1_filter_size']
         num = super_params['conv1_filter_num']
         input_channel = super_params['input_channel']
-        weights1_1 = weight_variable([size, size, input_channel, num])
-        biases1_1 = bias_variable([num])
-        conv1_1 = tf.nn.relu(conv2d(x, weights1_1) + biases1_1)
-
-        # input_channel = num
-        # weights1_2 = weight_variable([size, size, input_channel, num])
-        # biases1_2 = bias_variable([num])
-        # conv1_2 = tf.nn.relu(conv2d(conv1_1, weights1_2) + biases1_2)
-        pool1 = max_pool_2d(conv1_1)
+        weights = weight_variable([size, size, input_channel, num])
+        biases = bias_variable([num])
+        conv1 = tf.nn.relu(conv2d(x, weights) + biases)
+        pool1 = max_pool_2d(conv1)
     # 定义卷积层2
     with tf.variable_scope("conv2"):
         conv_out_height = math.ceil(conv_out_height / 2)
@@ -46,15 +41,10 @@ def define_model(x, super_params, keep_prob):
         size = super_params['conv2_filter_size']
         num = super_params['conv2_filter_num']
         input_channel = super_params['conv1_filter_num']
-        weights2_1 = weight_variable([size, size, input_channel, num])
-        biases2_1 = bias_variable([num])
-        conv2_1 = tf.nn.relu(conv2d(pool1, weights2_1) + biases2_1)
-
-        # input_channel = num
-        # weights2_2 = weight_variable([size, size, input_channel, num])
-        # biases2_2 = bias_variable([num])
-        # conv2_2 = tf.nn.relu(conv2d(conv2_1, weights2_2) + biases2_2)
-        pool2 = max_pool_2d(conv2_1)
+        weights = weight_variable([size, size, input_channel, num])
+        biases = bias_variable([num])
+        conv2 = tf.nn.relu(conv2d(pool1, weights) + biases)
+        pool2 = max_pool_2d(conv2)
     # 定义卷积层3
     with tf.variable_scope("conv3"):
         conv_out_height = math.ceil(conv_out_height / 2)
@@ -62,36 +52,14 @@ def define_model(x, super_params, keep_prob):
         size = super_params['conv3_filter_size']
         num = super_params['conv3_filter_num']
         input_channel = super_params['conv2_filter_num']
-        weights3_1 = weight_variable([size, size, input_channel, num])
-        biases3_1 = bias_variable([num])
-        conv3_1 = tf.nn.relu(conv2d(pool2, weights3_1) + biases3_1)
-
-        # input_channel = num
-        # weights3_2 = weight_variable([size, size, input_channel, num])
-        # biases3_2 = bias_variable([num])
-        # conv3_2 = tf.nn.relu(conv2d(conv3_1, weights3_2) + biases3_2)
-        pool3 = max_pool_2d(conv3_1)
-    # 定义卷积层4
-    # with tf.variable_scope("conv4"):
-    #     conv_out_height = math.ceil(conv_out_height / 2)
-    #     conv_out_width = math.ceil(conv_out_width / 2)
-    #     size = super_params['conv4_filter_size']
-    #     num = super_params['conv4_filter_num']
-    #     input_channel = super_params['conv3_filter_num']
-    #     weights4_1 = weight_variable([size, size, input_channel, num])
-    #     biases4_1 = bias_variable([num])
-    #     conv4_1 = tf.nn.relu(conv2d(pool3, weights4_1) + biases4_1)
-
-        # input_channel = super_params['conv3_filter_num']
-        # weights4_2 = weight_variable([size, size, input_channel, num])
-        # biases4_2 = bias_variable([num])
-        # conv4_2 = tf.nn.relu(conv2d(conv4_1, weights4_2) + biases4_2)
-
-        # pool4 = max_pool_2d(conv4_1)
+        weights = weight_variable([size, size, input_channel, num])
+        biases = bias_variable([num])
+        conv3 = tf.nn.relu(conv2d(pool2, weights) + biases)
+        pool3 = max_pool_2d(conv3)
     # 定义全连接层1
     with tf.variable_scope("fc1"):
         fc1_length = super_params['fc1_length']
-        input_channel = super_params['conv4_filter_num']
+        input_channel = super_params['conv3_filter_num']
         weights = weight_variable([conv_out_height * conv_out_width * input_channel, fc1_length]) # [-1,1024]
         biases = bias_variable([fc1_length])
         fc1_flat = tf.reshape(pool3, [-1, conv_out_height * conv_out_width * input_channel])
@@ -129,7 +97,7 @@ def update_model(super_params, url, id, flag, model_name, start_index):
     # 输入数据Y
     y_ = tf.placeholder(tf.float32, shape=[None, super_params['out_length']], name="y_")
     keep_prob = tf.placeholder(tf.float32, name='keep_prob')
-    initial_learning_rate = 0.0001
+    initial_learning_rate = 0.001
     # 定义模型结构并且获取输出层
     y_fc2 = define_model(x, super_params, keep_prob)
     # 定义损失函数
@@ -161,34 +129,41 @@ def update_model(super_params, url, id, flag, model_name, start_index):
         print(ckpt)
         if ckpt:
             if os.path.exists(ckpt.model_checkpoint_path + '.meta'):
-                print("restore")
-                loader.restore(sess, ckpt.model_checkpoint_path)
                 print('restored')
-        # X, Y = data_set.read_data_set(super_params['train_set_path'], input_height, input_width, input_chaneel,
-        #                               super_params['out_length'], start_index)
+                loader.restore(sess, ckpt.model_checkpoint_path)
+        X, Y = data_set.read_data_set(super_params['train_set_path'], input_height, input_width, input_chaneel,
+                                      super_params['out_length'], start_index)
         print('traindata loaded')
+        x_length = X.shape[0]
+        l = list(zip(X, Y))
+        np.random.shuffle(l)
+        X, Y = zip(*l)
 
         batch_size = super_params['batch_size']
+        index = 0
         saver = tf.train.Saver(max_to_keep=4)
-        train_set = DataSet(super_params['train_set_path'], super_params['start_index'], (128, 128, 3), batch_size)
-        test_set = DataSet(super_params['test_set_path'], super_params['start_index'], (128, 128, 3), 500)
-        for epoch in range(int(super_params['epoch'])):
-            train_set.reset()
-            test_set.reset()
-            while train_set.is_end():
-                input_x, input_y = train_set.next_bath()
-                # input_y = tf.one_hot(input_y, depth=super_params['out_length'])
-                input_y = input_y.astype(int)
-                input_y = np.eye(int(super_params['out_length']))[input_y]
-                train_step.run(feed_dict={x: input_x, y_: input_y, keep_prob: super_params['keep_prob']})
 
-            test_x, test_y = test_set.next_bath()
-            test_y = test_y.astype(int)
-            test_y = np.eye(int(super_params['out_length']))[test_y]
-            train_accuracy = accuracy.eval(feed_dict={x: test_x, y_: test_y, keep_prob: super_params['keep_prob']})
-            train_loss = cross_entropy_loss.eval(feed_dict={x: test_x, y_: test_y, keep_prob: super_params['keep_prob']})
+        for epoch in range(int(super_params['epoch'])):
+            while True:
+                if index + batch_size >= x_length:
+                    input_x = X[index: x_length]
+                    input_y = Y[index: x_length]
+                    index = 0
+                    l = list(zip(X, Y))
+                    np.random.shuffle(l)
+                    X, Y = zip(*l)
+                    train_step.run(feed_dict={x: input_x, y_: input_y, keep_prob: 0.5})
+                    break
+                else:
+                    input_x = X[index:index + batch_size]
+                    input_y = Y[index:index + batch_size]
+                    index += batch_size
+                train_step.run(feed_dict={x: input_x, y_: input_y, keep_prob: 0.5})
+
+            train_accuracy = accuracy.eval(feed_dict={x: X, y_: Y, keep_prob: 0.5})
+            train_loss = cross_entropy_loss.eval(feed_dict={x: X, y_: Y, keep_prob: 0.5})
             accuracy_scalar, loss_scalar = sess.run([train_accuracy_scalar, train_loss_scalar],
-                                                    feed_dict={x: test_x, y_: test_y, keep_prob: super_params['keep_prob']})
+                                                    feed_dict={x: X, y_: Y, keep_prob: 0.5})
             writer.add_summary(accuracy_scalar, epoch)
             writer.add_summary(loss_scalar, epoch)
 
@@ -204,32 +179,48 @@ def update_model(super_params, url, id, flag, model_name, start_index):
         saver.save(sess, './' + model_name + '/my-model', global_step=epoch)
     return log
 
-super_params = {
-    'train_set_path':'E:\\facedata\\dataset1\\train',
-    'test_set_path':'E:\\facedata\\dataset1\\test',
-    # 'train_set_path':'E:\\vscodeworkspace\\FaceRecognition\\train',
-    # 'test_set_path':'E:\\vscodeworkspace\\FaceRecognition\\train',
-    # 'train_set_path':'E:\\vscodeworkspace\\facedata\\data\\traindatahisted',
-    # 'test_set_path':'E:\\vscodeworkspace\\facedata\\data\\testdatahisted',
-    # 'train_set_path':'C:/Users/Administrator/Desktop/facedata/train',
-    # 'test_set_path':'C:/Users/Administrator/Desktop/facedata/train',
-    'input_height': 128,
-    'input_width': 128,
-    'input_channel': 3,
-    'conv1_filter_size': 3,
-    'conv2_filter_size': 3,
-    'conv3_filter_size': 3,
-    'conv4_filter_size': 3,
-    'conv1_filter_num': 32,
-    'conv2_filter_num': 64,
-    'conv3_filter_num': 128,
-    'conv4_filter_num': 128,
-    'fc1_length': 1024,
-    'out_length': 7,
-    'keep_prob': 0.5,
-    'batch_size': 128,
-    'epoch': 100,
-    'start_index': 0
-}
 
-update_model(super_params, '', '', False, 'model4', 0)
+def load_model(super_params):
+    X, Y = data_set.read_data_set('E:/vscodeworkspace/FaceRecognition/train', 128, 128, 3, 10)
+    with tf.Session() as sess:
+        # load the meta graph and weights
+        saver = tf.train.import_meta_graph('model1/my-model-90.meta')
+        saver.restore(sess, tf.train.latest_checkpoint("model1/"))
+        # get weights
+        graph = tf.get_default_graph()
+        fc2_w = graph.get_tensor_by_name("fc2/w:0")
+        fc2_b = graph.get_tensor_by_name("fc2/b:0")
+
+        print("------------------------------------------------------")
+        print(sess.run(fc2_w))
+        print("#######################################")
+        print(sess.run(fc2_b))
+        print("------------------------------------------------------")
+
+        input_x = graph.get_operation_by_name("x").outputs[0]
+
+        feed_dict = {"x:0":X, "y_:0":Y}
+        y = graph.get_tensor_by_name("y_:0")
+        yy = sess.run(y, feed_dict)
+        print(yy)
+        print("the answer is: ", sess.run(tf.argmax(yy, 1)))
+        print("------------------------------------------------------")
+
+        pred_y = tf.get_collection("predict")
+        pred = sess.run(pred_y, feed_dict)[0]
+        print(pred, '\n')
+
+        pred = sess.run(tf.argmax(pred, 1))
+        print("the predict is: ", pred)
+        print("------------------------------------------------------")
+
+        acc = graph.get_tensor_by_name("accuracy:0")
+        acc = sess.run(acc, feed_dict)
+        print("the accuracy is: ", acc)
+        print("------------------------------------------------------")
+
+# train_model()
+# load_model()
+# with tf.Session() as sess:
+#     print(tf.train.get_checkpoint_state('./model1/'))
+#     print(tf.train.get_checkpoint_state('./model1/').model_checkpoint_path)

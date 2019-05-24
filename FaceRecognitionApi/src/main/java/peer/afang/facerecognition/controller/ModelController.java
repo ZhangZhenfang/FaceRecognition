@@ -115,7 +115,7 @@ public class ModelController {
         List<String> paths = new ArrayList<>();
         for (Rect rect : rects) {
             Mat submat = m.submat(rect.y, rect.y + rect.height, rect.x, rect.x + rect.width);
-            Imgproc.resize(submat, submat, new Size(128, 128));
+            Imgproc.resize(submat, submat, new Size(160, 160));
             Imgcodecs.imwrite(path.getTmpPath() + "/" + Thread.currentThread().getId() + "_" + i + ".png", submat);
             paths.add(path.getTmpPath() + "/" + Thread.currentThread().getId() + "_" + i++ + ".png");
             Imgproc.rectangle(m, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y +
@@ -125,20 +125,24 @@ public class ModelController {
             MatUtil.eHist(s, s);
         }
         HashMap<String, String> params = new HashMap<>(16);
-        params.put("height", String.valueOf(128));
-        params.put("width", String.valueOf(128));
+        params.put("height", String.valueOf(160));
+        params.put("width", String.valueOf(160));
         params.put("channel", String.valueOf(3));
         String s = HttpClientUtil.PostFiles(urls.getFace() + "/predict", paths, params);
         if (!StringUtils.isEmpty(s)) {
-            String substring = s.substring(1, s.length() - 1);
-            substring = substring.trim();
-            String[] split = substring.split("\\s+");
+            String[] res = s.split(",");
+            String substring1 = res[0].substring(1, res[0].length() - 1);
+            String substring2 = res[1].substring(1, res[1].length() - 1);
+            substring1 = substring1.trim();
+            substring2 = substring2.trim();
+            String[] split = substring1.split("\\s+");
+            String[] ps = substring2.split("\\s+");
             i = 0;
             LOGGER.info("{}", Arrays.toString(split));
             for (Rect rect : rects) {
                 User byId = userService.getById(Integer.parseInt(split[i++]) + 1);
                 HashMap<String, String> p = new HashMap<>();
-                p.put("text", byId == null ? "未知" : byId.getUsername());
+                p.put("text", byId == null ? "未知" : byId.getUsername() + ps[i - 1]);
                 String post = HttpClientUtil.get(urls.getFace() + "/text2Mat", p);
                 if (post != null && post.length() > 3) {
                     byte[] decode = java.util.Base64.getDecoder().decode(post.substring(2, post.length() - 1));

@@ -53,6 +53,8 @@ export default {
       this.snapAndUpload(this.addFace)
       if (this.picNum++ < 10) {
         setTimeout(this.autoSnap, 500)
+      } else {
+        this.picNum = 0
       }
     },
     addFace () {

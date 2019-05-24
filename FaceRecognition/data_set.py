@@ -1,7 +1,7 @@
 from PIL import Image
 import numpy as np
 import os
-import cv2
+
 
 class DataSet:
     def __init__(self, src, start_index, image_shape, batch_size):
@@ -32,29 +32,13 @@ class DataSet:
 
     def read(self, names, batch_x, batch_y):
         # print(names)
-        # i = 0
-        # for name in names:
-        #     image_open = Image.open(self.src + "/" + name)
-        #     if image_open.mode == "L" :
-        #         image_open = image_open.convert("RGB")
-        #     array = np.array(image_open) / 255
-        #     batch_x[i] = array
-        #     end = name.index("_")
-        #     batch_y[i] = int(int(name[0:end]) - self.start_index)
-        #     i += 1
         i = 0
         for name in names:
-            imread = cv2.imread(self.src + "/" + name)
-            # imread = cv2.cvtColor(imread, cv2.COLOR_BGR2GRAY)
-            imread = imread / 255.
-            imread = cv2.resize(imread, self.image_shape[0:2])
-            batch_x[i] = imread
-            # image_open = Image.open(self.src + "/" + name)
-            # if image_open.mode == "L" :
-            #     image_open = image_open.convert("RGB")
-            #     image_open = image_open.resize(self.image_shape)
-            # array = np.array(image_open) / 255
-            # batch_x[i] = array
+            image_open = Image.open(self.src + "/" + name)
+            if image_open.mode == "L" :
+                image_open = image_open.convert("RGB")
+            array = np.array(image_open) / 255
+            batch_x[i] = array
             end = name.index("_")
             batch_y[i] = int(int(name[0:end]) - self.start_index)
             i += 1
@@ -65,7 +49,6 @@ class DataSet:
     def reset(self):
         self.index = 0
         np.random.shuffle(self.set_names)
-
 
 def read_data_set(path, height, width, channel, result_length, start_index):
     len1 = len(os.listdir(path))
