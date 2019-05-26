@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
  * @date 2019/4/21 13:13
  */
 @Component
-@PropertySource("classpath:application.properties")
+@PropertySource("classpath:application-dev.properties")
 @ConfigurationProperties(prefix = "url")
 public class Urls {
 

@@ -30,8 +30,8 @@ super_params = {
     'conv3_filter_num': 128,
     'conv4_filter_num': 128,
     'fc1_length': 1024,
-    'out_length': 25,
-    'keep_prob': 0.5,
+    'out_length': 26,
+    'keep_prob': 0.8,
     'batch_size': 128,
     'epoch': 100,
     'start_index': 1

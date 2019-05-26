@@ -91,7 +91,7 @@ def define_model(x, super_params, keep_prob):
     # 定义全连接层1
     with tf.variable_scope("fc1"):
         fc1_length = super_params['fc1_length']
-        input_channel = super_params['conv4_filter_num']
+        input_channel = super_params['conv3_filter_num']
         weights = weight_variable([conv_out_height * conv_out_width * input_channel, fc1_length]) # [-1,1024]
         biases = bias_variable([fc1_length])
         fc1_flat = tf.reshape(pool3, [-1, conv_out_height * conv_out_width * input_channel])
@@ -169,38 +169,50 @@ def update_model(super_params, url, id, flag, model_name, start_index):
         print('traindata loaded')
 
         batch_size = super_params['batch_size']
-        saver = tf.train.Saver(max_to_keep=4)
+        saver = tf.train.Saver(max_to_keep=2)
         train_set = DataSet(super_params['train_set_path'], super_params['start_index'], (128, 128, 3), batch_size)
         test_set = DataSet(super_params['test_set_path'], super_params['start_index'], (128, 128, 3), 500)
         for epoch in range(int(super_params['epoch'])):
             train_set.reset()
             test_set.reset()
+            step = 0
+            train_accuracy = 0
+            train_loss = 0
             while train_set.is_end():
                 input_x, input_y = train_set.next_bath()
                 # input_y = tf.one_hot(input_y, depth=super_params['out_length'])
                 input_y = input_y.astype(int)
                 input_y = np.eye(int(super_params['out_length']))[input_y]
+                train_accuracy = accuracy.eval(feed_dict={x: input_x, y_: input_y, keep_prob: super_params['keep_prob']})
+                train_loss = cross_entropy_loss.eval(feed_dict={x: input_x, y_: input_y, keep_prob: super_params['keep_prob']})
+                train_accuracy_, train_loss_ = sess.run([train_accuracy_scalar, train_loss_scalar],
+                                                    feed_dict={x: input_x, y_: input_y, keep_prob: super_params['keep_prob']})
                 train_step.run(feed_dict={x: input_x, y_: input_y, keep_prob: super_params['keep_prob']})
+                step_info = "epoch:{} step:{} loss:{:.5f} train_accuracy:{:.5f}".format(epoch, step, train_loss, train_accuracy)
+                step += 1
+                print(step_info)
+                log.append(step_info)
 
-            test_x, test_y = test_set.next_bath()
-            test_y = test_y.astype(int)
-            test_y = np.eye(int(super_params['out_length']))[test_y]
-            train_accuracy = accuracy.eval(feed_dict={x: test_x, y_: test_y, keep_prob: super_params['keep_prob']})
-            train_loss = cross_entropy_loss.eval(feed_dict={x: test_x, y_: test_y, keep_prob: super_params['keep_prob']})
-            accuracy_scalar, loss_scalar = sess.run([train_accuracy_scalar, train_loss_scalar],
-                                                    feed_dict={x: test_x, y_: test_y, keep_prob: super_params['keep_prob']})
-            writer.add_summary(accuracy_scalar, epoch)
-            writer.add_summary(loss_scalar, epoch)
+            writer.add_summary(train_accuracy_, epoch)
+            writer.add_summary(train_loss_, epoch)
 
-            step_info = "epoch:{} loss: {:.5f} accuracy:{:.5f}".format(epoch, train_loss, train_accuracy)
             if flag:
                 status_handler.handleTrainStep(url, id, step_info)
             log.append(step_info)
             print(step_info)
-            if epoch % 10 == 0:
+            if epoch % 5 == 0:
+                test_x, test_y = test_set.next_bath()
+                test_y = test_y.astype(int)
+                test_y = np.eye(int(super_params['out_length']))[test_y]
+                test_accuracy = accuracy.eval(feed_dict={x: test_x, y_: test_y, keep_prob: super_params['keep_prob']})
+                test_loss = cross_entropy_loss.eval(feed_dict={x: test_x, y_: test_y, keep_prob: super_params['keep_prob']})
+                # test_accuracy, test_loss = sess.run([train_accuracy_scalar, train_loss_scalar],
+                #                                     feed_dict={x: test_x, y_: test_y, keep_prob: super_params['keep_prob']})
+                step_info = "TEST == epoch:{} loss:{:.5f} train_accuracy:{:.5f}".format(epoch, test_loss, test_accuracy)
+                print(step_info)
                 saver.save(sess, './' + model_name + '/my-model', global_step=epoch)
-            if (train_accuracy > 0.98) & (train_loss < 0.001) :
-                break
+                if (test_accuracy > 0.98) & (test_loss < 0.01) :
+                    break
         saver.save(sess, './' + model_name + '/my-model', global_step=epoch)
     return log
 
@@ -232,4 +244,4 @@ super_params = {
     'start_index': 0
 }
 
-update_model(super_params, '', '', False, 'model4', 0)
+update_model(super_params, '', '', False, 'models/dth_model', 0)

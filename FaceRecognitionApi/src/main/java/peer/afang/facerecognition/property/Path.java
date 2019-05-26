@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
  * @date 2019/4/1 16:26
  */
 @Component
-@PropertySource("classpath:application.properties")
+@PropertySource("classpath:application-dev.properties")
 @ConfigurationProperties(prefix = "path")
 public class Path {
     private String tmpPath;

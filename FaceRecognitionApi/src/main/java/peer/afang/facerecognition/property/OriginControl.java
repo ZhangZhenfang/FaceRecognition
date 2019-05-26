@@ -11,7 +11,7 @@ import java.util.HashSet;
  * @date 2019/4/1 20:22
  */
 @Component
-@PropertySource("classpath:application.properties")
+@PropertySource("classpath:application-dev.properties")
 @ConfigurationProperties(prefix = "origin")
 public class OriginControl {
     private int originControlType;
