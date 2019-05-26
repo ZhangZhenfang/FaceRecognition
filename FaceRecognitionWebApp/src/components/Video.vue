@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import urls from '../json/urls'
+import urls from '../json/URLS'
 import { setTimeout } from 'timers'
 export default {
   props: ['stream', 'username', 'faces'],

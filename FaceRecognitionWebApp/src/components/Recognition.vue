@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import urls from '../json/urls'
+import urls from '../json/URLS'
 export default {
   name: 'Recognition',
   data () {

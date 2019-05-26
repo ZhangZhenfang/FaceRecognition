@@ -49,7 +49,7 @@
 
 <script>
 import Video from './Video'
-import urls from '../json/urls'
+import urls from '../json/URLS'
 export default {
   name: 'Userinfo',
   components: { Video },
