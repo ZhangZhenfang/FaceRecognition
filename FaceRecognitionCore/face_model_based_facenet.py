@@ -7,7 +7,7 @@ from data_set import DataSet
 import os
 import status_handler
 image_size = 160
-modeldir = 'E:/pycharm/facenet/src/models/20170512-110547/20170512-110547.pb'
+modeldir = './models/20170512-110547/20170512-110547.pb'
 
 
 def weight_variable(shape, trainable):
@@ -133,7 +133,7 @@ def update_model(super_params, url, id, flag, model_name, start_index):
         saver.save(sess, './' + model_name + '/my-model', global_step=epoch)
     return log
 
-
+'''
 super_params = {
     # 'train_set_path':'E:\\facedata\\dataset3\\train',
     # 'test_set_path':'E:\\facedata\\dataset3\\test',
@@ -161,5 +161,5 @@ super_params = {
     'epoch': 100,
     'start_index': 1
 }
-
 update_model(super_params, '', '', False, 'models/model1', 0)
+'''

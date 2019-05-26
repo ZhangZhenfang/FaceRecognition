@@ -31,9 +31,9 @@ super_params = {
     'conv4_filter_num': 128,
     'fc1_length': 1024,
     'out_length': 26,
-    'keep_prob': 0.8,
+    'keep_prob': 1.0,
     'batch_size': 128,
-    'epoch': 100,
+    'epoch': 50,
     'start_index': 1
 }
 
@@ -60,7 +60,7 @@ def update():
     out_length = request.form.get('out_length')
     super_params['out_length'] = int(out_length)
     # version, log = model.update(url, id)
-    log = face_model.update_model(super_params, url, id, flag, 'model1', 1)
+    log = face_model.update_model(super_params, url, id, flag, 'models/model1', 1)
     return "{}={}={}={}".format("success", id, 'tmp', log)
 
 

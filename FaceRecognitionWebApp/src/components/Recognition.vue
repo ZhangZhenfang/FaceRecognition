@@ -57,7 +57,7 @@ export default {
       this.axios.post(urls.api + '/model/detectPlus', formData).then(response => {
         if (!this.stop) {
           this.img.src = 'data:image/jpg;base64,' + response.data
-          setTimeout(this.snapAndUpload, 300)
+          setTimeout(this.snapAndUpload, 100)
         }
       })
     },
