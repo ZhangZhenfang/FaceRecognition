@@ -16,10 +16,10 @@ app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 
 app.sess = tf.Session()
-ckpt = tf.train.get_checkpoint_state('./models/./models/facenet_based_face_model/')
+ckpt = tf.train.get_checkpoint_state('./models/facenet_based_face_model/')
 saver = tf.train.import_meta_graph(ckpt.model_checkpoint_path +'.meta')
 print(ckpt.model_checkpoint_path)
-saver.restore(app.sess, tf.train.latest_checkpoint("./models/./models/facenet_based_face_model/"))
+saver.restore(app.sess, tf.train.latest_checkpoint("./models/facenet_based_face_model/"))
 
 
 @app.route('/')
