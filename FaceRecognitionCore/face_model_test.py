@@ -216,12 +216,12 @@ def update_model(super_params, url, id, flag, model_name, start_index):
                     total_loss += test_loss
                     test_step += 1
                 test_info = "TEST: epoch:{} loss: {:.5f} test_accuracy:{:.5f}".format(epoch,
-                                                                                      total_loss / test_step,
-                                                                                      total_accuracy / test_step)
+                                                                                      (total_loss / test_step),
+                                                                                      (total_accuracy / test_step))
                 log.append(test_info)
                 print(test_info)
                 saver.save(sess, './' + model_name + '/my-model', global_step=epoch)
-                if (train_accuracy > 0.99) & (train_loss < 0.1):
+                if ((total_loss / test_step) > 0.99) & ((total_accuracy / test_step) < 0.1):
                     break
         saver.save(sess, './' + model_name + '/my-model', global_step=epoch)
         write_log(log, './' + model_name + '/log.txt')
@@ -238,8 +238,8 @@ def write_log(log, path):
 
 
 super_params = {
-    'train_set_path':'E:\\facedata\\dataset1\\train',
-    'test_set_path':'E:\\facedata\\dataset1\\test',
+    'train_set_path':'E:\\facedata\\dataset3\\train',
+    'test_set_path':'E:\\facedata\\dataset3\\test',
     # 'train_set_path':'E:\\vscodeworkspace\\FaceRecognition\\train',
     # 'test_set_path':'E:\\vscodeworkspace\\FaceRecognition\\train',
     # 'train_set_path':'E:\\vscodeworkspace\\facedata\\data\\traindatahisted',
@@ -258,11 +258,11 @@ super_params = {
     'conv3_filter_num': 128,
     'conv4_filter_num': 128,
     'fc1_length': 1024,
-    'out_length': 7,
+    'out_length': 25,
     'keep_prob': 0.5,
     'batch_size': 128,
-    'epoch': 1,
-    'start_index': 0
+    'epoch': 200,
+    'start_index': 1
 }
 
-update_model(super_params, '', '', False, 'models/dth_model', 0)
+update_model(super_params, '', '', False, 'models/weibo_model', 0)

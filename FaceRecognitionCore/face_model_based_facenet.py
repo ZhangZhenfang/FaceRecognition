@@ -151,7 +151,7 @@ def update_model(super_params, url, id, flag, model_name, start_index):
                 log.append(test_info)
                 print(test_info)
                 saver.save(sess, './' + model_name + '/my-model', global_step=epoch)
-                if (train_accuracy > 0.99) & (train_loss < 0.1):
+                if ((total_loss / test_step) > 0.99) & ((total_accuracy / test_step) < 0.1):
                     break
         saver.save(sess, './' + model_name + '/my-model', global_step=epoch)
         write_log(log, './' + model_name + '/log.txt')
