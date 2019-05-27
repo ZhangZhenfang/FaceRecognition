@@ -5,6 +5,7 @@ import numpy as np
 import os
 from data_set import DataSet
 
+
 def define_model(x, super_params, keep_prob):
     def weight_variable(shape):
         initial = tf.truncated_normal(shape, stddev=0.1)
@@ -108,9 +109,6 @@ def define_model(x, super_params, keep_prob):
 
 
 def update_model(super_params, url, id, flag, model_name, start_index):
-
-    # loader = tf.train.Saver(var_list=[var for var in tf.trainable_variables() if not var.name.startswith("fc2")],
-    #                                max_to_keep=4)
     ckpt = tf.train.get_checkpoint_state('./' + model_name + '/')
     out = 0
     if ckpt:
@@ -145,6 +143,8 @@ def update_model(super_params, url, id, flag, model_name, start_index):
 
     tf.add_to_collection("predict", y_fc2)
 
+    train_set = DataSet(super_params['train_set_path'], super_params['start_index'], (128, 128, 3), super_params['batch_size'])
+    test_set = DataSet(super_params['test_set_path'], super_params['start_index'], (128, 128, 3), super_params['batch_size'])
     with tf.Session() as sess:
         writer = tf.summary.FileWriter('logs', sess.graph) #将训练日志写入到logs文件夹下
         train_accuracy_scalar = tf.summary.scalar('train_accuracy', accuracy)
@@ -154,67 +154,88 @@ def update_model(super_params, url, id, flag, model_name, start_index):
         sess.run(tf.global_variables_initializer())
         if out != super_params['out_length']:
             loader = tf.train.Saver(var_list=[var for var in tf.trainable_variables() if not var.name.startswith("fc2")],
-                               max_to_keep=4)
+                               max_to_keep=2)
         else:
             loader = tf.train.Saver(var_list=[var for var in tf.trainable_variables()],
-                               max_to_keep=4)
+                               max_to_keep=2)
         print(ckpt)
         if ckpt:
             if os.path.exists(ckpt.model_checkpoint_path + '.meta'):
                 print("restore")
                 loader.restore(sess, ckpt.model_checkpoint_path)
                 print('restored')
-        # X, Y = data_set.read_data_set(super_params['train_set_path'], input_height, input_width, input_chaneel,
-        #                               super_params['out_length'], start_index)
         print('traindata loaded')
 
-        batch_size = super_params['batch_size']
         saver = tf.train.Saver(max_to_keep=2)
-        train_set = DataSet(super_params['train_set_path'], super_params['start_index'], (128, 128, 3), batch_size)
-        test_set = DataSet(super_params['test_set_path'], super_params['start_index'], (128, 128, 3), 500)
-        for epoch in range(int(super_params['epoch'])):
+
+        for epoch in range(super_params['epoch']):
             train_set.reset()
             test_set.reset()
             step = 0
-            train_accuracy = 0
             train_loss = 0
+            train_accuracy = 0
             while train_set.is_end():
                 input_x, input_y = train_set.next_bath()
-                # input_y = tf.one_hot(input_y, depth=super_params['out_length'])
                 input_y = input_y.astype(int)
-                input_y = np.eye(int(super_params['out_length']))[input_y]
-                train_accuracy = accuracy.eval(feed_dict={x: input_x, y_: input_y, keep_prob: super_params['keep_prob']})
-                train_loss = cross_entropy_loss.eval(feed_dict={x: input_x, y_: input_y, keep_prob: super_params['keep_prob']})
-                train_accuracy_, train_loss_ = sess.run([train_accuracy_scalar, train_loss_scalar],
-                                                    feed_dict={x: input_x, y_: input_y, keep_prob: super_params['keep_prob']})
-                train_step.run(feed_dict={x: input_x, y_: input_y, keep_prob: super_params['keep_prob']})
-                step_info = "epoch:{} step:{} loss:{:.5f} train_accuracy:{:.5f}".format(epoch, step, train_loss, train_accuracy)
+                input_y = np.eye(super_params['out_length'])[input_y]
+                feed_dict = {x: input_x,
+                             y_: input_y,
+                             keep_prob: super_params['keep_prob']}
+                train_accuracy = accuracy.eval(feed_dict=feed_dict)
+                train_loss = cross_entropy_loss.eval(feed_dict=feed_dict)
+                train_step.run(feed_dict=feed_dict)
+                step_info = "epoch:{} step:{} loss: {:.5f} train_accuracy:{:.5f}".format(epoch,
+                                                                                         step,
+                                                                                         train_loss,
+                                                                                         train_accuracy)
                 step += 1
                 print(step_info)
                 log.append(step_info)
+                if flag:
+                    status_handler.handleTrainStep(url, id, step_info)
+                accuracy_scalar, loss_scalar = sess.run([train_accuracy_scalar, train_loss_scalar],
+                                                    feed_dict={x: input_x, y_: input_y, keep_prob: 0.5})
+                writer.add_summary(accuracy_scalar, epoch)
+                writer.add_summary(loss_scalar, epoch)
 
-            writer.add_summary(train_accuracy_, epoch)
-            writer.add_summary(train_loss_, epoch)
-
-            if flag:
-                status_handler.handleTrainStep(url, id, step_info)
-            log.append(step_info)
-            print(step_info)
             if epoch % 5 == 0:
-                test_x, test_y = test_set.next_bath()
-                test_y = test_y.astype(int)
-                test_y = np.eye(int(super_params['out_length']))[test_y]
-                test_accuracy = accuracy.eval(feed_dict={x: test_x, y_: test_y, keep_prob: super_params['keep_prob']})
-                test_loss = cross_entropy_loss.eval(feed_dict={x: test_x, y_: test_y, keep_prob: super_params['keep_prob']})
-                # test_accuracy, test_loss = sess.run([train_accuracy_scalar, train_loss_scalar],
-                #                                     feed_dict={x: test_x, y_: test_y, keep_prob: super_params['keep_prob']})
-                step_info = "TEST == epoch:{} loss:{:.5f} train_accuracy:{:.5f}".format(epoch, test_loss, test_accuracy)
-                print(step_info)
+                total_accuracy = 0
+                total_loss = 0
+                test_step = 0
+                while test_set.is_end():
+                    test_x, test_y = test_set.next_bath()
+                    test_y = test_y.astype(int)
+                    test_y = np.eye(super_params['out_length'])[test_y]
+                    feed_dict = {x: test_x,
+                                 y_: test_y,
+                                 keep_prob: super_params['keep_prob']}
+
+                    test_accuracy = accuracy.eval(feed_dict=feed_dict)
+                    test_loss = cross_entropy_loss.eval(feed_dict=feed_dict)
+                    total_accuracy += test_accuracy
+                    total_loss += test_loss
+                    test_step += 1
+                test_info = "TEST: epoch:{} loss: {:.5f} test_accuracy:{:.5f}".format(epoch,
+                                                                                      total_loss / test_step,
+                                                                                      total_accuracy / test_step)
+                log.append(test_info)
+                print(test_info)
                 saver.save(sess, './' + model_name + '/my-model', global_step=epoch)
-                if (test_accuracy > 0.98) & (test_loss < 0.01) :
+                if (train_accuracy > 0.99) & (train_loss < 0.1):
                     break
         saver.save(sess, './' + model_name + '/my-model', global_step=epoch)
-    return log
+        write_log(log, './' + model_name + '/log.txt')
+        return log
+
+
+def write_log(log, path):
+    if os.path.exists(path):
+        os.remove(path)
+    fp = open(path, 'a')
+    for l in log:
+        fp.write(str(l) + "\n")
+    fp.close()
+
 
 super_params = {
     'train_set_path':'E:\\facedata\\dataset1\\train',
@@ -240,7 +261,7 @@ super_params = {
     'out_length': 7,
     'keep_prob': 0.5,
     'batch_size': 128,
-    'epoch': 100,
+    'epoch': 1,
     'start_index': 0
 }
 
