@@ -27,7 +27,6 @@ def resize2(src_dir, height, width):
             img = cv2.resize(img, (height, width))
             cv2.imwrite(src_dir + "/" + file, img)
 
-
 # img = cv2.imread("6_81.bmp")
 # if img.shape[0] != 160:
 #     img = cv2.resize(img, (160, 160))

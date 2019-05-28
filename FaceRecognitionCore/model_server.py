@@ -4,20 +4,20 @@ from flask import Flask, request
 from gevent import pywsgi
 from font_util import FontUtil
 import base64
-# import face_model
-import face_model_based_facenet as face_model
+from facenet_embeddings import Embedding
+import fc_net as face_model
 monkey.patch_all()
 os.environ["CUDA_VISIBLE_DEVICES"] = "" #不使用GPU
 
 
 app = Flask(__name__)
+app.embedding = Embedding()
 app.config['JSON_AS_ASCII'] = False
-
+app.src_path = 'E:/vscodeworkspace/FaceRecognition/train'
+app.npy_path = 'E:/vscodeworkspace/FaceRecognition/trainnpy'
 super_params = {
     'train_set_path':'E:/vscodeworkspace/FaceRecognition/train',
     'test_set_path':'E:/vscodeworkspace/FaceRecognition/train',
-    # 'train_set_path':'C:/Users/Administrator/Desktop/facedata/train',
-    # 'test_set_path':'C:/Users/Administrator/Desktop/facedata/train',
     'input_height': 160,
     'input_width': 160,
     'input_channel': 3,
@@ -38,11 +38,6 @@ super_params = {
 }
 
 
-@app.route('/')
-def index():
-    return 'Hello World'
-
-
 @app.route('/hello')
 def response_request():
     return "hi"
@@ -59,8 +54,18 @@ def update():
     id = request.form.get('id')
     out_length = request.form.get('out_length')
     super_params['out_length'] = int(out_length)
-    # version, log = model.update(url, id)
-    log = face_model.update_model(super_params, url, id, flag, 'models/model1', 1)
+    src_path = app.src_path
+    npy_path = app.npy_path
+    if os.path.exists(npy_path):
+        for f in os.listdir(npy_path):
+            if os.path.exists(npy_path + "/" + f):
+                os.remove(npy_path + "/" + f)
+    else:
+        os.makedirs(npy_path)
+    app.embedding.embedding(src_path, npy_path)
+    super_params['train_set_path'] = npy_path
+    super_params['test_set_path'] = npy_path
+    log = face_model.update_model(super_params, url, id, flag, 'models/facenet_based_face_model_fc', 1)
     return "{}={}={}={}".format("success", id, 'tmp', log)
 
 

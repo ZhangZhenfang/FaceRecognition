@@ -1,11 +1,8 @@
 import tensorflow as tf
-import numpy as np
-import facenet
-from data_set import DataSet
 import os
+from data_set import DataSetFromNpy
 import status_handler
-image_size = 160
-model_dir = './models/20170512-110547/20170512-110547.pb'
+import numpy as np
 
 
 def weight_variable(shape, trainable):
@@ -18,17 +15,14 @@ def bias_variable(shape, trainable):
     return tf.Variable(initial, name="b", trainable=trainable)
 
 
-def define(out_length, keep_prob):
-    tf.Graph().as_default()
-    facenet.load_model(model_dir)
-    embeddings = tf.get_default_graph().get_tensor_by_name("embeddings:0")
+def define(x, out_length, keep_prob):
 
     # 定义全连接层1
     with tf.variable_scope("fc1"):
         fc1_length = 1024
         weights = weight_variable([128, fc1_length], True)
         biases = bias_variable([fc1_length], True)
-        fc1 = tf.nn.relu(tf.matmul(embeddings, weights) + biases)
+        fc1 = tf.nn.relu(tf.matmul(x, weights) + biases)
         fc1_drop = tf.nn.dropout(fc1, keep_prob)
     # 定义全连接层2
     with tf.variable_scope("fc2"):
@@ -54,11 +48,10 @@ def update_model(super_params, url, id, flag, model_name, start_index):
     # 每次训练重置Graph
     tf.reset_default_graph()
     log = []
+    x = tf.placeholder(tf.float32, shape=[None, 128], name="x")
     y_ = tf.placeholder(tf.float32, shape=[None, super_params['out_length']], name="y_")
     keep_prob = tf.placeholder(tf.float32, name='keep_prob')
-    out = define(super_params['out_length'], keep_prob)
-    images_placeholder = tf.get_default_graph().get_tensor_by_name("input:0")
-    phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")
+    out = define(x, super_params['out_length'], keep_prob)
     # 计算训练数据的正确率
     correct_prediction = tf.equal(tf.argmax(out, 1), tf.argmax(y_, 1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32), name='accuracy')
@@ -74,13 +67,13 @@ def update_model(super_params, url, id, flag, model_name, start_index):
                                         epsilon=1e-08).minimize(cross_entropy_loss)
 
     saver = tf.train.Saver(max_to_keep=2)
-    train_set = DataSet(super_params['train_set_path'],
+    train_set = DataSetFromNpy(super_params['train_set_path'],
                         1,
-                        (super_params['input_width'], super_params['input_height'], 3),
+                        (128,),
                         super_params['batch_size'])
-    test_set = DataSet(super_params['test_set_path'],
+    test_set = DataSetFromNpy(super_params['test_set_path'],
                        1,
-                       (super_params['input_width'], super_params['input_height'], 3),
+                       (128,),
                        super_params['batch_size'])
     tf.add_to_collection("predict", out)
     with tf.Session() as sess:
@@ -110,10 +103,9 @@ def update_model(super_params, url, id, flag, model_name, start_index):
                 input_x, input_y, _ = train_set.next_bath()
                 input_y = input_y.astype(int)
                 input_y = np.eye(super_params['out_length'])[input_y]
-                feed_dict = {images_placeholder: input_x,
+                feed_dict = {x: input_x,
                              y_: input_y,
-                             keep_prob: super_params['keep_prob'],
-                             phase_train_placeholder: False}
+                             keep_prob: super_params['keep_prob'],}
                 train_accuracy = accuracy.eval(feed_dict=feed_dict)
                 train_loss = cross_entropy_loss.eval(feed_dict=feed_dict)
                 train_step.run(feed_dict=feed_dict)
@@ -135,10 +127,9 @@ def update_model(super_params, url, id, flag, model_name, start_index):
                     test_x, test_y, _ = test_set.next_bath()
                     test_y = test_y.astype(int)
                     test_y = np.eye(super_params['out_length'])[test_y]
-                    feed_dict = {images_placeholder: test_x,
+                    feed_dict = {x: test_x,
                                  y_: test_y,
-                                 keep_prob: super_params['keep_prob'],
-                                 phase_train_placeholder: False}
+                                 keep_prob: super_params['keep_prob'],}
 
                     test_accuracy = accuracy.eval(feed_dict=feed_dict)
                     test_loss = cross_entropy_loss.eval(feed_dict=feed_dict)
@@ -151,7 +142,7 @@ def update_model(super_params, url, id, flag, model_name, start_index):
                 log.append(test_info)
                 print(test_info)
                 saver.save(sess, './' + model_name + '/my-model', global_step=epoch)
-                if ((total_loss / test_step) > 0.99) & ((total_accuracy / test_step) < 0.1):
+                if (total_accuracy / test_step > 0.99) & (total_loss / test_step < 0.1):
                     break
         saver.save(sess, './' + model_name + '/my-model', global_step=epoch)
         write_log(log, './' + model_name + '/log.txt')
@@ -170,8 +161,8 @@ def write_log(log, path):
 # super_params = {
 #     # 'train_set_path':'E:\\facedata\\dataset3\\train',
 #     # 'test_set_path':'E:\\facedata\\dataset3\\test',
-#     'train_set_path':'E:\\vscodeworkspace\\FaceRecognition\\train',
-#     'test_set_path':'E:\\vscodeworkspace\\FaceRecognition\\train',
+#     'train_set_path':'E:\\vscodeworkspace\\FaceRecognition\\trainnpy',
+#     'test_set_path':'E:\\vscodeworkspace\\FaceRecognition\\trainnpy',
 #     # 'train_set_path':'E:\\vscodeworkspace\\facedata\\data\\traindatahisted',
 #     # 'test_set_path':'E:\\vscodeworkspace\\facedata\\data\\testdatahisted',
 #     # 'train_set_path':'C:/Users/Administrator/Desktop/facedata/train',
@@ -194,5 +185,4 @@ def write_log(log, path):
 #     'epoch': 50,
 #     'start_index': 1
 # }
-# update_model(super_params, '', '', False, 'models/facenet_based_face_model', 0)
-#
+# update_model(super_params, '', '', False, 'models/facenet_based_face_model_fc', 0)

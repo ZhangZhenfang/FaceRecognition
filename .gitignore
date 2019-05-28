@@ -10,9 +10,10 @@ HELP.md
 .settings
 .springBeans
 .sts4-cache
-
+/trainnpy/
 ### IntelliJ IDEA ###
 /FaceRecognitionApi/.idea
+/FaceRecognitionApi/log*
 /FaceRecognitionApi/*.iws
 /FaceRecognitionApi/*.iml
 /FaceRecognitionApi/*.ipr
