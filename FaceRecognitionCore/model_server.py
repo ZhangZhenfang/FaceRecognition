@@ -56,12 +56,13 @@ def update():
     super_params['out_length'] = int(out_length)
     src_path = app.src_path
     npy_path = app.npy_path
-    if os.path.exists(npy_path):
-        for f in os.listdir(npy_path):
-            if os.path.exists(npy_path + "/" + f):
-                os.remove(npy_path + "/" + f)
-    else:
-        os.makedirs(npy_path)
+    # if os.path.exists(npy_path):
+    #
+    #     # for f in os.listdir(npy_path):
+    #     #     if os.path.exists(npy_path + "/" + f):
+    #     #         os.remove(npy_path + "/" + f)
+    # else:
+    #     os.makedirs(npy_path)
     app.embedding.embedding(src_path, npy_path)
     super_params['train_set_path'] = npy_path
     super_params['test_set_path'] = npy_path

@@ -38,7 +38,7 @@ def predict():
     pred = app.model.predict(X, 1.0)
     pred_soft_max = app.model.sess.run(app.model.tf.nn.softmax(pred))
     pred_max = app.model.sess.run(app.model.tf.argmax(pred_soft_max, 1))
-    # print("{}:{}\n{}:{}".format('max', pred, 'softmax', pred_soft_max))
+    print("{}:{}\n{}:{}".format('max', pred, 'softmax', pred_soft_max))
     index_i = 0
     p = np.empty(len(pred_max))
     for i in pred:

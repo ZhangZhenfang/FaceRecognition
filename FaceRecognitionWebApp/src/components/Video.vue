@@ -14,7 +14,7 @@
         </div>
       </el-tab-pane>
       <el-tab-pane label="自动拍照">
-        每隔500ms自动拍照上传一次<br>
+        每隔500ms自动拍照一次<br>
         <el-button @click="autoSnap" v-bind:disabled="autosnapvisiable">开始</el-button>
       </el-tab-pane>
     </el-tabs>

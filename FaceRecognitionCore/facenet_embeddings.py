@@ -1,8 +1,9 @@
 import tensorflow as tf
 import facenet
 import time
-from data_set import DataSet
+from data_set import DataSetFromNameList
 import numpy as np
+import os
 model_dir = './models/20170512-110547/20170512-110547.pb'
 
 
@@ -22,15 +23,33 @@ class Embedding:
         return e
 
     def embedding(self, src_path, npy_path):
-        data = DataSet(src_path, 1, (160, 160, 3), 100)
-        print(data.size)
+        e = Embedding()
+        src = os.listdir(src_path)
+        src_npy = []
+        for i in src:
+            src_npy.append(i + ".npy")
+        npy = os.listdir(npy_path)
+        sub = set(npy) - set(src_npy)
+        for i in sub:
+            os.remove(npy_path + "/" + i)
+        sub = set(src_npy) - set(npy)
+        list_to_encode = []
+        for i in sub:
+            list_to_encode.append(i[0:i.index(".npy")])
+        # print(list_to_encode)
+        data = DataSetFromNameList(src_path, list_to_encode, 1, (160, 160, 3), 100)
+        # print(data.size)
         while data.is_end():
             x, y, names = data.next_bath()
-            es = self.get_embeddings(x)
+            es = e.get_embeddings(x)
             i = 0
             for name in names:
                 np.save(npy_path + "/" + name + ".npy", es[i])
                 i += 1
+# src_path = 'E:/vscodeworkspace/FaceRecognition/train'
+# npy_path = 'E:/vscodeworkspace/FaceRecognition/trainnpy'
+# embedding(src_path, npy_path)
+
 # data = DataSet("E:\\vscodeworkspace\\FaceRecognition\\train", 1, (160, 160, 3), 3)
 # x, y = data.next_bath()
 #

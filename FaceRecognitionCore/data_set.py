@@ -69,6 +69,71 @@ class DataSet:
         np.random.shuffle(self.set_names)
 
 
+class DataSetFromNameList:
+    def __init__(self, src, names, start_index, image_shape, batch_size):
+        self.start_index = start_index
+        self.src = src
+        self.batch_size = batch_size
+        self.set_names = names # os.listdir(src)
+        self.size = len(self.set_names)
+        self.image_shape = image_shape
+        self.index = 0
+        np.random.shuffle(self.set_names)
+
+    def next_bath(self):
+        if self.batch_size == 0:
+            return None
+        if self.index < len(self.set_names):
+            if self.index + self.batch_size <= len(self.set_names):
+                batch_x = np.empty((self.batch_size,) + self.image_shape)
+                batch_y = np.empty(self.batch_size)
+            else:
+                batch_x = np.empty((len(self.set_names) - self.index,) + self.image_shape)
+                batch_y = np.empty(len(self.set_names) - self.index)
+            names = self.set_names[self.index:self.index + self.batch_size]
+            self.read(names, batch_x, batch_y)
+            self.index += self.batch_size
+            return batch_x, batch_y, names
+        else:
+            return None
+
+    def read(self, names, batch_x, batch_y):
+        # print(names)
+        # i = 0
+        # for name in names:
+        #     image_open = Image.open(self.src + "/" + name)
+        #     if image_open.mode == "L" :
+        #         image_open = image_open.convert("RGB")
+        #     array = np.array(image_open) / 255
+        #     batch_x[i] = array
+        #     end = name.index("_")
+        #     batch_y[i] = int(int(name[0:end]) - self.start_index)
+        #     i += 1
+        i = 0
+        for name in names:
+            imread = cv2.imread(self.src + "/" + name)
+            # imread = cv2.cvtColor(imread, cv2.COLOR_BGR2GRAY)
+            imread = imread / 255.
+            imread = cv2.resize(imread, self.image_shape[0:2])
+            batch_x[i] = imread
+            # image_open = Image.open(self.src + "/" + name)
+            # if image_open.mode == "L" :
+            #     image_open = image_open.convert("RGB")
+            #     image_open = image_open.resize(self.image_shape)
+            # array = np.array(image_open) / 255
+            # batch_x[i] = array
+            end = name.index("_")
+            batch_y[i] = int(int(name[0:end]) - self.start_index)
+            i += 1
+
+    def is_end(self):
+        return self.index < len(self.set_names)
+
+    def reset(self):
+        self.index = 0
+        np.random.shuffle(self.set_names)
+
+
 class DataSetFromNpy:
     def __init__(self, src, start_index, image_shape, batch_size):
         self.start_index = start_index
