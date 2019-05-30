@@ -43,7 +43,7 @@ def predict():
     p = np.empty(len(pred_max))
     for i in pred:
         p[index_i] = pred_soft_max[index_i][pred_max[index_i]]
-        if pred_soft_max[index_i][pred_max[index_i]] < 0.7:
+        if pred_soft_max[index_i][pred_max[index_i]] < 0.8:
             pred_max[index_i] = -1
         index_i += 1
     return "{}, {}".format(pred_max, p)
