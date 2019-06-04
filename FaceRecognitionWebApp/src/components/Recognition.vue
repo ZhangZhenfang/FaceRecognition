@@ -37,7 +37,7 @@ export default {
         this.video.srcObject = this.stream
         this.video.play()
         this.stop = false
-        setTimeout(this.snapAndUpload, 200)
+        setTimeout(this.snapAndUpload, 10)
       })
     },
     handleCloseVideo (done) {
@@ -57,7 +57,7 @@ export default {
       this.axios.post(urls.api + '/model/detectPlus', formData).then(response => {
         if (!this.stop) {
           this.img.src = 'data:image/jpg;base64,' + response.data
-          setTimeout(this.snapAndUpload, 100)
+          setTimeout(this.snapAndUpload, 10)
         }
       })
     },

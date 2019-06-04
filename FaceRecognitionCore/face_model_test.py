@@ -33,7 +33,7 @@ def define_model(x, super_params, keep_prob):
         input_channel = super_params['input_channel']
         weights1_1 = weight_variable([size, size, input_channel, num])
         biases1_1 = bias_variable([num])
-        conv1_1 = tf.nn.relu(conv2d(x, weights1_1) + biases1_1)
+        conv1_1 = tf.nn.relu(tf.layers.batch_normalization(conv2d(x, weights1_1) + biases1_1))
 
         # input_channel = num
         # weights1_2 = weight_variable([size, size, input_channel, num])
@@ -49,7 +49,7 @@ def define_model(x, super_params, keep_prob):
         input_channel = super_params['conv1_filter_num']
         weights2_1 = weight_variable([size, size, input_channel, num])
         biases2_1 = bias_variable([num])
-        conv2_1 = tf.nn.relu(conv2d(pool1, weights2_1) + biases2_1)
+        conv2_1 = tf.nn.relu(tf.layers.batch_normalization(conv2d(pool1, weights2_1) + biases2_1))
 
         # input_channel = num
         # weights2_2 = weight_variable([size, size, input_channel, num])
@@ -65,7 +65,8 @@ def define_model(x, super_params, keep_prob):
         input_channel = super_params['conv2_filter_num']
         weights3_1 = weight_variable([size, size, input_channel, num])
         biases3_1 = bias_variable([num])
-        conv3_1 = tf.nn.relu(conv2d(pool2, weights3_1) + biases3_1)
+        tf.nn.batch_normalization
+        conv3_1 = tf.nn.relu(tf.layers.batch_normalization(conv2d(pool2, weights3_1) + biases3_1))
 
         # input_channel = num
         # weights3_2 = weight_variable([size, size, input_channel, num])
@@ -96,7 +97,7 @@ def define_model(x, super_params, keep_prob):
         weights = weight_variable([conv_out_height * conv_out_width * input_channel, fc1_length]) # [-1,1024]
         biases = bias_variable([fc1_length])
         fc1_flat = tf.reshape(pool3, [-1, conv_out_height * conv_out_width * input_channel])
-        fc1 = tf.nn.relu(tf.matmul(fc1_flat, weights) + biases)
+        fc1 = tf.nn.relu(tf.layers.batch_normalization(tf.matmul(fc1_flat, weights) + biases))
         fc1_drop = tf.nn.dropout(fc1, keep_prob)
     # 定义全连接层1
     with tf.variable_scope("fc2"):
@@ -175,7 +176,7 @@ def update_model(super_params, url, id, flag, model_name, start_index):
             train_loss = 0
             train_accuracy = 0
             while train_set.is_end():
-                input_x, input_y = train_set.next_bath()
+                input_x, input_y, _ = train_set.next_bath()
                 input_y = input_y.astype(int)
                 input_y = np.eye(super_params['out_length'])[input_y]
                 feed_dict = {x: input_x,
@@ -203,7 +204,7 @@ def update_model(super_params, url, id, flag, model_name, start_index):
                 total_loss = 0
                 test_step = 0
                 while test_set.is_end():
-                    test_x, test_y = test_set.next_bath()
+                    test_x, test_y, _ = test_set.next_bath()
                     test_y = test_y.astype(int)
                     test_y = np.eye(super_params['out_length'])[test_y]
                     feed_dict = {x: test_x,
@@ -221,7 +222,7 @@ def update_model(super_params, url, id, flag, model_name, start_index):
                 log.append(test_info)
                 print(test_info)
                 saver.save(sess, './' + model_name + '/my-model', global_step=epoch)
-                if ((total_loss / test_step) > 0.99) & ((total_accuracy / test_step) < 0.1):
+                if ((total_loss / test_step) < 0.01) & ((total_accuracy / test_step) > 0.99):
                     break
         saver.save(sess, './' + model_name + '/my-model', global_step=epoch)
         write_log(log, './' + model_name + '/log.txt')

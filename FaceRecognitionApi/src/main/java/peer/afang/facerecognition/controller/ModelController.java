@@ -142,9 +142,9 @@ public class ModelController {
             for (Rect rect : rects) {
                 User byId = userService.getById(Integer.parseInt(split[i++]) + 1);
                 HashMap<String, String> p = new HashMap<>();
-//                p.put("text", byId == null ? "未知" : byId.getUsername());
-                p.put("text", byId == null ? "未知" : byId.getUsername() + ps[i - 1]);
-                String post = HttpClientUtil.get(urls.getFace() + "/text2Mat", p);
+                p.put("text", byId == null ? "未知" : byId.getUsername());
+//                p.put("text", byId == null ? "未知" : byId.getUsername() + ps[i - 1]);
+                String post = HttpClientUtil.get(urls.getText2Mat() + "/text2Mat", p);
                 if (post != null && post.length() > 3) {
                     byte[] decode = java.util.Base64.getDecoder().decode(post.substring(2, post.length() - 1));
                     Mat mat = Imgcodecs.imdecode(new MatOfByte(decode), Imgcodecs.CV_LOAD_IMAGE_UNCHANGED);

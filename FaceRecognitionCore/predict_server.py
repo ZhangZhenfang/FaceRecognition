@@ -3,8 +3,6 @@ from gevent import monkey
 from flask import Flask, request
 from gevent import pywsgi
 import data_set
-from font_util import FontUtil
-import base64
 import numpy as np
 from face_model_based_facenet_and_fcnet import ModelBasedFaceNetAndFcNet
 
@@ -30,6 +28,7 @@ def restore():
 
 @app.route('/predict', methods=['POST'])
 def predict():
+    print('12585')
     images = request.files.getlist('data')
     height = int(request.form.get('height'))
     width = int(request.form.get('width'))
@@ -43,20 +42,10 @@ def predict():
     p = np.empty(len(pred_max))
     for i in pred:
         p[index_i] = pred_soft_max[index_i][pred_max[index_i]]
-        if pred_soft_max[index_i][pred_max[index_i]] < 0.8:
+        if pred_soft_max[index_i][pred_max[index_i]] < 0.9:
             pred_max[index_i] = -1
         index_i += 1
     return "{}, {}".format(pred_max, p)
-
-
-@app.route('/text2Mat', methods=['GET'])
-def text_2_mat():
-    t = request.args.get("text")
-    mat = FontUtil.text2Mat(t, 15, len(t) * 12, 12)
-    mat.save("./tmp.bmp")
-    with open("./tmp.bmp", 'rb') as f:
-        encode = base64.b64encode(f.read())
-    return str(encode)
 
 
 if __name__ == "__main__":

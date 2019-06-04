@@ -142,7 +142,7 @@ def update_model(super_params, url, id, flag, model_name, start_index):
             train_loss = 0
             train_accuracy = 0
             while train_set.is_end():
-                input_x, input_y = train_set.next_bath()
+                input_x, input_y, _ = train_set.next_bath()
                 input_y = input_y.astype(int)
                 input_y = np.eye(super_params['out_length'])[input_y]
                 feed_dict = {x: input_x,
@@ -170,7 +170,7 @@ def update_model(super_params, url, id, flag, model_name, start_index):
                 total_loss = 0
                 test_step = 0
                 while test_set.is_end():
-                    test_x, test_y = test_set.next_bath()
+                    test_x, test_y, _ = test_set.next_bath()
                     test_y = test_y.astype(int)
                     test_y = np.eye(super_params['out_length'])[test_y]
                     feed_dict = {x: test_x,
@@ -188,7 +188,7 @@ def update_model(super_params, url, id, flag, model_name, start_index):
                 log.append(test_info)
                 print(test_info)
                 saver.save(sess, './' + model_name + '/my-model', global_step=epoch)
-                if ((total_loss / test_step) > 0.99) & ((total_accuracy / test_step) < 0.1):
+                if ((total_loss / test_step) < 0.01) & ((total_accuracy / test_step) > 0.99):
                     break
         saver.save(sess, './' + model_name + '/my-model', global_step=epoch)
         write_log(log, './' + model_name + '/log.txt')
