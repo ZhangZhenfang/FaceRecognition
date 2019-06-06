@@ -37,7 +37,7 @@ export default {
         this.video.srcObject = this.stream
         this.video.play()
         this.stop = false
-        setTimeout(this.snapAndUpload, 10)
+        setTimeout(this.snapAndUpload, 50)
       })
     },
     handleCloseVideo (done) {
@@ -52,7 +52,7 @@ export default {
       var file = this.takecapture()
       this.currentPic = file
       var formData = new FormData()
-      console.log(file)
+      // console.log(file)
       formData.append('data', file)
       this.axios.post(urls.api + '/model/detectPlus', formData).then(response => {
         if (!this.stop) {
