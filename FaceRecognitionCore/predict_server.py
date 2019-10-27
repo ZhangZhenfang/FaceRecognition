@@ -14,8 +14,8 @@ app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 
 app.model = ModelBasedFaceNetAndFcNet(
-    'D:/FaceRecognition/FaceRecognitionCore/models/20170512-110547/20170512-110547.pb',
-    "D:/FaceRecognition/FaceRecognitionCore/models/facenet_based_face_model_fc/")
+    'E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/models/20170512-110547/20170512-110547.pb',
+    "E:/vscodeworkspace/FaceRecognition/FaceRecognitionCore/models/facenet_based_face_model_fc/")
 
 
 @app.route('/hello')
@@ -38,17 +38,18 @@ def predict():
     channel = int(request.form.get('channel'))
     X, Y = data_set.read_data(images, height, width, channel, 0)
     start = time.clock()
-    pred, pred_soft_max, pred_max = app.model.predict(X, 1.0)
-    # print("{}:{}\n{}:{}".format('max', pred, 'softmax', pred_soft_max))
+    pred, pred_soft_max, pred_max = app.model.predict(X, 0.8)
+    print("out:{}\nsoftmax:{}\nargmax:{}".format(pred, pred_soft_max, pred_max))
     index_i = 0
     p = np.empty(len(pred_max))
     for i in pred:
-        p[index_i] = pred[index_i][pred_max[index_i]]
-        if pred[index_i][pred_max[index_i]] < 0.9:
+        p[index_i] = pred_soft_max[index_i][pred_max[index_i]]
+        if pred_soft_max[index_i][pred_max[index_i]] < 0.9:
             pred_max[index_i] = -1
         index_i += 1
     end = time.clock()
     print(end - start)
+    print("{}, {}".format(pred_max, p))
     return "{}, {}".format(pred_max, p)
 
 

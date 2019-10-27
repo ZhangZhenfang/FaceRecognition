@@ -42,7 +42,7 @@ class ModelBasedFaceNetAndFcNet:
         print(time.clock() - start)
         out = self.sess.run(self.out, feed_dict={self.x: e, self.keep_prob: keep_prob})
         print(time.clock() - start)
-        return out, np.exp(out) / sum(np.exp(out)), np.argmax(out, axis=1)
+        return out, np.exp(out) / np.sum(np.exp(out), axis=1)[:, None], np.argmax(out, axis=1)
 
 
 # model = ModelBasedFaceNetAndFcNet('./models/20170512-110547/20170512-110547.pb',
