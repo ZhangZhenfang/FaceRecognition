@@ -61,3 +61,4 @@ userface/
 /FaceRecognitionWebApp/*.ntvs*
 /FaceRecognitionWebApp/*.njsproj
 /FaceRecognitionWebApp/*.sln
+FaceRecognitionCore/venv

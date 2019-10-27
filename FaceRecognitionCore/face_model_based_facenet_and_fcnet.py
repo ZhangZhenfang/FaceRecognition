@@ -1,5 +1,7 @@
 import tensorflow as tf
 import facenet
+import time
+import numpy as np
 
 
 class ModelBasedFaceNetAndFcNet:
@@ -35,11 +37,16 @@ class ModelBasedFaceNetAndFcNet:
         self.keep_prob = tf.get_default_graph().get_operation_by_name("keep_prob").outputs[0]
 
     def predict(self, x, keep_prob):
+        start = time.clock()
         e = self.sess.run(self.embeddings, feed_dict={self.input_x: x, self.phase_train_placeholder: False})
-        res = self.sess.run(self.out, feed_dict={self.x: e, self.keep_prob: keep_prob})
-        return res
+        print(time.clock() - start)
+        out = self.sess.run(self.out, feed_dict={self.x: e, self.keep_prob: keep_prob})
+        print(time.clock() - start)
+        return out, np.exp(out) / sum(np.exp(out)), np.argmax(out, axis=1)
 
-# model = ModelBasedFaceNetAndFcNet('./models/20170512-110547/20170512-110547.pb', "./models/facenet_based_face_model_fc/")
+
+# model = ModelBasedFaceNetAndFcNet('./models/20170512-110547/20170512-110547.pb',
+# "./models/facenet_based_face_model_fc/")
 # data = DataSet("E:\\vscodeworkspace\\FaceRecognition\\train",
 #                         1,
 #                         (160, 160, 3),

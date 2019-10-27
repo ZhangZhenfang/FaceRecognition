@@ -13,11 +13,11 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "" #不使用GPU
 app = Flask(__name__)
 app.embedding = Embedding()
 app.config['JSON_AS_ASCII'] = False
-app.src_path = 'E:/vscodeworkspace/FaceRecognition/train'
-app.npy_path = 'E:/vscodeworkspace/FaceRecognition/trainnpy'
+app.src_path = 'D:/FaceRecognition/train'
+app.npy_path = 'D:/FaceRecognition/trainnpy'
 super_params = {
-    'train_set_path':'E:/vscodeworkspace/FaceRecognition/train',
-    'test_set_path':'E:/vscodeworkspace/FaceRecognition/train',
+    'train_set_path':'D:/FaceRecognition/train',
+    'test_set_path':'D:/FaceRecognition/train',
     'input_height': 160,
     'input_width': 160,
     'input_channel': 3,
