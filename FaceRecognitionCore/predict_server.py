@@ -38,7 +38,7 @@ def predict():
     channel = int(request.form.get('channel'))
     X, Y = data_set.read_data(images, height, width, channel, 0)
     start = time.clock()
-    pred, pred_soft_max, pred_max = app.model.predict(X, 0.8)
+    pred, pred_soft_max, pred_max = app.model.predict(X, 1.0)
     print("out:{}\nsoftmax:{}\nargmax:{}".format(pred, pred_soft_max, pred_max))
     index_i = 0
     p = np.empty(len(pred_max))

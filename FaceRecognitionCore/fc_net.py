@@ -77,6 +77,10 @@ def update_model(super_params, url, id, flag, model_name, start_index):
                        super_params['batch_size'])
     tf.add_to_collection("predict", out)
     with tf.Session() as sess:
+        writer = tf.summary.FileWriter('logs', sess.graph) #将训练日志写入到logs文件夹下
+        train_accuracy_scalar = tf.summary.scalar('train_accuracy', accuracy)
+        train_loss_scalar = tf.summary.scalar('train_loss', cross_entropy_loss)
+
         ckpt = tf.train.get_checkpoint_state('./' + model_name + '/')
         sess.run(tf.global_variables_initializer())
         if out_length != super_params['out_length']:
@@ -118,6 +122,10 @@ def update_model(super_params, url, id, flag, model_name, start_index):
                 log.append(step_info)
                 if flag:
                     status_handler.handleTrainStep(url, id, step_info)
+                accuracy_scalar, loss_scalar = sess.run([train_accuracy_scalar, train_loss_scalar],
+                                                    feed_dict={x: input_x, y_: input_y, keep_prob: 0.5})
+                writer.add_summary(accuracy_scalar, epoch)
+                writer.add_summary(loss_scalar, epoch)
 
             if epoch % 5 == 0:
                 total_accuracy = 0

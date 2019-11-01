@@ -147,9 +147,9 @@ def update_model(super_params, url, id, flag, model_name, start_index):
     train_set = DataSet(super_params['train_set_path'], super_params['start_index'], (128, 128, 3), super_params['batch_size'])
     test_set = DataSet(super_params['test_set_path'], super_params['start_index'], (128, 128, 3), super_params['batch_size'])
     with tf.Session() as sess:
-        writer = tf.summary.FileWriter('logs', sess.graph) #将训练日志写入到logs文件夹下
-        train_accuracy_scalar = tf.summary.scalar('train_accuracy', accuracy)
-        train_loss_scalar = tf.summary.scalar('train_loss', cross_entropy_loss)
+        writer = tf.summary.FileWriter('logs/1', sess.graph) #将训练日志写入到logs文件夹下
+        train_accuracy_scalar = tf.summary.scalar('train_accuracy1', accuracy)
+        train_loss_scalar = tf.summary.scalar('train_loss1', cross_entropy_loss)
 
         ckpt = tf.train.get_checkpoint_state('./' + model_name + '/')
         sess.run(tf.global_variables_initializer())
@@ -239,10 +239,10 @@ def write_log(log, path):
 
 
 super_params = {
-    'train_set_path':'E:\\facedata\\dataset3\\train',
-    'test_set_path':'E:\\facedata\\dataset3\\test',
-    # 'train_set_path':'E:\\vscodeworkspace\\FaceRecognition\\train',
-    # 'test_set_path':'E:\\vscodeworkspace\\FaceRecognition\\train',
+    # 'train_set_path':'E:\\facedata\\dataset3\\train',
+    # 'test_set_path':'E:\\facedata\\dataset3\\test',
+    'train_set_path':'E:\\vscodeworkspace\\FaceRecognition\\train',
+    'test_set_path':'E:\\vscodeworkspace\\FaceRecognition\\train',
     # 'train_set_path':'E:\\vscodeworkspace\\facedata\\data\\traindatahisted',
     # 'test_set_path':'E:\\vscodeworkspace\\facedata\\data\\testdatahisted',
     # 'train_set_path':'C:/Users/Administrator/Desktop/facedata/train',
@@ -259,7 +259,7 @@ super_params = {
     'conv3_filter_num': 128,
     'conv4_filter_num': 128,
     'fc1_length': 1024,
-    'out_length': 25,
+    'out_length': 31,
     'keep_prob': 0.5,
     'batch_size': 128,
     'epoch': 200,

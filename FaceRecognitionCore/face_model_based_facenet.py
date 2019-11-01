@@ -84,6 +84,9 @@ def update_model(super_params, url, id, flag, model_name, start_index):
                        super_params['batch_size'])
     tf.add_to_collection("predict", out)
     with tf.Session() as sess:
+        writer = tf.summary.FileWriter('logs/2', sess.graph) #将训练日志写入到logs文件夹下
+        train_accuracy_scalar = tf.summary.scalar('train_accuracy', accuracy)
+        train_loss_scalar = tf.summary.scalar('train_loss', cross_entropy_loss)
         ckpt = tf.train.get_checkpoint_state('./' + model_name + '/')
         sess.run(tf.global_variables_initializer())
         if out_length != super_params['out_length']:
@@ -126,6 +129,10 @@ def update_model(super_params, url, id, flag, model_name, start_index):
                 log.append(step_info)
                 if flag:
                     status_handler.handleTrainStep(url, id, step_info)
+                accuracy_scalar, loss_scalar = sess.run([train_accuracy_scalar, train_loss_scalar],
+                                                    feed_dict=feed_dict)
+                writer.add_summary(accuracy_scalar, epoch)
+                writer.add_summary(loss_scalar, epoch)
 
             if epoch % 5 == 0:
                 total_accuracy = 0
@@ -188,11 +195,11 @@ def write_log(log, path):
 #     'conv3_filter_num': 128,
 #     'conv4_filter_num': 128,
 #     'fc1_length': 1024,
-#     'out_length': 27,
+#     'out_length': 31,
 #     'keep_prob': 1.0,
 #     'batch_size': 128,
 #     'epoch': 50,
 #     'start_index': 1
 # }
 # update_model(super_params, '', '', False, 'models/facenet_based_face_model', 0)
-#
+
